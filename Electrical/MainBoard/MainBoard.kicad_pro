@@ -412,7 +412,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "MattTemplate.kicad_pro",
+    "filename": "MainBoard.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -501,6 +501,42 @@
     [
       "bd24c4db-4e36-4117-bd4f-5228ef241da9",
       ""
+    ],
+    [
+      "8ba935aa-d6da-451b-8954-3c3ef7086bfd",
+      "Power"
+    ],
+    [
+      "d4596efc-cbfe-411a-9b03-58f747019e1a",
+      "IMU"
+    ],
+    [
+      "d895d168-5c3b-4f65-b0f2-4d47b39f1a08",
+      "SPI_UART"
+    ],
+    [
+      "783fabe8-20be-46c9-9aa7-e8ec2689d507",
+      "LED"
+    ],
+    [
+      "41ea0116-63b8-412b-88a7-1e6a491b97c5",
+      "Buttons"
+    ],
+    [
+      "f45a9536-5513-41e8-a632-51113262766c",
+      "USB"
+    ],
+    [
+      "3be9d459-284b-4f8e-a3bf-b88a036c8948",
+      "Motor"
+    ],
+    [
+      "c568ceec-b7ac-45ca-9b64-1ad9e4a2513b",
+      "OtherSensors"
+    ],
+    [
+      "3efd4746-229a-4377-9033-64e7155c364f",
+      "GPS"
     ]
   ],
   "text_variables": {}

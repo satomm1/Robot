@@ -1,0 +1,20 @@
+(kicad_sch (version 20230121) (generator eeschema)
+
+  (uuid 93814c4f-d53f-4a7b-b8d0-81dff4848857)
+
+  (paper "B")
+
+  (title_block
+    (title "MCU Controller")
+    (rev "0.1")
+    (company "satomm@stanford.edu")
+    (comment 1 "Department of Civil and Environmental Engineering")
+    (comment 2 "Engineering Informatics Group")
+    (comment 3 "Stanford University")
+    (comment 4 "Matthew Sato")
+  )
+
+  (lib_symbols
+  )
+
+)

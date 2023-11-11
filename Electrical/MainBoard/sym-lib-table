@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "RobotLibary")(type "KiCad")(uri "${KIPRJMOD}/MainBoardModels/RobotLibary.kicad_sym")(options "")(descr ""))
+)
