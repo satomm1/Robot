@@ -2609,7 +2609,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R45") (unit 1)
+          (reference "R35") (unit 1)
         )
       )
     )
@@ -2640,7 +2640,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "C25") (unit 1)
+          (reference "C22") (unit 1)
         )
       )
     )
@@ -2649,7 +2649,7 @@
   (symbol (lib_id "power:Vdrive") (at 344.805 45.72 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 0ef1499e-6125-4cb2-a825-7dfe803d4ee6)
-    (property "Reference" "#PWR0156" (at 339.725 49.53 0)
+    (property "Reference" "#PWR0129" (at 339.725 49.53 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "Vdrive" (at 344.805 41.275 0)
@@ -2665,7 +2665,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0156") (unit 1)
+          (reference "#PWR0129") (unit 1)
         )
       )
     )
@@ -2726,7 +2726,7 @@
   (symbol (lib_id "power:GND") (at 294.64 181.61 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 1919b1ce-157a-4ecf-a2ac-dcc9899a2b83)
-    (property "Reference" "#PWR0145" (at 294.64 187.96 0)
+    (property "Reference" "#PWR0122" (at 294.64 187.96 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 294.64 186.055 0)
@@ -2742,7 +2742,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0145") (unit 1)
+          (reference "#PWR0122") (unit 1)
         )
       )
     )
@@ -2751,7 +2751,7 @@
   (symbol (lib_id "RobotLibary:Quadrature_Encoder") (at 274.32 210.82 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 19698f19-740d-4cea-a32c-5ee075b4748a)
-    (property "Reference" "U14" (at 274.0025 201.295 0)
+    (property "Reference" "U11" (at 274.0025 201.295 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "Quad_Encoder" (at 274.0025 203.835 0)
@@ -2791,7 +2791,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "U14") (unit 1)
+          (reference "U11") (unit 1)
         )
       )
     )
@@ -2843,7 +2843,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "C31") (unit 1)
+          (reference "C26") (unit 1)
         )
       )
     )
@@ -2895,7 +2895,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R36") (unit 1)
+          (reference "R26") (unit 1)
         )
       )
     )
@@ -2945,7 +2945,7 @@
           (reference "C5") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "C29") (unit 1)
+          (reference "C28") (unit 1)
         )
       )
     )
@@ -2997,7 +2997,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "C26") (unit 1)
+          (reference "C23") (unit 1)
         )
       )
     )
@@ -3028,7 +3028,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R32") (unit 1)
+          (reference "R22") (unit 1)
         )
       )
     )
@@ -3080,7 +3080,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "C32") (unit 1)
+          (reference "C29") (unit 1)
         )
       )
     )
@@ -3132,7 +3132,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R30") (unit 1)
+          (reference "R20") (unit 1)
         )
       )
     )
@@ -3184,7 +3184,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R29") (unit 1)
+          (reference "R19") (unit 1)
         )
       )
     )
@@ -3263,7 +3263,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "U15") (unit 1)
+          (reference "U13") (unit 1)
         )
       )
     )
@@ -3272,7 +3272,7 @@
   (symbol (lib_id "power:GND") (at 290.195 212.09 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 5ca28939-d270-463f-a9c9-1cc9cd49d199)
-    (property "Reference" "#PWR0148" (at 290.195 218.44 0)
+    (property "Reference" "#PWR0120" (at 290.195 218.44 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 290.195 216.535 0)
@@ -3288,7 +3288,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0148") (unit 1)
+          (reference "#PWR0120") (unit 1)
         )
       )
     )
@@ -3318,7 +3318,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0131") (unit 1)
+          (reference "#PWR0104") (unit 1)
         )
       )
     )
@@ -3327,7 +3327,7 @@
   (symbol (lib_id "power:Vdrive") (at 345.44 64.135 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 661de253-8257-4305-9c7d-232fba086f73)
-    (property "Reference" "#PWR0158" (at 340.36 67.945 0)
+    (property "Reference" "#PWR0131" (at 340.36 67.945 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "Vdrive" (at 345.44 59.69 0)
@@ -3343,7 +3343,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0158") (unit 1)
+          (reference "#PWR0131") (unit 1)
         )
       )
     )
@@ -3373,7 +3373,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0151") (unit 1)
+          (reference "#PWR0117") (unit 1)
         )
       )
     )
@@ -3404,7 +3404,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R42") (unit 1)
+          (reference "R32") (unit 1)
         )
       )
     )
@@ -3435,7 +3435,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R41") (unit 1)
+          (reference "R31") (unit 1)
         )
       )
     )
@@ -3444,7 +3444,7 @@
   (symbol (lib_id "power:Vdrive") (at 143.51 67.31 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 71e4afc3-f20f-4642-9bd8-a5776c51118f)
-    (property "Reference" "#PWR0140" (at 138.43 71.12 0)
+    (property "Reference" "#PWR0113" (at 138.43 71.12 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "Vdrive" (at 143.51 62.865 0)
@@ -3460,7 +3460,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0140") (unit 1)
+          (reference "#PWR0113") (unit 1)
         )
       )
     )
@@ -3469,7 +3469,7 @@
   (symbol (lib_id "power:Vdrive") (at 297.18 248.285 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 72c5a312-dc5a-41b5-b1a8-cae155cbfa81)
-    (property "Reference" "#PWR0144" (at 292.1 252.095 0)
+    (property "Reference" "#PWR0123" (at 292.1 252.095 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "Vdrive" (at 297.18 243.84 0)
@@ -3485,7 +3485,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0144") (unit 1)
+          (reference "#PWR0123") (unit 1)
         )
       )
     )
@@ -3537,7 +3537,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "C24") (unit 1)
+          (reference "C21") (unit 1)
         )
       )
     )
@@ -3567,7 +3567,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0132") (unit 1)
+          (reference "#PWR0105") (unit 1)
         )
       )
     )
@@ -3597,7 +3597,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0139") (unit 1)
+          (reference "#PWR0112") (unit 1)
         )
       )
     )
@@ -3627,7 +3627,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0154") (unit 1)
+          (reference "#PWR0127") (unit 1)
         )
       )
     )
@@ -3657,7 +3657,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0153") (unit 1)
+          (reference "#PWR0126") (unit 1)
         )
       )
     )
@@ -3687,7 +3687,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0155") (unit 1)
+          (reference "#PWR0128") (unit 1)
         )
       )
     )
@@ -3717,7 +3717,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0134") (unit 1)
+          (reference "#PWR0107") (unit 1)
         )
       )
     )
@@ -3769,7 +3769,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "C28") (unit 1)
+          (reference "C25") (unit 1)
         )
       )
     )
@@ -3800,7 +3800,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "C27") (unit 1)
+          (reference "C24") (unit 1)
         )
       )
     )
@@ -3809,7 +3809,7 @@
   (symbol (lib_id "power:+3.3V") (at 294.005 171.45 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 8b100bd3-5827-46e0-84ab-0b10abac0e4c)
-    (property "Reference" "#PWR0146" (at 294.005 175.26 0)
+    (property "Reference" "#PWR0121" (at 294.005 175.26 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 294.005 167.005 0)
@@ -3825,7 +3825,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0146") (unit 1)
+          (reference "#PWR0121") (unit 1)
         )
       )
     )
@@ -3877,7 +3877,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R37") (unit 1)
+          (reference "R27") (unit 1)
         )
       )
     )
@@ -3886,7 +3886,7 @@
   (symbol (lib_id "RobotLibary:Quadrature_Encoder") (at 278.765 180.34 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 8dc9cca9-7bc1-47b8-950d-2d14f590017c)
-    (property "Reference" "U13" (at 278.4475 170.815 0)
+    (property "Reference" "U12" (at 278.4475 170.815 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "Quad_Encoder" (at 278.4475 173.355 0)
@@ -3926,7 +3926,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "U13") (unit 1)
+          (reference "U12") (unit 1)
         )
       )
     )
@@ -3957,7 +3957,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R44") (unit 1)
+          (reference "R34") (unit 1)
         )
       )
     )
@@ -3988,7 +3988,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R34") (unit 1)
+          (reference "R24") (unit 1)
         )
       )
     )
@@ -4018,7 +4018,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0157") (unit 1)
+          (reference "#PWR0130") (unit 1)
         )
       )
     )
@@ -4027,7 +4027,7 @@
   (symbol (lib_id "power:+3.3V") (at 289.56 201.93 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 99747266-b88b-4210-b319-d642e014e174)
-    (property "Reference" "#PWR0147" (at 289.56 205.74 0)
+    (property "Reference" "#PWR0119" (at 289.56 205.74 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 289.56 197.485 0)
@@ -4043,7 +4043,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0147") (unit 1)
+          (reference "#PWR0119") (unit 1)
         )
       )
     )
@@ -4074,7 +4074,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R31") (unit 1)
+          (reference "R21") (unit 1)
         )
       )
     )
@@ -4105,7 +4105,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R33") (unit 1)
+          (reference "R23") (unit 1)
         )
       )
     )
@@ -4184,7 +4184,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "U12") (unit 1)
+          (reference "U10") (unit 1)
         )
       )
     )
@@ -4236,7 +4236,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "C36") (unit 1)
+          (reference "C33") (unit 1)
         )
       )
     )
@@ -4288,7 +4288,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "C23") (unit 1)
+          (reference "C20") (unit 1)
         )
       )
     )
@@ -4318,7 +4318,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0137") (unit 1)
+          (reference "#PWR0110") (unit 1)
         )
       )
     )
@@ -4370,7 +4370,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R46") (unit 1)
+          (reference "R36") (unit 1)
         )
       )
     )
@@ -4400,7 +4400,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0141") (unit 1)
+          (reference "#PWR0114") (unit 1)
         )
       )
     )
@@ -4430,7 +4430,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0149") (unit 1)
+          (reference "#PWR0115") (unit 1)
         )
       )
     )
@@ -4460,7 +4460,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0136") (unit 1)
+          (reference "#PWR0109") (unit 1)
         )
       )
     )
@@ -4491,7 +4491,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "C35") (unit 1)
+          (reference "C32") (unit 1)
         )
       )
     )
@@ -4574,7 +4574,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R43") (unit 1)
+          (reference "R33") (unit 1)
         )
       )
     )
@@ -4624,7 +4624,7 @@
           (reference "C5") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "C30") (unit 1)
+          (reference "C27") (unit 1)
         )
       )
     )
@@ -4654,7 +4654,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0152") (unit 1)
+          (reference "#PWR0118") (unit 1)
         )
       )
     )
@@ -4706,7 +4706,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R28") (unit 1)
+          (reference "R18") (unit 1)
         )
       )
     )
@@ -4758,7 +4758,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "C34") (unit 1)
+          (reference "C31") (unit 1)
         )
       )
     )
@@ -4767,7 +4767,7 @@
   (symbol (lib_id "power:Vdrive") (at 142.875 49.53 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid cda1e2d1-9ae6-46ab-b54a-cb13c5dcd91e)
-    (property "Reference" "#PWR0138" (at 137.795 53.34 0)
+    (property "Reference" "#PWR0111" (at 137.795 53.34 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "Vdrive" (at 142.875 45.085 0)
@@ -4783,7 +4783,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0138") (unit 1)
+          (reference "#PWR0111") (unit 1)
         )
       )
     )
@@ -4814,7 +4814,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "C33") (unit 1)
+          (reference "C30") (unit 1)
         )
       )
     )
@@ -4823,7 +4823,7 @@
   (symbol (lib_id "power:GND") (at 297.18 257.175 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid e00165d4-5da9-4bd9-9903-626ddde5d381)
-    (property "Reference" "#PWR0143" (at 297.18 263.525 0)
+    (property "Reference" "#PWR0124" (at 297.18 263.525 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 297.18 261.62 0)
@@ -4839,7 +4839,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0143") (unit 1)
+          (reference "#PWR0124") (unit 1)
         )
       )
     )
@@ -4891,7 +4891,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R40") (unit 1)
+          (reference "R30") (unit 1)
         )
       )
     )
@@ -4943,7 +4943,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R39") (unit 1)
+          (reference "R29") (unit 1)
         )
       )
     )
@@ -4973,7 +4973,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0159") (unit 1)
+          (reference "#PWR0132") (unit 1)
         )
       )
     )
@@ -5003,7 +5003,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0133") (unit 1)
+          (reference "#PWR0106") (unit 1)
         )
       )
     )
@@ -5012,7 +5012,7 @@
   (symbol (lib_id "power:+3.3V") (at 297.815 238.76 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid f1ae51d8-fdfc-412d-98d0-08ebe1e22a34)
-    (property "Reference" "#PWR0142" (at 297.815 242.57 0)
+    (property "Reference" "#PWR0125" (at 297.815 242.57 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 297.815 234.315 0)
@@ -5028,7 +5028,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0142") (unit 1)
+          (reference "#PWR0125") (unit 1)
         )
       )
     )
@@ -5080,7 +5080,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R27") (unit 1)
+          (reference "R17") (unit 1)
         )
       )
     )
@@ -5132,7 +5132,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R35") (unit 1)
+          (reference "R25") (unit 1)
         )
       )
     )
@@ -5162,7 +5162,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0150") (unit 1)
+          (reference "#PWR0116") (unit 1)
         )
       )
     )
@@ -5214,7 +5214,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "R38") (unit 1)
+          (reference "R28") (unit 1)
         )
       )
     )
@@ -5244,7 +5244,7 @@
       )
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/3be9d459-284b-4f8e-a3bf-b88a036c8948"
-          (reference "#PWR0135") (unit 1)
+          (reference "#PWR0108") (unit 1)
         )
       )
     )

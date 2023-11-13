@@ -447,7 +447,7 @@
           (reference "#PWR025") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/d4596efc-cbfe-411a-9b03-58f747019e1a"
-          (reference "#PWR071") (unit 1)
+          (reference "#PWR069") (unit 1)
         )
       )
     )
@@ -475,7 +475,7 @@
           (reference "#PWR025") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/d4596efc-cbfe-411a-9b03-58f747019e1a"
-          (reference "#PWR068") (unit 1)
+          (reference "#PWR073") (unit 1)
         )
       )
     )
@@ -503,7 +503,7 @@
           (reference "#PWR026") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/d4596efc-cbfe-411a-9b03-58f747019e1a"
-          (reference "#PWR074") (unit 1)
+          (reference "#PWR076") (unit 1)
         )
       )
     )
@@ -531,7 +531,7 @@
           (reference "#PWR026") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/d4596efc-cbfe-411a-9b03-58f747019e1a"
-          (reference "#PWR076") (unit 1)
+          (reference "#PWR071") (unit 1)
         )
       )
     )
@@ -581,7 +581,7 @@
           (reference "C2") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/d4596efc-cbfe-411a-9b03-58f747019e1a"
-          (reference "C14") (unit 1)
+          (reference "C17") (unit 1)
         )
       )
     )
@@ -631,7 +631,7 @@
           (reference "C2") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/d4596efc-cbfe-411a-9b03-58f747019e1a"
-          (reference "C15") (unit 1)
+          (reference "C18") (unit 1)
         )
       )
     )
@@ -659,7 +659,7 @@
           (reference "#PWR025") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/d4596efc-cbfe-411a-9b03-58f747019e1a"
-          (reference "#PWR072") (unit 1)
+          (reference "#PWR077") (unit 1)
         )
       )
     )
@@ -737,7 +737,7 @@
           (reference "#PWR026") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/d4596efc-cbfe-411a-9b03-58f747019e1a"
-          (reference "#PWR073") (unit 1)
+          (reference "#PWR075") (unit 1)
         )
       )
     )
@@ -746,7 +746,7 @@
   (symbol (lib_id "RobotLibary:ICM-42688-P") (at 111.76 121.92 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 83756f41-874c-4a5c-a91f-589afeb87f5d)
-    (property "Reference" "U6" (at 142.875 114.3 0)
+    (property "Reference" "U4" (at 142.875 114.3 0)
       (effects (font (size 3 3)))
     )
     (property "Value" "ICM-42688-P" (at 144.145 144.145 0)
@@ -796,7 +796,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/d4596efc-cbfe-411a-9b03-58f747019e1a"
-          (reference "U6") (unit 1)
+          (reference "U4") (unit 1)
         )
       )
     )
@@ -824,7 +824,7 @@
           (reference "#PWR026") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/d4596efc-cbfe-411a-9b03-58f747019e1a"
-          (reference "#PWR070") (unit 1)
+          (reference "#PWR072") (unit 1)
         )
       )
     )
@@ -852,7 +852,7 @@
           (reference "#PWR026") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/d4596efc-cbfe-411a-9b03-58f747019e1a"
-          (reference "#PWR069") (unit 1)
+          (reference "#PWR074") (unit 1)
         )
       )
     )
@@ -880,7 +880,7 @@
           (reference "#PWR026") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/d4596efc-cbfe-411a-9b03-58f747019e1a"
-          (reference "#PWR075") (unit 1)
+          (reference "#PWR070") (unit 1)
         )
       )
     )

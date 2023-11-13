@@ -489,14 +489,8 @@
   (junction (at 168.275 73.025) (diameter 0) (color 0 0 0 0)
     (uuid aa995a5e-e50c-4408-80c7-6f25658b2388)
   )
-  (junction (at 189.23 100.33) (diameter 0) (color 0 0 0 0)
-    (uuid c9567a3f-e911-4658-a392-3cdf5d9f1ba4)
-  )
   (junction (at 156.845 73.025) (diameter 0) (color 0 0 0 0)
     (uuid ce15feb2-97f0-489e-bc68-6f8741da25e1)
-  )
-  (junction (at 189.23 97.155) (diameter 0) (color 0 0 0 0)
-    (uuid d67fc64e-b5ee-4906-9e36-e3294673704c)
   )
 
   (wire (pts (xy 127 93.98) (xy 127 88.265))
@@ -519,7 +513,7 @@
     (stroke (width 0) (type default))
     (uuid 0c87d0aa-26a5-4bd0-9e76-07941c71e79b)
   )
-  (wire (pts (xy 191.77 100.33) (xy 189.23 100.33))
+  (wire (pts (xy 186.055 100.33) (xy 191.77 100.33))
     (stroke (width 0) (type default))
     (uuid 0f7d72aa-a476-4274-9180-6197da51eef1)
   )
@@ -539,10 +533,6 @@
     (stroke (width 0) (type default))
     (uuid 1eb2ffd0-e8d0-4b14-8b5f-beca8bc0b393)
   )
-  (wire (pts (xy 189.23 97.155) (xy 191.77 97.155))
-    (stroke (width 0) (type default))
-    (uuid 218fe371-7ef4-4967-ab80-25a900aaa257)
-  )
   (wire (pts (xy 271.78 92.71) (xy 264.795 92.71))
     (stroke (width 0) (type default))
     (uuid 25145f3a-5040-4ec2-9fad-803da3e2ede9)
@@ -555,13 +545,13 @@
     (stroke (width 0) (type default))
     (uuid 271d7ba4-35c6-41ad-b5ff-c09e632f3e6e)
   )
+  (wire (pts (xy 184.15 97.155) (xy 191.77 97.155))
+    (stroke (width 0) (type default))
+    (uuid 2864a316-ba21-4caf-9375-783bd392b785)
+  )
   (wire (pts (xy 262.255 73.025) (xy 235.585 73.025))
     (stroke (width 0) (type default))
     (uuid 300e9f5d-b851-48b3-87d1-a7531667dd4d)
-  )
-  (wire (pts (xy 189.23 100.33) (xy 186.055 100.33))
-    (stroke (width 0) (type default))
-    (uuid 31043d1d-e636-4532-ac65-94cdefc878a6)
   )
   (wire (pts (xy 129.54 107.315) (xy 129.54 100.33))
     (stroke (width 0) (type default))
@@ -579,9 +569,9 @@
     (stroke (width 0) (type default))
     (uuid 47bdf024-ed98-46fd-adc9-e22b87d335b2)
   )
-  (wire (pts (xy 212.09 100.33) (xy 209.55 100.33))
+  (wire (pts (xy 209.55 100.33) (xy 212.09 100.33))
     (stroke (width 0) (type default))
-    (uuid 5cbbfe94-fce7-4e8d-aba2-fd36707fa59e)
+    (uuid 4ac1d9f6-c10b-40d3-9592-3d2ca734c7ee)
   )
   (wire (pts (xy 148.59 93.98) (xy 148.59 107.315))
     (stroke (width 0) (type default))
@@ -622,10 +612,6 @@
   (wire (pts (xy 127 73.025) (xy 144.78 73.025))
     (stroke (width 0) (type default))
     (uuid 8cca8c68-3369-4a5d-9496-a046320827b0)
-  )
-  (wire (pts (xy 184.15 97.155) (xy 189.23 97.155))
-    (stroke (width 0) (type default))
-    (uuid 8d39e484-96cf-460a-afdd-79695517d763)
   )
   (wire (pts (xy 271.78 85.725) (xy 271.78 92.71))
     (stroke (width 0) (type default))
@@ -790,7 +776,7 @@
   (symbol (lib_id "Device:R_US") (at 127 76.835 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 1cf85075-d629-4ec6-ae7d-29eb94518001)
-    (property "Reference" "R4" (at 121.285 75.565 0)
+    (property "Reference" "R5" (at 121.285 75.565 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "130R" (at 120.015 78.105 0)
@@ -828,7 +814,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "R4") (unit 1)
+          (reference "R5") (unit 1)
         )
       )
     )
@@ -837,7 +823,7 @@
   (symbol (lib_id "Device:LED") (at 103.505 84.455 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 278c34f6-326c-4703-8cca-f25bb4cebd70)
-    (property "Reference" "D1" (at 98.425 83.185 90)
+    (property "Reference" "D2" (at 98.425 83.185 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "LED 2" (at 95.885 85.725 90)
@@ -875,7 +861,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "D1") (unit 1)
+          (reference "D2") (unit 1)
         )
       )
     )
@@ -884,7 +870,7 @@
   (symbol (lib_id "Device:R_US") (at 168.275 76.835 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 29490b0e-d1aa-4bb6-ba84-d14b0ff517b6)
-    (property "Reference" "R6" (at 162.56 75.565 0)
+    (property "Reference" "R7" (at 162.56 75.565 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "130R" (at 161.29 78.105 0)
@@ -922,7 +908,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "R6") (unit 1)
+          (reference "R7") (unit 1)
         )
       )
     )
@@ -931,7 +917,7 @@
   (symbol (lib_id "Device:R_US") (at 259.715 96.52 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 2c0cb7ca-75ea-4d31-9569-684cf605a651)
-    (property "Reference" "R18" (at 257.81 95.25 0)
+    (property "Reference" "R10" (at 257.81 95.25 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "130R" (at 258.445 97.79 0)
@@ -969,7 +955,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "R18") (unit 1)
+          (reference "R10") (unit 1)
         )
       )
     )
@@ -978,7 +964,7 @@
   (symbol (lib_id "Device:LED") (at 186.055 84.455 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 46d64136-bb88-44a8-b8ba-c8d48b15c20b)
-    (property "Reference" "D5" (at 180.34 83.185 90)
+    (property "Reference" "D6" (at 180.34 83.185 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "LED 6" (at 178.435 85.725 90)
@@ -1016,7 +1002,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "D5") (unit 1)
+          (reference "D6") (unit 1)
         )
       )
     )
@@ -1025,7 +1011,7 @@
   (symbol (lib_id "Device:LED") (at 144.78 84.455 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 66f87ad5-680f-404d-8cfb-05b3e54ce0a5)
-    (property "Reference" "D3" (at 139.065 83.185 90)
+    (property "Reference" "D4" (at 139.065 83.185 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "LED 4" (at 137.16 85.725 90)
@@ -1063,7 +1049,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "D3") (unit 1)
+          (reference "D4") (unit 1)
         )
       )
     )
@@ -1072,7 +1058,7 @@
   (symbol (lib_id "power:+3.3V") (at 262.255 73.025 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 68eb0ed0-c660-4525-8f2d-523089fba2c2)
-    (property "Reference" "#PWR095" (at 262.255 76.835 0)
+    (property "Reference" "#PWR087" (at 262.255 76.835 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 262.255 69.215 0)
@@ -1088,7 +1074,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "#PWR095") (unit 1)
+          (reference "#PWR087") (unit 1)
         )
       )
     )
@@ -1097,7 +1083,7 @@
   (symbol (lib_id "power:GND") (at 160.02 107.315 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 6dddaee5-702a-4f89-af39-0fac1b481d7d)
-    (property "Reference" "#PWR035" (at 160.02 113.665 0)
+    (property "Reference" "#PWR085" (at 160.02 113.665 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 160.02 111.125 0)
@@ -1113,7 +1099,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "#PWR035") (unit 1)
+          (reference "#PWR085") (unit 1)
         )
       )
     )
@@ -1173,7 +1159,7 @@
   (symbol (lib_id "RobotLibary:GSF7002DW") (at 158.115 90.17 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 7f228dc5-d30b-42a4-922b-245f7fd2467c)
-    (property "Reference" "U3" (at 159.385 90.17 0)
+    (property "Reference" "U6" (at 159.385 90.17 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "GSF7002DW" (at 159.385 104.14 0)
@@ -1215,7 +1201,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "U3") (unit 1)
+          (reference "U6") (unit 1)
         )
       )
     )
@@ -1275,13 +1261,13 @@
     )
   )
 
-  (symbol (lib_id "RobotLibary:GSF7002DW") (at 199.39 90.17 0) (mirror y) (unit 1)
+  (symbol (lib_id "RobotLibary:GSF7002DW") (at 199.39 90.17 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 839fc33f-ee26-4e59-984d-3f71f949572d)
-    (property "Reference" "U4" (at 198.12 90.17 0)
+    (property "Reference" "U7" (at 200.66 90.17 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "GSF7002DW" (at 198.12 104.14 0)
+    (property "Value" "GSF7002DW" (at 200.66 104.14 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "Package_TO_SOT_SMD:SOT-363_SC-70-6" (at 199.39 90.17 0)
@@ -1311,16 +1297,16 @@
     (property "Supplier 2 P/N" "" (at 199.39 90.17 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 45c671fd-fc4b-4ed9-9f33-8412fe5389d0))
-    (pin "2" (uuid b5e6bb56-ad4d-40d5-9e6d-1900df450044))
-    (pin "3" (uuid 45a61f3a-81b9-4a8d-a5c4-f563858bea11))
-    (pin "4" (uuid 72c5cc3b-6965-44b7-a9a1-351121378cb5))
-    (pin "5" (uuid cf220bc4-4c09-4408-86f4-3978ea421f9a))
-    (pin "6" (uuid 39a91b26-d837-4d51-833b-5d65714f26c6))
+    (pin "1" (uuid eef44bd8-5ca5-4d03-8a74-434bc5b5e477))
+    (pin "2" (uuid e377b360-fb7c-4c72-b85c-578f5b3e7bcf))
+    (pin "3" (uuid 739994fc-3d92-4f6f-a5a0-7f572bac6515))
+    (pin "4" (uuid ba2f3bd2-850c-485f-9c48-ab34e5027e9e))
+    (pin "5" (uuid af6ff5d3-9963-41dc-914c-b90ee1d1b6a5))
+    (pin "6" (uuid 6cddb502-6b4e-4c97-8c84-c5d3a067054d))
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "U4") (unit 1)
+          (reference "U7") (unit 1)
         )
       )
     )
@@ -1329,7 +1315,7 @@
   (symbol (lib_id "Device:R_US") (at 186.055 76.835 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 9186d856-3aa4-4ab0-9f07-3321030c7f70)
-    (property "Reference" "R7" (at 180.34 75.565 0)
+    (property "Reference" "R8" (at 180.34 75.565 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "130R" (at 179.07 78.105 0)
@@ -1367,7 +1353,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "R7") (unit 1)
+          (reference "R8") (unit 1)
         )
       )
     )
@@ -1376,7 +1362,7 @@
   (symbol (lib_id "Device:LED") (at 209.55 84.455 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid ac1b46b5-d358-4615-8075-208e2593b3e9)
-    (property "Reference" "D6" (at 203.835 83.185 90)
+    (property "Reference" "D7" (at 203.835 83.185 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "LED 5" (at 201.93 85.725 90)
@@ -1414,7 +1400,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "D6") (unit 1)
+          (reference "D7") (unit 1)
         )
       )
     )
@@ -1423,7 +1409,7 @@
   (symbol (lib_id "RobotLibary:GSF7002DW") (at 116.84 90.17 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid b2156886-1d35-4715-aae1-ed76655b524b)
-    (property "Reference" "U2" (at 118.11 90.17 0)
+    (property "Reference" "U5" (at 118.11 90.17 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "GSF7002DW" (at 118.11 104.14 0)
@@ -1465,7 +1451,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "U2") (unit 1)
+          (reference "U5") (unit 1)
         )
       )
     )
@@ -1474,7 +1460,7 @@
   (symbol (lib_id "Device:R_US") (at 264.795 96.52 180) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid b533a65f-f1f4-483b-8672-2c148c81b3a6)
-    (property "Reference" "R17" (at 270.51 95.25 0)
+    (property "Reference" "R11" (at 270.51 95.25 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "130R" (at 271.78 97.79 0)
@@ -1512,7 +1498,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "R17") (unit 1)
+          (reference "R11") (unit 1)
         )
       )
     )
@@ -1521,7 +1507,7 @@
   (symbol (lib_id "Device:LED") (at 127 84.455 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid cebb0fa8-d05c-48aa-b3ca-0d19614add0f)
-    (property "Reference" "D2" (at 120.65 83.185 90)
+    (property "Reference" "D3" (at 120.65 83.185 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "LED 1" (at 119.38 85.725 90)
@@ -1559,7 +1545,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "D2") (unit 1)
+          (reference "D3") (unit 1)
         )
       )
     )
@@ -1568,7 +1554,7 @@
   (symbol (lib_id "Device:LED") (at 168.275 84.455 90) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid d5fcd465-5c48-4f3c-a4a5-3a1b23106e0c)
-    (property "Reference" "D4" (at 162.56 83.185 90)
+    (property "Reference" "D5" (at 162.56 83.185 90)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Value" "LED 3" (at 160.655 85.725 90)
@@ -1606,7 +1592,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "D4") (unit 1)
+          (reference "D5") (unit 1)
         )
       )
     )
@@ -1615,7 +1601,7 @@
   (symbol (lib_id "Device:R_US") (at 103.505 76.835 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid d68a71b1-df84-4390-821c-cc087d08320e)
-    (property "Reference" "R3" (at 97.79 75.565 0)
+    (property "Reference" "R4" (at 97.79 75.565 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "130R" (at 96.52 78.105 0)
@@ -1653,7 +1639,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "R3") (unit 1)
+          (reference "R4") (unit 1)
         )
       )
     )
@@ -1662,7 +1648,7 @@
   (symbol (lib_id "power:+3.3V") (at 156.845 73.025 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid d75b51c7-14e4-4125-950b-bb897fa108e5)
-    (property "Reference" "#PWR034" (at 156.845 76.835 0)
+    (property "Reference" "#PWR084" (at 156.845 76.835 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 156.845 69.215 0)
@@ -1678,7 +1664,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "#PWR034") (unit 1)
+          (reference "#PWR084") (unit 1)
         )
       )
     )
@@ -1687,7 +1673,7 @@
   (symbol (lib_id "Device:R_US") (at 209.55 76.835 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid d8ba6264-0bef-45ab-aa6b-2d482f1bf73c)
-    (property "Reference" "R8" (at 203.835 75.565 0)
+    (property "Reference" "R9" (at 203.835 75.565 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "130R" (at 202.565 78.105 0)
@@ -1725,7 +1711,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "R8") (unit 1)
+          (reference "R9") (unit 1)
         )
       )
     )
@@ -1734,7 +1720,7 @@
   (symbol (lib_id "power:+3.3V") (at 160.655 186.055 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid dfca8a8b-b47a-43a4-9f3b-81563fba1c9f)
-    (property "Reference" "#PWR033" (at 160.655 189.865 0)
+    (property "Reference" "#PWR086" (at 160.655 189.865 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 160.655 180.975 0)
@@ -1750,7 +1736,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "#PWR033") (unit 1)
+          (reference "#PWR086") (unit 1)
         )
       )
     )
@@ -1759,7 +1745,7 @@
   (symbol (lib_id "power:GND") (at 262.255 115.57 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid e375a27f-7c99-45d0-b452-674eb4ca1481)
-    (property "Reference" "#PWR094" (at 262.255 121.92 0)
+    (property "Reference" "#PWR088" (at 262.255 121.92 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 262.255 119.38 0)
@@ -1775,7 +1761,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "#PWR094") (unit 1)
+          (reference "#PWR088") (unit 1)
         )
       )
     )
@@ -1784,7 +1770,7 @@
   (symbol (lib_id "Device:R_US") (at 144.78 76.835 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid f70028c0-0750-4309-8b50-e146c21a7952)
-    (property "Reference" "R5" (at 139.065 75.565 0)
+    (property "Reference" "R6" (at 139.065 75.565 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "130R" (at 137.795 78.105 0)
@@ -1822,7 +1808,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "R5") (unit 1)
+          (reference "R6") (unit 1)
         )
       )
     )
@@ -1831,7 +1817,7 @@
   (symbol (lib_id "power:GND") (at 149.86 183.515 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid f9b8b26d-24c8-4a91-b4ad-702eed682d17)
-    (property "Reference" "#PWR032" (at 149.86 189.865 0)
+    (property "Reference" "#PWR083" (at 149.86 189.865 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 149.86 188.595 0)
@@ -1847,7 +1833,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-          (reference "#PWR032") (unit 1)
+          (reference "#PWR083") (unit 1)
         )
       )
     )

@@ -1120,7 +1120,7 @@
   (symbol (lib_id "power:GND") (at 137.795 106.045 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 03dfc4a1-18d1-4472-bb5f-0ed8e2aebd05)
-    (property "Reference" "#PWR062" (at 137.795 112.395 0)
+    (property "Reference" "#PWR0135" (at 137.795 112.395 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 137.795 109.855 0)
@@ -1136,7 +1136,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "#PWR062") (unit 1)
+          (reference "#PWR0135") (unit 1)
         )
       )
     )
@@ -1145,7 +1145,7 @@
   (symbol (lib_id "Connector_Generic:Conn_02x02_Odd_Even") (at 285.75 156.845 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 08eee82b-fdf8-4831-bc76-1790835901e2)
-    (property "Reference" "J11" (at 287.02 151.13 0)
+    (property "Reference" "J10" (at 287.02 151.13 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "Refl_Mount" (at 287.02 153.67 0)
@@ -1185,7 +1185,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "J11") (unit 1)
+          (reference "J10") (unit 1)
         )
       )
     )
@@ -1235,7 +1235,7 @@
           (reference "R2") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "R22") (unit 1)
+          (reference "R45") (unit 1)
         )
       )
     )
@@ -1244,7 +1244,7 @@
   (symbol (lib_id "power:GND") (at 137.795 122.555 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 0f67cc10-ce2e-4aa4-8557-9e5f8720dfac)
-    (property "Reference" "#PWR061" (at 137.795 128.905 0)
+    (property "Reference" "#PWR0136" (at 137.795 128.905 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 137.795 126.365 0)
@@ -1260,7 +1260,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "#PWR061") (unit 1)
+          (reference "#PWR0136") (unit 1)
         )
       )
     )
@@ -1269,7 +1269,7 @@
   (symbol (lib_id "Switch:SW_SPST") (at 128.27 114.935 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 12ca363a-389d-4798-83d5-233806fc4c5a)
-    (property "Reference" "SW6" (at 128.27 108.585 0)
+    (property "Reference" "SW9" (at 128.27 108.585 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "SW_SPST" (at 128.27 111.125 0)
@@ -1307,7 +1307,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "SW6") (unit 1)
+          (reference "SW9") (unit 1)
         )
       )
     )
@@ -1316,7 +1316,7 @@
   (symbol (lib_id "Connector_Generic:Conn_02x02_Odd_Even") (at 290.195 71.755 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 15ee8311-e97d-40e1-ab70-150c8f3c9604)
-    (property "Reference" "J9" (at 291.465 66.04 0)
+    (property "Reference" "J12" (at 291.465 66.04 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "Refl_Mount" (at 291.465 68.58 0)
@@ -1356,7 +1356,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "J9") (unit 1)
+          (reference "J12") (unit 1)
         )
       )
     )
@@ -1365,7 +1365,7 @@
   (symbol (lib_id "power:+3.3V") (at 334.645 74.93 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 1b0828e5-5a5f-4f07-9c97-01b2a5091c82)
-    (property "Reference" "#PWR096" (at 334.645 78.74 0)
+    (property "Reference" "#PWR0142" (at 334.645 78.74 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 334.645 69.85 0)
@@ -1381,7 +1381,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "#PWR096") (unit 1)
+          (reference "#PWR0142") (unit 1)
         )
       )
     )
@@ -1390,7 +1390,7 @@
   (symbol (lib_id "Switch:SW_SPST") (at 128.27 83.185 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 30cbe801-490b-499f-ab8f-a40554e305e7)
-    (property "Reference" "SW4" (at 128.27 76.835 0)
+    (property "Reference" "SW7" (at 128.27 76.835 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "SW_SPST" (at 128.27 79.375 0)
@@ -1428,7 +1428,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "SW4") (unit 1)
+          (reference "SW7") (unit 1)
         )
       )
     )
@@ -1478,7 +1478,7 @@
           (reference "R1") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "R10") (unit 1)
+          (reference "R37") (unit 1)
         )
       )
     )
@@ -1528,22 +1528,22 @@
           (reference "R2") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "R19") (unit 1)
+          (reference "R43") (unit 1)
         )
       )
     )
   )
 
-  (symbol (lib_id "Device:R_US") (at 274.32 166.37 180) (unit 1)
+  (symbol (lib_id "Device:R_US") (at 274.32 166.37 0) (mirror x) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 3379741b-9e88-4a85-9e6b-cdc6f3d0c48a)
-    (property "Reference" "R2" (at 270.8275 165.4175 0)
+    (property "Reference" "R2" (at 277.8125 165.4175 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "100R" (at 270.8275 167.3225 0)
+    (property "Value" "100R" (at 277.8125 167.3225 0)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder" (at 273.304 166.116 90)
+    (property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder" (at 275.336 166.116 90)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf" (at 274.32 166.37 0)
@@ -1578,7 +1578,7 @@
           (reference "R2") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "R23") (unit 1)
+          (reference "R41") (unit 1)
         )
       )
     )
@@ -1587,7 +1587,7 @@
   (symbol (lib_id "RobotLibary:QRE1113GR") (at 278.765 85.09 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 39b2f253-4201-45fc-a6cb-3d67965bdc7e)
-    (property "Reference" "K1" (at 291.465 77.47 0)
+    (property "Reference" "K3" (at 291.465 77.47 0)
       (effects (font (size 1.524 1.524)))
     )
     (property "Value" "QRE1113GR" (at 291.465 80.01 0)
@@ -1627,7 +1627,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "K1") (unit 1)
+          (reference "K3") (unit 1)
         )
       )
     )
@@ -1636,7 +1636,7 @@
   (symbol (lib_id "Switch:SW_SPST") (at 128.27 98.425 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 40cb7248-dda3-43c2-89f4-533c7dd2230e)
-    (property "Reference" "SW5" (at 128.27 92.075 0)
+    (property "Reference" "SW8" (at 128.27 92.075 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "SW_SPST" (at 128.27 94.615 0)
@@ -1674,7 +1674,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "SW5") (unit 1)
+          (reference "SW8") (unit 1)
         )
       )
     )
@@ -1683,7 +1683,7 @@
   (symbol (lib_id "power:+3.3V") (at 337.82 161.29 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 4567827d-f638-44d2-b08d-2892302effe7)
-    (property "Reference" "#PWR0101" (at 337.82 165.1 0)
+    (property "Reference" "#PWR0145" (at 337.82 165.1 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 337.82 156.21 0)
@@ -1699,7 +1699,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "#PWR0101") (unit 1)
+          (reference "#PWR0145") (unit 1)
         )
       )
     )
@@ -1749,7 +1749,7 @@
           (reference "R1") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "R12") (unit 1)
+          (reference "R39") (unit 1)
         )
       )
     )
@@ -1758,7 +1758,7 @@
   (symbol (lib_id "power:GND") (at 332.105 122.555 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 4fa401b5-cd10-4745-b58b-1d220663a3c4)
-    (property "Reference" "#PWR098" (at 332.105 128.905 0)
+    (property "Reference" "#PWR0141" (at 332.105 128.905 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 332.105 126.365 0)
@@ -1774,7 +1774,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "#PWR098") (unit 1)
+          (reference "#PWR0141") (unit 1)
         )
       )
     )
@@ -1783,7 +1783,7 @@
   (symbol (lib_id "Mechanical:MountingHole") (at 328.93 180.34 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 5689cc31-56c2-400c-a779-b2440f47bf1c)
-    (property "Reference" "H7" (at 331.47 179.07 0)
+    (property "Reference" "H5" (at 331.47 179.07 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "MountingHole" (at 331.47 181.61 0)
@@ -1819,7 +1819,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "H7") (unit 1)
+          (reference "H5") (unit 1)
         )
       )
     )
@@ -1869,7 +1869,7 @@
           (reference "R2") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "R24") (unit 1)
+          (reference "R44") (unit 1)
         )
       )
     )
@@ -1878,7 +1878,7 @@
   (symbol (lib_id "Mechanical:MountingHole") (at 332.74 93.98 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 68571b5d-49f6-4eac-826d-2784c54743ef)
-    (property "Reference" "H5" (at 335.28 92.71 0)
+    (property "Reference" "H7" (at 335.28 92.71 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "MountingHole" (at 335.28 95.25 0)
@@ -1914,7 +1914,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "H5") (unit 1)
+          (reference "H7") (unit 1)
         )
       )
     )
@@ -1923,7 +1923,7 @@
   (symbol (lib_id "power:+3.3V") (at 335.28 118.11 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 69fc214b-e139-4279-b028-8b7c64089156)
-    (property "Reference" "#PWR099" (at 335.28 121.92 0)
+    (property "Reference" "#PWR0144" (at 335.28 121.92 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 335.28 113.03 0)
@@ -1939,7 +1939,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "#PWR099") (unit 1)
+          (reference "#PWR0144") (unit 1)
         )
       )
     )
@@ -1948,7 +1948,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x03") (at 341.63 78.105 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 72803d00-faaf-472a-8585-8a6b6721bd16)
-    (property "Reference" "J12" (at 344.17 76.835 0)
+    (property "Reference" "J13" (at 344.17 76.835 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "Refl_PCB_Connect" (at 344.17 79.375 0)
@@ -1987,7 +1987,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "J12") (unit 1)
+          (reference "J13") (unit 1)
         )
       )
     )
@@ -1996,7 +1996,7 @@
   (symbol (lib_id "Connector_Generic:Conn_02x02_Odd_Even") (at 288.29 114.3 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 8a8b963f-3a24-4b1c-be3f-3a0e187a6296)
-    (property "Reference" "J10" (at 289.56 108.585 0)
+    (property "Reference" "J11" (at 289.56 108.585 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "Refl_Mount" (at 289.56 111.125 0)
@@ -2036,7 +2036,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "J10") (unit 1)
+          (reference "J11") (unit 1)
         )
       )
     )
@@ -2045,7 +2045,7 @@
   (symbol (lib_id "power:GND") (at 271.78 252.73 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 8b0086a0-2291-4215-92a1-56128f53c663)
-    (property "Reference" "#PWR057" (at 271.78 259.08 0)
+    (property "Reference" "#PWR0138" (at 271.78 259.08 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 271.78 257.81 0)
@@ -2061,7 +2061,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "#PWR057") (unit 1)
+          (reference "#PWR0138") (unit 1)
         )
       )
     )
@@ -2070,7 +2070,7 @@
   (symbol (lib_id "RobotLibary:QRE1113GR") (at 274.32 170.18 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 8e9c84cb-878d-4bde-8c4f-2e907a268122)
-    (property "Reference" "K3" (at 287.02 162.56 0)
+    (property "Reference" "K1" (at 287.02 162.56 0)
       (effects (font (size 1.524 1.524)))
     )
     (property "Value" "QRE1113GR" (at 287.02 165.1 0)
@@ -2110,7 +2110,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "K3") (unit 1)
+          (reference "K1") (unit 1)
         )
       )
     )
@@ -2164,7 +2164,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x03") (at 344.805 164.465 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 94401af2-3536-444d-9bcb-06bc97b30c14)
-    (property "Reference" "J14" (at 347.345 163.195 0)
+    (property "Reference" "J15" (at 347.345 163.195 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "Refl_PCB_Connect" (at 347.345 165.735 0)
@@ -2203,7 +2203,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "J14") (unit 1)
+          (reference "J15") (unit 1)
         )
       )
     )
@@ -2212,7 +2212,7 @@
   (symbol (lib_id "power:GND") (at 331.47 79.375 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid a2b7675c-037f-41d4-a2e6-e1cb3934bd08)
-    (property "Reference" "#PWR097" (at 331.47 85.725 0)
+    (property "Reference" "#PWR0140" (at 331.47 85.725 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 331.47 83.185 0)
@@ -2228,7 +2228,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "#PWR097") (unit 1)
+          (reference "#PWR0140") (unit 1)
         )
       )
     )
@@ -2237,7 +2237,7 @@
   (symbol (lib_id "power:GND") (at 137.795 90.805 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid b19fa0b2-461c-4bdd-b6e7-888d93ae6c86)
-    (property "Reference" "#PWR063" (at 137.795 97.155 0)
+    (property "Reference" "#PWR0134" (at 137.795 97.155 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 137.795 94.615 0)
@@ -2253,7 +2253,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "#PWR063") (unit 1)
+          (reference "#PWR0134") (unit 1)
         )
       )
     )
@@ -2262,7 +2262,7 @@
   (symbol (lib_id "Switch:SW_SPST") (at 128.27 132.08 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid b1fa7f98-21a1-4175-bb69-53806d7b34cf)
-    (property "Reference" "SW7" (at 128.27 125.73 0)
+    (property "Reference" "SW10" (at 128.27 125.73 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "SW_SPST" (at 128.27 128.27 0)
@@ -2300,7 +2300,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "SW7") (unit 1)
+          (reference "SW10") (unit 1)
         )
       )
     )
@@ -2309,7 +2309,7 @@
   (symbol (lib_id "power:GND") (at 334.645 165.735 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid c1679a8b-193e-44a2-aedb-57a12b6c2b05)
-    (property "Reference" "#PWR0100" (at 334.645 172.085 0)
+    (property "Reference" "#PWR0143" (at 334.645 172.085 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 334.645 169.545 0)
@@ -2325,7 +2325,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "#PWR0100") (unit 1)
+          (reference "#PWR0143") (unit 1)
         )
       )
     )
@@ -2334,7 +2334,7 @@
   (symbol (lib_id "power:+3.3V") (at 123.19 77.47 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid cf05a930-4d7a-45e3-b2e0-7dc911bb0bf7)
-    (property "Reference" "#PWR059" (at 123.19 81.28 0)
+    (property "Reference" "#PWR0133" (at 123.19 81.28 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 123.19 72.39 0)
@@ -2350,7 +2350,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "#PWR059") (unit 1)
+          (reference "#PWR0133") (unit 1)
         )
       )
     )
@@ -2359,7 +2359,7 @@
   (symbol (lib_id "power:GND") (at 137.795 139.7 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid cfbf9988-ed33-416a-8da8-1579f13f51de)
-    (property "Reference" "#PWR060" (at 137.795 146.05 0)
+    (property "Reference" "#PWR0137" (at 137.795 146.05 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 137.795 143.51 0)
@@ -2375,7 +2375,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "#PWR060") (unit 1)
+          (reference "#PWR0137") (unit 1)
         )
       )
     )
@@ -2425,7 +2425,7 @@
           (reference "R1") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "R11") (unit 1)
+          (reference "R38") (unit 1)
         )
       )
     )
@@ -2475,7 +2475,7 @@
           (reference "R1") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "R13") (unit 1)
+          (reference "R40") (unit 1)
         )
       )
     )
@@ -2525,7 +2525,7 @@
           (reference "R2") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "R20") (unit 1)
+          (reference "R46") (unit 1)
         )
       )
     )
@@ -2534,7 +2534,7 @@
   (symbol (lib_id "power:+3.3V") (at 294.64 250.19 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid f210c5f6-c844-42ef-b118-bb13b3aadcde)
-    (property "Reference" "#PWR058" (at 294.64 254 0)
+    (property "Reference" "#PWR0139" (at 294.64 254 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 294.64 245.11 0)
@@ -2550,7 +2550,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "#PWR058") (unit 1)
+          (reference "#PWR0139") (unit 1)
         )
       )
     )
@@ -2600,7 +2600,7 @@
           (reference "R2") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "R21") (unit 1)
+          (reference "R42") (unit 1)
         )
       )
     )
@@ -2609,7 +2609,7 @@
   (symbol (lib_id "Connector_Generic:Conn_01x03") (at 342.265 121.285 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid fa68a8f0-64b7-446c-afb9-528042e04feb)
-    (property "Reference" "J13" (at 344.805 120.015 0)
+    (property "Reference" "J14" (at 344.805 120.015 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "Refl_PCB_Connect" (at 344.805 122.555 0)
@@ -2648,7 +2648,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b"
-          (reference "J13") (unit 1)
+          (reference "J14") (unit 1)
         )
       )
     )

@@ -348,7 +348,7 @@
   (symbol (lib_id "power:+3.3V") (at 292.735 247.65 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 01c208fc-15a9-4fb1-a77d-3028404445ea)
-    (property "Reference" "#PWR091" (at 292.735 251.46 0)
+    (property "Reference" "#PWR095" (at 292.735 251.46 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 292.735 243.205 0)
@@ -364,7 +364,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/41ea0116-63b8-412b-88a7-1e6a491b97c5"
-          (reference "#PWR091") (unit 1)
+          (reference "#PWR095") (unit 1)
         )
       )
     )
@@ -414,7 +414,7 @@
           (reference "R1") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/41ea0116-63b8-412b-88a7-1e6a491b97c5"
-          (reference "R16") (unit 1)
+          (reference "R13") (unit 1)
         )
       )
     )
@@ -423,7 +423,7 @@
   (symbol (lib_id "power:+3.3V") (at 173.355 120.65 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 468b4303-c3ef-4ca4-861d-dda536ff7f49)
-    (property "Reference" "#PWR088" (at 173.355 124.46 0)
+    (property "Reference" "#PWR089" (at 173.355 124.46 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 173.355 116.205 0)
@@ -439,7 +439,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/41ea0116-63b8-412b-88a7-1e6a491b97c5"
-          (reference "#PWR088") (unit 1)
+          (reference "#PWR089") (unit 1)
         )
       )
     )
@@ -448,7 +448,7 @@
   (symbol (lib_id "Switch:SW_Push") (at 184.15 121.92 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 5544cf45-23a4-4078-a1b4-d22637e78f19)
-    (property "Reference" "SW9" (at 184.15 114.3 0)
+    (property "Reference" "SW4" (at 184.15 114.3 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "User_Button" (at 184.15 116.84 0)
@@ -486,7 +486,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/41ea0116-63b8-412b-88a7-1e6a491b97c5"
-          (reference "SW9") (unit 1)
+          (reference "SW4") (unit 1)
         )
       )
     )
@@ -495,7 +495,7 @@
   (symbol (lib_id "power:GND") (at 292.735 254.635 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 5a5537b6-7692-4c73-b796-5ac7f50dadc5)
-    (property "Reference" "#PWR090" (at 292.735 260.985 0)
+    (property "Reference" "#PWR096" (at 292.735 260.985 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 292.735 259.08 0)
@@ -511,7 +511,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/41ea0116-63b8-412b-88a7-1e6a491b97c5"
-          (reference "#PWR090") (unit 1)
+          (reference "#PWR096") (unit 1)
         )
       )
     )
@@ -520,7 +520,7 @@
   (symbol (lib_id "power:GND") (at 192.405 129.54 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 674e4f82-c4dc-4cc9-b223-f99c0afc65a2)
-    (property "Reference" "#PWR085" (at 192.405 135.89 0)
+    (property "Reference" "#PWR092" (at 192.405 135.89 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 192.405 133.985 0)
@@ -536,7 +536,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/41ea0116-63b8-412b-88a7-1e6a491b97c5"
-          (reference "#PWR085") (unit 1)
+          (reference "#PWR092") (unit 1)
         )
       )
     )
@@ -545,7 +545,7 @@
   (symbol (lib_id "Switch:SW_Push") (at 184.785 100.33 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 710061c7-4bb5-4dc6-aa68-232ceb01b44d)
-    (property "Reference" "SW8" (at 184.785 92.71 0)
+    (property "Reference" "SW6" (at 184.785 92.71 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "User_Button" (at 184.785 95.25 0)
@@ -583,7 +583,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/41ea0116-63b8-412b-88a7-1e6a491b97c5"
-          (reference "SW8") (unit 1)
+          (reference "SW6") (unit 1)
         )
       )
     )
@@ -592,7 +592,7 @@
   (symbol (lib_id "power:+3.3V") (at 173.99 99.06 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 79264cbe-aa29-4329-83cf-8c1d5177db8d)
-    (property "Reference" "#PWR087" (at 173.99 102.87 0)
+    (property "Reference" "#PWR091" (at 173.99 102.87 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 173.99 94.615 0)
@@ -608,7 +608,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/41ea0116-63b8-412b-88a7-1e6a491b97c5"
-          (reference "#PWR087") (unit 1)
+          (reference "#PWR091") (unit 1)
         )
       )
     )
@@ -617,7 +617,7 @@
   (symbol (lib_id "power:GND") (at 192.405 147.955 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 7ebf1038-93cb-43ec-bfa9-9c5a0d68a945)
-    (property "Reference" "#PWR086" (at 192.405 154.305 0)
+    (property "Reference" "#PWR093" (at 192.405 154.305 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 192.405 152.4 0)
@@ -633,7 +633,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/41ea0116-63b8-412b-88a7-1e6a491b97c5"
-          (reference "#PWR086") (unit 1)
+          (reference "#PWR093") (unit 1)
         )
       )
     )
@@ -642,7 +642,7 @@
   (symbol (lib_id "Switch:SW_Push") (at 184.15 140.335 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 8764d451-83a2-4b63-a83e-444116fc4289)
-    (property "Reference" "SW10" (at 184.15 132.715 0)
+    (property "Reference" "SW5" (at 184.15 132.715 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "User_Button" (at 184.15 135.255 0)
@@ -680,7 +680,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/41ea0116-63b8-412b-88a7-1e6a491b97c5"
-          (reference "SW10") (unit 1)
+          (reference "SW5") (unit 1)
         )
       )
     )
@@ -730,7 +730,7 @@
           (reference "R1") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/41ea0116-63b8-412b-88a7-1e6a491b97c5"
-          (reference "R15") (unit 1)
+          (reference "R12") (unit 1)
         )
       )
     )
@@ -739,7 +739,7 @@
   (symbol (lib_id "power:+3.3V") (at 173.355 139.065 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid bb1397ae-d245-425b-8686-28fd36cd1a47)
-    (property "Reference" "#PWR089" (at 173.355 142.875 0)
+    (property "Reference" "#PWR090" (at 173.355 142.875 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 173.355 134.62 0)
@@ -755,7 +755,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/41ea0116-63b8-412b-88a7-1e6a491b97c5"
-          (reference "#PWR089") (unit 1)
+          (reference "#PWR090") (unit 1)
         )
       )
     )
@@ -764,7 +764,7 @@
   (symbol (lib_id "power:GND") (at 193.04 107.95 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid c111b5b0-714e-4f92-af86-42131269b9e5)
-    (property "Reference" "#PWR084" (at 193.04 114.3 0)
+    (property "Reference" "#PWR094" (at 193.04 114.3 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 193.04 112.395 0)
@@ -780,7 +780,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/41ea0116-63b8-412b-88a7-1e6a491b97c5"
-          (reference "#PWR084") (unit 1)
+          (reference "#PWR094") (unit 1)
         )
       )
     )

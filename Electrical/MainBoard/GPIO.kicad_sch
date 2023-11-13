@@ -362,7 +362,7 @@
   (symbol (lib_id "Connector_Generic:Conn_02x10_Odd_Even") (at 149.86 94.615 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid bb1e62df-5895-4e03-92ba-57a0338eee3f)
-    (property "Reference" "J17" (at 151.13 78.74 0)
+    (property "Reference" "J16" (at 151.13 78.74 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "GPIO" (at 151.13 81.28 0)
@@ -418,7 +418,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/7681952e-9ac4-4545-8f8a-d83e518f0640"
-          (reference "J17") (unit 1)
+          (reference "J16") (unit 1)
         )
       )
     )

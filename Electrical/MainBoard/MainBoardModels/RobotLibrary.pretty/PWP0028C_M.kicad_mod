@@ -10,7 +10,7 @@
       (effects (font (size 1 1) (thickness 0.15)))
     (tstamp 6e2a6147-e82b-4280-9aca-cf5a62b9bc1f)
   )
-  (fp_text user "Designator9" (at -4.2672 -6.477 unlocked) (layer "F.SilkS")
+  (fp_text user "*" (at -4.28 -4.62 unlocked) (layer "F.SilkS")
       (effects (font (size 1 1) (thickness 0.15)))
     (tstamp 0b8d6ea5-3f62-4c51-b25d-b8111bd2f75c)
   )

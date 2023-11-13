@@ -482,7 +482,7 @@
   (symbol (lib_id "RobotLibary:MEM2061-01-188-00-A") (at 118.745 44.45 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 181675c3-b7e9-4d80-8f5e-095be0afac62)
-    (property "Reference" "J16" (at 149.86 38.1 0)
+    (property "Reference" "J17" (at 149.86 38.1 0)
       (effects (font (size 1.524 1.524)))
     )
     (property "Value" "MEM2061-01-188-00-A" (at 149.225 63.5 0)
@@ -530,7 +530,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/f4129289-3c0d-4adc-b4a9-f79af269c84f"
-          (reference "J16") (unit 1)
+          (reference "J17") (unit 1)
         )
       )
     )
@@ -558,7 +558,7 @@
           (reference "#PWR032") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/f4129289-3c0d-4adc-b4a9-f79af269c84f"
-          (reference "#PWR0124") (unit 1)
+          (reference "#PWR0155") (unit 1)
         )
       )
     )
@@ -567,7 +567,7 @@
   (symbol (lib_id "power:GND") (at 186.69 46.99 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 25fe8cb3-8118-4696-a316-e40c61b45c08)
-    (property "Reference" "#PWR0120" (at 186.69 53.34 0)
+    (property "Reference" "#PWR0159" (at 186.69 53.34 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 186.69 52.07 0)
@@ -583,7 +583,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/f4129289-3c0d-4adc-b4a9-f79af269c84f"
-          (reference "#PWR0120") (unit 1)
+          (reference "#PWR0159") (unit 1)
         )
       )
     )
@@ -592,7 +592,7 @@
   (symbol (lib_id "power:GND") (at 113.03 41.275 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 28c32006-7161-42d5-90d5-c6bbade8fd08)
-    (property "Reference" "#PWR0123" (at 113.03 47.625 0)
+    (property "Reference" "#PWR0151" (at 113.03 47.625 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 113.03 45.085 0)
@@ -608,7 +608,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/f4129289-3c0d-4adc-b4a9-f79af269c84f"
-          (reference "#PWR0123") (unit 1)
+          (reference "#PWR0151") (unit 1)
         )
       )
     )
@@ -658,7 +658,7 @@
           (reference "C3") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/f4129289-3c0d-4adc-b4a9-f79af269c84f"
-          (reference "C22") (unit 1)
+          (reference "C36") (unit 1)
         )
       )
     )
@@ -667,7 +667,7 @@
   (symbol (lib_id "power:GND") (at 179.705 106.68 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 300cab45-541e-4e44-a298-a345f71d81bb)
-    (property "Reference" "#PWR0130" (at 179.705 113.03 0)
+    (property "Reference" "#PWR0158" (at 179.705 113.03 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 179.705 110.49 0)
@@ -683,7 +683,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/f4129289-3c0d-4adc-b4a9-f79af269c84f"
-          (reference "#PWR0130") (unit 1)
+          (reference "#PWR0158") (unit 1)
         )
       )
     )
@@ -711,7 +711,7 @@
           (reference "#PWR032") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/f4129289-3c0d-4adc-b4a9-f79af269c84f"
-          (reference "#PWR0129") (unit 1)
+          (reference "#PWR0154") (unit 1)
         )
       )
     )
@@ -720,7 +720,7 @@
   (symbol (lib_id "power:+3.3V") (at 116.205 31.75 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 5a9cedf0-2dd3-414b-b06f-24ed1c92ff9e)
-    (property "Reference" "#PWR0122" (at 116.205 35.56 0)
+    (property "Reference" "#PWR0152" (at 116.205 35.56 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "+3.3V" (at 116.205 27.305 0)
@@ -736,7 +736,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/f4129289-3c0d-4adc-b4a9-f79af269c84f"
-          (reference "#PWR0122") (unit 1)
+          (reference "#PWR0152") (unit 1)
         )
       )
     )
@@ -764,7 +764,7 @@
           (reference "#PWR033") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/f4129289-3c0d-4adc-b4a9-f79af269c84f"
-          (reference "#PWR0125") (unit 1)
+          (reference "#PWR0156") (unit 1)
         )
       )
     )
@@ -773,7 +773,7 @@
   (symbol (lib_id "power:GND") (at 117.475 58.42 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid aa19064d-fde7-479b-8019-2b68de8eb7f3)
-    (property "Reference" "#PWR0121" (at 117.475 64.77 0)
+    (property "Reference" "#PWR0153" (at 117.475 64.77 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Value" "GND" (at 117.475 63.5 0)
@@ -789,7 +789,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/f4129289-3c0d-4adc-b4a9-f79af269c84f"
-          (reference "#PWR0121") (unit 1)
+          (reference "#PWR0153") (unit 1)
         )
       )
     )
@@ -817,7 +817,7 @@
           (reference "#PWR033") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/f4129289-3c0d-4adc-b4a9-f79af269c84f"
-          (reference "#PWR0128") (unit 1)
+          (reference "#PWR0157") (unit 1)
         )
       )
     )
@@ -826,7 +826,7 @@
   (symbol (lib_id "RobotLibary:M95M01-DFMN6TP") (at 128.905 109.855 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid db163d1b-d614-4127-b2c1-c9b858861cf6)
-    (property "Reference" "U11" (at 149.225 100.33 0)
+    (property "Reference" "U15" (at 149.225 100.33 0)
       (effects (font (size 1.524 1.524)))
     )
     (property "Value" "M95M01-DFMN6TP" (at 149.225 102.87 0)
@@ -870,7 +870,7 @@
     (instances
       (project "MainBoard"
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/f4129289-3c0d-4adc-b4a9-f79af269c84f"
-          (reference "U11") (unit 1)
+          (reference "U15") (unit 1)
         )
       )
     )
@@ -920,7 +920,7 @@
           (reference "C3") (unit 1)
         )
         (path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/f4129289-3c0d-4adc-b4a9-f79af269c84f"
-          (reference "C21") (unit 1)
+          (reference "C35") (unit 1)
         )
       )
     )
