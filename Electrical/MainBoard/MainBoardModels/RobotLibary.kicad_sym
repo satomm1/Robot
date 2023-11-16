@@ -60,7 +60,9 @@
         (stroke (width 0.254) (type default))
         (fill (type none))
       )
-      (pin input line (at 0 -5.08 90) (length 2.54)
+    )
+    (symbol "APAE1590R2540AKDB1-T_1_0"
+      (pin bidirectional line (at 0 -5.08 90) (length 2.54)
         (name "~" (effects (font (size 1.016 1.016))))
         (number "1" (effects (font (size 1.016 1.016))))
       )
