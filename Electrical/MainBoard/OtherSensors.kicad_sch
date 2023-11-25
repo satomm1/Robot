@@ -1143,7 +1143,7 @@
   )
 
   (symbol (lib_id "Connector_Generic:Conn_02x02_Odd_Even") (at 285.75 156.845 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom no) (on_board no) (dnp yes) (fields_autoplaced)
     (uuid 08eee82b-fdf8-4831-bc76-1790835901e2)
     (property "Reference" "J10" (at 287.02 151.13 0)
       (effects (font (size 1.27 1.27)))
@@ -1192,7 +1192,7 @@
   )
 
   (symbol (lib_id "Device:R_US") (at 306.705 121.92 180) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board no) (dnp yes)
     (uuid 0be456e4-e206-4d4b-97b1-b76eddd47d86)
     (property "Reference" "R2" (at 309.88 120.65 0)
       (effects (font (size 1.27 1.27)))
@@ -1314,7 +1314,7 @@
   )
 
   (symbol (lib_id "Connector_Generic:Conn_02x02_Odd_Even") (at 290.195 71.755 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom no) (on_board no) (dnp yes) (fields_autoplaced)
     (uuid 15ee8311-e97d-40e1-ab70-150c8f3c9604)
     (property "Reference" "J12" (at 291.465 66.04 0)
       (effects (font (size 1.27 1.27)))
@@ -1485,7 +1485,7 @@
   )
 
   (symbol (lib_id "Device:R_US") (at 278.765 81.28 180) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board no) (dnp yes)
     (uuid 31919d39-9f38-4005-a2aa-c763bc0a9d74)
     (property "Reference" "R2" (at 275.2725 80.3275 0)
       (effects (font (size 1.27 1.27)))
@@ -1535,7 +1535,7 @@
   )
 
   (symbol (lib_id "Device:R_US") (at 274.32 166.37 0) (mirror x) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board no) (dnp yes)
     (uuid 3379741b-9e88-4a85-9e6b-cdc6f3d0c48a)
     (property "Reference" "R2" (at 277.8125 165.4175 0)
       (effects (font (size 1.27 1.27)))
@@ -1585,7 +1585,7 @@
   )
 
   (symbol (lib_id "RobotLibary:QRE1113GR") (at 278.765 85.09 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom no) (on_board no) (dnp yes) (fields_autoplaced)
     (uuid 39b2f253-4201-45fc-a6cb-3d67965bdc7e)
     (property "Reference" "K3" (at 291.465 77.47 0)
       (effects (font (size 1.524 1.524)))
@@ -1781,7 +1781,7 @@
   )
 
   (symbol (lib_id "Mechanical:MountingHole") (at 328.93 180.34 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom no) (on_board no) (dnp yes) (fields_autoplaced)
     (uuid 5689cc31-56c2-400c-a779-b2440f47bf1c)
     (property "Reference" "H5" (at 331.47 179.07 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -1826,7 +1826,7 @@
   )
 
   (symbol (lib_id "Device:R_US") (at 304.165 164.465 180) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board no) (dnp yes)
     (uuid 576f04cf-03b1-483e-9cf9-4b94d7725182)
     (property "Reference" "R2" (at 307.34 163.195 0)
       (effects (font (size 1.27 1.27)))
@@ -1876,7 +1876,7 @@
   )
 
   (symbol (lib_id "Mechanical:MountingHole") (at 332.74 93.98 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom no) (on_board no) (dnp yes) (fields_autoplaced)
     (uuid 68571b5d-49f6-4eac-826d-2784c54743ef)
     (property "Reference" "H7" (at 335.28 92.71 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -1994,7 +1994,7 @@
   )
 
   (symbol (lib_id "Connector_Generic:Conn_02x02_Odd_Even") (at 288.29 114.3 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom no) (on_board no) (dnp yes) (fields_autoplaced)
     (uuid 8a8b963f-3a24-4b1c-be3f-3a0e187a6296)
     (property "Reference" "J11" (at 289.56 108.585 0)
       (effects (font (size 1.27 1.27)))
@@ -2068,7 +2068,7 @@
   )
 
   (symbol (lib_id "RobotLibary:QRE1113GR") (at 274.32 170.18 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom no) (on_board no) (dnp yes) (fields_autoplaced)
     (uuid 8e9c84cb-878d-4bde-8c4f-2e907a268122)
     (property "Reference" "K1" (at 287.02 162.56 0)
       (effects (font (size 1.524 1.524)))
@@ -2117,7 +2117,7 @@
   )
 
   (symbol (lib_id "Mechanical:MountingHole") (at 330.835 136.525 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom no) (on_board no) (dnp yes) (fields_autoplaced)
     (uuid 93c3e085-ce16-468b-af18-b7fd33274198)
     (property "Reference" "H6" (at 333.375 135.255 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -2482,7 +2482,7 @@
   )
 
   (symbol (lib_id "Device:R_US") (at 308.61 79.375 180) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board no) (dnp yes)
     (uuid dd5e28f9-da94-46ff-ac27-ea904e2176ad)
     (property "Reference" "R2" (at 311.785 78.105 0)
       (effects (font (size 1.27 1.27)))
@@ -2557,7 +2557,7 @@
   )
 
   (symbol (lib_id "Device:R_US") (at 276.86 123.825 180) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
+    (in_bom no) (on_board no) (dnp yes)
     (uuid f5978f9f-a65a-4898-beb7-7346ce8d503f)
     (property "Reference" "R2" (at 273.3675 122.8725 0)
       (effects (font (size 1.27 1.27)))
@@ -2655,7 +2655,7 @@
   )
 
   (symbol (lib_id "RobotLibary:QRE1113GR") (at 276.86 127.635 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom no) (on_board no) (dnp yes) (fields_autoplaced)
     (uuid fc8e904d-0b03-4e31-a82a-4adafd004571)
     (property "Reference" "K2" (at 289.56 120.015 0)
       (effects (font (size 1.524 1.524)))
