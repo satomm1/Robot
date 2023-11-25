@@ -1542,7 +1542,8 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid ac353bbf-d8aa-4749-885c-dbffddc89ab6)
   )
-  (text "Molex + Switch" (at 258.445 55.245 0)
+  (text "Molex + Switch\n\nFemale, DigiKey P/N: WM2124-ND\nCrimp,  DigiKey P/N: WM20948CT-ND"
+    (at 250.825 53.34 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid fbda59ba-a0eb-4bab-ad35-a5d2e774880e)
   )

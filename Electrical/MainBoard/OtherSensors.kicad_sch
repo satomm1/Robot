@@ -1037,7 +1037,7 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 5fb133fd-b565-498e-aeb8-805c4e4d8c7c)
   )
-  (text "Corresponding Female: DigiKey PN 900-0022013037-ND\nCorresponding Crimp : DigiKey PN WM2756CT-ND\nButton          	: DigiKey PN EG2025-ND"
+  (text "Corresponding Female: DigiKey PN 900-0022013037-ND\nCorresponding Crimp : DigiKey PN WM2756CT-ND\n"
     (at 290.83 203.2 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 6c31a48b-3bc7-4ffb-810f-c8e4b8e30200)
