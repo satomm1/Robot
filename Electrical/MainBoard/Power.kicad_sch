@@ -2252,7 +2252,7 @@
     (property "Reference" "D1" (at 292.735 139.7 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
-    (property "Value" "ON" (at 292.735 141.605 0)
+    (property "Value" "LED" (at 292.735 141.605 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
     (property "Footprint" "LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder" (at 294.005 136.525 0)

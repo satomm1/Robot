@@ -671,7 +671,7 @@
     (property "Reference" "C2" (at 85.725 134.62 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Value" "10 nF" (at 83.82 137.16 0)
+    (property "Value" "0.01 uF" (at 83.82 137.16 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder" (at 93.6752 139.7 0)
