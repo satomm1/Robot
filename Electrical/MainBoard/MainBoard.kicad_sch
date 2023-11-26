@@ -4130,7 +4130,7 @@
   )
 
   (symbol (lib_id "Lab_3:MountingHole") (at 285.75 253.365 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom no) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 2c75b38b-b8a8-4753-b11f-f3b8fe3926bd)
     (property "Reference" "H3" (at 288.925 252.095 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -5262,7 +5262,7 @@
   )
 
   (symbol (lib_id "Lab_3:MountingHole") (at 263.525 253.365 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom no) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid a38e49dd-ea46-498b-a630-1dd15eebaa6e)
     (property "Reference" "H1" (at 266.7 252.095 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -5640,7 +5640,7 @@
   )
 
   (symbol (lib_id "Lab_3:MountingHole") (at 285.75 262.255 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom no) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid af453335-91eb-4181-b288-111f4cad47b7)
     (property "Reference" "H4" (at 288.925 260.985 0)
       (effects (font (size 1.27 1.27)) (justify left))
@@ -6310,7 +6310,7 @@
   )
 
   (symbol (lib_id "Lab_3:MountingHole") (at 263.525 262.89 0) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
+    (in_bom no) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid fd66fcc0-7d6d-428a-963d-7952cdec2bf7)
     (property "Reference" "H2" (at 266.7 261.62 0)
       (effects (font (size 1.27 1.27)) (justify left))
