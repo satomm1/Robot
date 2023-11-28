@@ -9571,6 +9571,11 @@
     (pad "3" thru_hole circle (at 0 4.500001 270) (size 1.507998 1.507998) (drill 0.999998) (layers "*.Cu" "*.Mask") (tstamp 0659b8cb-a33f-4081-a3dd-75118443843d))
     (pad "4" thru_hole circle (at 6.500002 4.500001 270) (size 1.507998 1.507998) (drill 0.999998) (layers "*.Cu" "*.Mask")
       (net 154 "Net-(C1-Pad1)") (pintype "passive") (tstamp 5ab06f05-67a1-497f-8278-5729feb7cbbc))
+    (model "${KIPRJMOD}/MainBoardModels/B3F_1020/B3F_1020.step"
+      (offset (xyz 3.25 -2.25 0))
+      (scale (xyz 1 1 1))
+      (rotate (xyz -90 0 0))
+    )
   )
 
   (footprint "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder" (layer "F.Cu")
