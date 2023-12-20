@@ -91,11 +91,11 @@ extern  uint8_t _INTCON_temp;
 typedef enum
 {
   ES_Timer_RATE_OFF   = (0),
-  ES_Timer_RATE_d5mS   = 10000,     /* 0.5ms timer tick */  
-  ES_Timer_RATE_1mS  = 20000,       /* 1ms timer tick */
-  ES_Timer_RATE_2mS  = 40000,       /* 2ms timer tick */
-  ES_Timer_RATE_4mS  = 80000,       /* 4ms timer tick */
-  ES_Timer_RATE_5mS  = 100000,       /* 5ms timer tick */
+  ES_Timer_RATE_d5mS   = 50000,     /* 0.5ms timer tick */  
+  ES_Timer_RATE_1mS  = 100000,       /* 1ms timer tick */
+  ES_Timer_RATE_2mS  = 200000,       /* 2ms timer tick */
+  ES_Timer_RATE_4mS  = 400000,       /* 4ms timer tick */
+  ES_Timer_RATE_5mS  = 500000,       /* 5ms timer tick */
 }TimerRate_t;
 
 #if 0 // Moved to terminal.h

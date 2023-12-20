@@ -43,7 +43,9 @@
                    projectFiles="true">
       <itemPath>ProjectHeaders/EventCheckWrapper.h</itemPath>
       <itemPath>ProjectHeaders/EventCheckers.h</itemPath>
-      <itemPath>ProjectHeaders/TestHarnessService0.h</itemPath>
+      <itemPath>ProjectHeaders/IMU_SM.h</itemPath>
+      <itemPath>ProjectHeaders/UsbService.h</itemPath>
+      <itemPath>ProjectHeaders/MotorSM.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -53,8 +55,10 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>ProjectSource/EventCheckers.c</itemPath>
-      <itemPath>ProjectSource/TestHarnessService0.c</itemPath>
       <itemPath>ProjectSource/main.c</itemPath>
+      <itemPath>ProjectSource/IMU_SM.c</itemPath>
+      <itemPath>ProjectSource/UsbService.c</itemPath>
+      <itemPath>ProjectSource/MotorSM.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -76,7 +80,7 @@
         <targetDevice>PIC32MZ0512EFF144</targetDevice>
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
-        <platformTool>noID</platformTool>
+        <platformTool>snap</platformTool>
         <languageToolchain>XC32</languageToolchain>
         <languageToolchainVersion>4.35</languageToolchainVersion>
         <platform>3</platform>

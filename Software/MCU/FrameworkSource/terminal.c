@@ -33,7 +33,7 @@
 //this module
 #include "terminal.h"
 /*----------------------------- Module Defines ----------------------------*/
-#define BAUD_CONST 42 // sets up baud rate for 115200
+#define BAUD_CONST 216 // sets up baud rate for 115200
 //#define BAUD_CONST 21 // sets up baud rate for 230400
 
 /*---------------------------- Module Functions ---------------------------*/
@@ -57,32 +57,14 @@ static cbuf_handle_t xmitBufferHandle;
  ******************************************************************************/
 void Terminal_HWInit(void)
 {
-//#define USE_RB2_3
-#ifdef USE_RB2_3
-  // This was the original pin choice, though we changed this for the project
-  // Set up RB2 as RX and RB3 as TX
-  // clear analog control
-  ANSELB &= (BIT3LO & BIT2LO);
-  // start with TX high
-  LATBbits.LATB3 = 1;
-  // set RB3 as output
-  TRISBbits.TRISB3 = 0;
-  // set RB2 as input
-  TRISBbits.TRISB2 = 1;
-  // Remap the pins
-  RPB3R = 0b0001; // U1TX -> RB3
-  U1RXR = 0b0100; // U1RX <- RB2
-#else
-  // this moves the UART pins to RB6 & RB7, freeing up RB2 & RB3 to be used
-  // as analog inputs
-  ANSELB &= (BIT6LO & BIT7LO);  // clear analog control
-  LATBbits.LATB7 = 1;           // start with TX high
-  TRISBbits.TRISB7 = 0;         // set RB7 as output
-  TRISBbits.TRISB6 = 1;         // set RB6 as input
-  RPB7R = 0b0001;               // map U1TX -> RB7
-  U1RXR = 0b0001;               // map U1RX <- RB6
-#endif  //USE_RB2_3
+  // this moves the UART pins to RF4 & RF5
+  TRISFCLR = _TRISF_TRISF5_MASK; // set RF5 as output
+  TRISFSET = _TRISF_TRISF4_MASK; // set RF4 as input       
+  LATFbits.LATF5 = 1;           // start with TX high
   
+  RPF5R = 0b0001;               // map U1TX -> RF5
+  U1RXR = 0b00010;               // map U1RX <- RF4
+
   // disable the UART to be safe
   U1MODEbits.ON = 0;
   // Setup high-speed mode, data = 8 bit, no parity, 1 stop bit

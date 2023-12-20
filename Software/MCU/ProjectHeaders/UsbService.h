@@ -5,8 +5,8 @@
 
  ****************************************************************************/
 
-#ifndef TestHarnessService0_H
-#define TestHarnessService0_H
+#ifndef UsbService_H
+#define UsbService_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -15,9 +15,9 @@
 #include "ES_Port.h"                // needed for definition of REENTRANT
 // Public Function Prototypes
 
-bool InitTestHarnessService0(uint8_t Priority);
-bool PostTestHarnessService0(ES_Event_t ThisEvent);
-ES_Event_t RunTestHarnessService0(ES_Event_t ThisEvent);
+bool InitUsbService(uint8_t Priority);
+bool PostUsbService(ES_Event_t ThisEvent);
+ES_Event_t RunUsbService(ES_Event_t ThisEvent);
 
-#endif /* ServTemplate_H */
+#endif /* UsbService_H */
 
