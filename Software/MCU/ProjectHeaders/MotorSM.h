@@ -19,6 +19,24 @@ typedef enum
   InitPState_Motor, Motor1, Motor2
 }MotorState_t;
 
+typedef struct
+{
+    uint16_t TimerBits;
+    uint16_t RolloverBits;
+} TimerByBytes_t;
+
+typedef union
+{
+    TimerByBytes_t TimeStruct;
+    uint32_t FullTime;
+} MotorTimer_t;
+
+typedef enum
+{
+    Forward,
+    Backward
+} Direction_t;
+
 // Public Function Prototypes
 
 bool InitMotorSM(uint8_t Priority);
