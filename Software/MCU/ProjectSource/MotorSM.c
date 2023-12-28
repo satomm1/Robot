@@ -287,6 +287,46 @@ MotorState_t QueryMotorSM(void)
   return CurrentState;
 }
 
+/****************************************************************************
+ Function
+     SetDesiredRPM
+
+ Parameters
+     uint16_t LeftRPM: the desired left wheel RPM
+     uint16_t RighRPM: the desired right wheel RPM
+
+ Returns
+     None
+
+ Description
+     Sets the desired RPM for the two motors
+****************************************************************************/
+void SetDesiredRPM(uint16_t LeftRPM, uint16_t RightRPM)
+{
+  DesiredLeftRPM = LeftRPM;
+  DesiredRightRPM = RightRPM;
+}
+
+/****************************************************************************
+ Function
+     SetDesiredRPM
+
+ Parameters
+     float LinearVelocity: the desired linear velocity
+     float AngularVelocity: the desired angular velocity
+
+ Returns
+     None
+
+ Description
+     Sets the desired RPM for the two motors
+****************************************************************************/
+void SetDesiredSpeed(float LinearVelocity, float AngularVelocity)
+{
+    // TODO: Calculate Left/Right RPM based on input linear/angular velocities
+    SetDesiredRPM(0, 0);
+}
+
 /***************************************************************************
  private functions
  ***************************************************************************/

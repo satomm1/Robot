@@ -33,7 +33,7 @@
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 3
+#define NUM_SERVICES 4
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service.
@@ -83,11 +83,11 @@
 // These are the definitions for Service 3
 #if NUM_SERVICES > 3
 // the header file with the public function prototypes
-#define SERV_3_HEADER "TestHarnessService3.h"
+#define SERV_3_HEADER "JetsonSM.h"
 // the name of the Init function
-#define SERV_3_INIT InitTestHarnessService3
+#define SERV_3_INIT InitJetsonSM
 // the name of the run function
-#define SERV_3_RUN RunTestHarnessService3
+#define SERV_3_RUN RunJetsonSM
 // How big should this services Queue be?
 #define SERV_3_QUEUE_SIZE 3
 #endif
@@ -261,7 +261,9 @@ typedef enum
   /* User-defined events start here */
   ES_NEW_KEY,               /* signals a new key received from terminal */
   ES_LOCK,
-  ES_UNLOCK
+  ES_UNLOCK,
+  EV_JETSON_MESSAGE_RECEIVED,
+  EV_JETSON_TRANSFER_COMPLETE
 }ES_EventType_t;
 
 /****************************************************************************/
@@ -319,7 +321,7 @@ typedef enum
 #define TIMER11_RESP_FUNC TIMER_UNUSED
 #define TIMER12_RESP_FUNC TIMER_UNUSED
 #define TIMER13_RESP_FUNC TIMER_UNUSED
-#define TIMER14_RESP_FUNC TIMER_UNUSED
+#define TIMER14_RESP_FUNC PostJetsonSM
 #define TIMER15_RESP_FUNC PostUsbService
 
 /****************************************************************************/
@@ -330,6 +332,7 @@ typedef enum
 // These symbolic names should be changed to be relevant to your application
 
 #define SERVICE0_TIMER 15
+#define JETSON_TIMER 14
 
 
 #endif /* ES_CONFIGURE_H */

@@ -43,6 +43,8 @@ bool InitMotorSM(uint8_t Priority);
 bool PostMotorSM(ES_Event_t ThisEvent);
 ES_Event_t RunMotorSM(ES_Event_t ThisEvent);
 MotorState_t QueryMotorSM(void);
+void SetDesiredRPM(uint16_t LeftRPM, uint16_t RightRPM);
+void SetDesiredSpeed(float LinearVelocity, float AngularVelocity);
 
 #endif /* MotorFSM_H */
 
