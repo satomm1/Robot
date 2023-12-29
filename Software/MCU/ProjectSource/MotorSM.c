@@ -26,6 +26,7 @@
 #define IC_PERIOD 65535 // Input capture period
 #define OC_PERIOD 833   // Output compare period
 #define CONTROL_PERIOD 200 // Control update period
+#define NO_SPEED_PERIOD 500 // Period to indicate motor not spinning
 #define Kp 1 // Proportional constant for PID law
 #define Ki 1 // Integral constant for PID law
 
@@ -38,7 +39,14 @@
 // everybody needs a state variable, you may need others as well.
 // type of state variable should match that of enum in header file
 static MotorState_t CurrentState;
+
+// Everything we need for measuring motor speed
 static volatile MotorTimer_t MyTimer;
+static volatile uint32_t LeftPulseLength = 4294967295; 
+static volatile uint32_t RightPulseLength = 4294967295; 
+static volatile uint32_t LeftPrevTime = 0; 
+static volatile uint32_t RightPrevTime = 0; 
+
 static uint16_t DesiredLeftRPM;
 static uint16_t DesiredRightRPM;
 
@@ -112,6 +120,21 @@ bool InitMotorSM(uint8_t Priority)
   PR3 = IC_PERIOD; // Use input capture period
   TMR3 = 0; // Set TMR3 to 0
   
+  // Timer 4 (For Left Motor No Speed)
+  T4CON = 0;
+  T4CONbits.TCKPS = 0b000; // 1:1 prescale value
+  T4CONbits.T32 = 0; // Use separate 16 bit timers
+  T4CONbits.TCS = 0; // Use internal peripheral clock
+  PR4 = NO_SPEED_PERIOD; // Use no speed period
+  TMR4 = 0; // Set TMR4 to 0
+  
+  // Timer 5 (For Right Motor No Speed)
+  T5CON = 0;
+  T5CONbits.TCKPS = 0b000; // 1:1 prescale value
+  T5CONbits.TCS = 0; // Use internal peripheral clock
+  PR5 = NO_SPEED_PERIOD; // Use no speed period
+  TMR5 = 0; // Set TMR5 to 0
+  
   // Setup Output compare
   OC1CON = 0; // Reset OC1CON register settings
   OC2CON = 0; // Reset OC2CON register settings
@@ -149,35 +172,40 @@ bool InitMotorSM(uint8_t Priority)
   // Setup Interrupts
   INTCONbits.MVEC = 1; // Use multivector mode
   PRISSbits.PRI7SS = 0b0111; // Priority 7 interrupt use shadow set 7
+  PRISSbits.PRI6SS = 0b0110; // Interrupt with a priority level of 6 uses Shadow Set 6
   
   // Set interrupt priorities
   IPC1bits.IC1IP = 7; // IC1
-  IPC2bits.IC2IP = 7; // IC2
+//  IPC2bits.IC2IP = 7; // IC2
   IPC4bits.IC3IP = 7; // IC3
-  IPC5bits.IC4IP = 7; // IC4
+//  IPC5bits.IC4IP = 7; // IC4
   IPC1bits.T1IP = 7; // T1
   IPC3bits.T3IP = 7; // T3
+  IPC4bits.T4IP = 6; // T4
+  IPC6bits.T5IP = 6; // T5
   
   // Clear interrupt flags
-  IFS0CLR = _IFS0_IC1IF_MASK | _IFS0_IC2IF_MASK | _IFS0_IC3IF_MASK | 
-          _IFS0_IC4IF_MASK | _IFS0_T1IF_MASK | _IFS0_T3IF_MASK;
+  IFS0CLR = _IFS0_IC1IF_MASK | _IFS0_IC3IF_MASK | _IFS0_T1IF_MASK | 
+          _IFS0_T3IF_MASK | _IFS0_T4IF_MASK | _IFS0_T5IF_MASK; // | _IFS0_IC2IF_MASK | _IFS0_IC4IF_MASK
   
   // Local enable interrupts
-  IEC0SET = _IEC0_IC1IE_MASK | _IEC0_IC2IE_MASK | _IEC0_IC3IE_MASK | 
-          _IEC0_IC4IE_MASK | _IEC0_T1IE_MASK | _IEC0_T3IE_MASK;
+  IEC0SET = _IEC0_IC1IE_MASK | _IEC0_IC3IE_MASK | _IEC0_T1IE_MASK | 
+          _IEC0_T3IE_MASK | _IEC0_T4IE_MASK | _IEC0_T5IE_MASK; //_IEC0_IC2IE_MASK | _IEC0_IC4IE_MASK 
   
   __builtin_enable_interrupts(); // Global enable interrupts
   
   // Turn Everything On
   IC1CONbits.ON = 1; // Turn input capture on
-  IC2CONbits.ON = 1; // Turn input capture on
+//  IC2CONbits.ON = 1; // Turn input capture on
   IC3CONbits.ON = 1; // Turn input capture on
-  IC4CONbits.ON = 1; // Turn input capture on
+//  IC4CONbits.ON = 1; // Turn input capture on
   OC1CONbits.ON = 1; // Turn OC1 on
   OC2CONbits.ON = 1; // Turn OC2 on
   T1CONbits.ON = 1; // Turn timer 1 on
   T2CONbits.ON = 1; // Turn timer 2 on
   T3CONbits.ON = 1; // Turn timer 3 on
+  T4CONbits.ON = 1; // Turn timer 4 on
+  T5CONbits.ON = 1; // Turn timer 5 on
   
   MyPriority = Priority;
   // put us into the Initial PseudoState
@@ -236,23 +264,19 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
     {
       if (ThisEvent.EventType == ES_INIT) 
       {
-        // this is where you would put any actions associated with the
-        // transition from the initial pseudo-state into the actual
-        // initial state
-
         // now put the machine into the actual initial state
-        CurrentState = Motor1;
+        CurrentState = MotorWait;
       }
     }
     break;
 
-    case Motor1:      
+    case MotorWait:      
     {
       switch (ThisEvent.EventType)
       {
         case ES_LOCK:  
         { 
-          CurrentState = Motor1;  
+          
         }
         break;
 
@@ -325,6 +349,12 @@ void SetDesiredSpeed(float LinearVelocity, float AngularVelocity)
 {
     // TODO: Calculate Left/Right RPM based on input linear/angular velocities
     SetDesiredRPM(0, 0);
+    
+    // Also set direction pins and update internal representation:
+//    LATFbits.LATF8 = 0; // Start direction pins low
+//    LATJbits.LATJ3 = 0; // Start direction pins low
+//    LeftDirection = Forward;
+//    RightDirection = Forward;
 }
 
 /***************************************************************************
@@ -332,24 +362,67 @@ void SetDesiredSpeed(float LinearVelocity, float AngularVelocity)
  ***************************************************************************/
 
 ////////////////////// Interrupt Service Routines //////////////////////
+
+/****************************************************************************
+ Function
+    IC1Handler
+
+ Description
+   Counts time between encoder pulses for measuring left motor pulse lengths
+****************************************************************************/
 void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
 {
+    MyTimer.TimeStruct.TimerBits = (uint16_t)IC1BUF; // grab the captured time 
+    IFS0CLR = _IFS0_IC1IF_MASK; // Clear the interrupt
+    if (IFS0bits.T3IF && MyTimer.TimeStruct.TimerBits < 0x8000) {            
+        MyTimer.TimeStruct.RolloverBits += 1; // increment the rollover counter
+        IFS0CLR = _IFS0_T3IF_MASK; // clear the rollover interrupt   
+    }                                                     
     
+    // Calculate the time length between encoder pulses
+    LeftPulseLength = MyTimer.FullTime - LeftPrevTime;         
+    LeftPrevTime = MyTimer.FullTime; // update our last time variable 
+    
+    // restart Timer4 (timer to indicate if motor is stopped)
+    T4CONCLR = _T4CON_ON_MASK;     
+    TMR4 = 0;     
+    T4CONSET = _T4CON_ON_MASK; 
 }
 
 void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL7SRS) IC2Handler(void)
 {
-    
+    // Probably don't need this here, we should just use this input to see if wheel moving forwards or backwards
 }
 
+/****************************************************************************
+ Function
+    IC3Handler
+
+ Description
+   Counts time between encoder pulses for measuring right motor pulse lengths
+****************************************************************************/
 void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
 {
+    MyTimer.TimeStruct.TimerBits = (uint16_t)IC3BUF; // grab the captured time 
+    IFS0CLR = _IFS0_IC3IF_MASK; // Clear the interrupt
+    if (IFS0bits.T3IF && MyTimer.TimeStruct.TimerBits < 0x8000) {            
+        MyTimer.TimeStruct.RolloverBits += 1; // increment the rollover counter
+        IFS0CLR = _IFS0_T3IF_MASK; // clear the rollover interrupt   
+    }                                                     
     
+    // Calculate the time length between encoder pulses
+    RightPulseLength = MyTimer.FullTime - RightPrevTime;         
+    RightPrevTime = MyTimer.FullTime; // update our last time variable 
+    
+    // restart Timer5 (timer to indicate if motor is stopped)
+    T5CONCLR = _T5CON_ON_MASK;     
+    TMR5 = 0;     
+    T5CONSET = _T5CON_ON_MASK; 
 }
 
 void __ISR(_INPUT_CAPTURE_4_VECTOR, IPL7SRS) IC4Handler(void)
 {
-    
+    // Probably don't need this here, we should just use this input to see if wheel moving forwards or backwards
 }
 
 /****************************************************************************
@@ -438,4 +511,32 @@ void __ISR(_TIMER_3_VECTOR, IPL7SRS) T3Handler(void)
     }
     
     __builtin_enable_interrupts(); // Enable interrupts globally
+}
+
+/****************************************************************************
+ Function
+    T4Handler
+
+ Description
+   If we reach here this means the left motor is not moving
+****************************************************************************/
+void __ISR(_TIMER_4_VECTOR, IPL6SRS) T4Handler(void)
+{
+    IFS0CLR = _IFS0_T4IF_MASK; // clear the interrupt flag     
+    T4CONCLR = _T4CON_ON_MASK; // stop the timer 
+    LeftPulseLength = 4294967295; // set LeftPulseLength to max    
+}
+
+/****************************************************************************
+ Function
+    T5Handler
+
+ Description
+   If we reach here this means the right motor is not moving
+****************************************************************************/
+void __ISR(_TIMER_5_VECTOR, IPL6SRS) T5Handler(void)
+{
+    IFS0CLR = _IFS0_T5IF_MASK; // clear the interrupt flag     
+    T5CONCLR = _T5CON_ON_MASK; // stop the timer 
+    RightPulseLength = 4294967295; // set RightPulseLength to max    
 }

@@ -40,51 +40,9 @@
 // actual functionsdefinition
 #include "EventCheckers.h"
 
-// This is the event checking function sample. It is not intended to be
-// included in the module. It is only here as a sample to guide you in writing
-// your own event checkers
-#if 0
-/****************************************************************************
- Function
-   Check4Lock
- Parameters
-   None
- Returns
-   bool: true if a new event was detected
- Description
-   Sample event checker grabbed from the simple lock state machine example
- Notes
-   will not compile, sample only
- Author
-   J. Edward Carryer, 08/06/13, 13:48
-****************************************************************************/
-bool Check4Lock(void)
-{
-  static uint8_t  LastPinState = 0;
-  uint8_t         CurrentPinState;
-  bool            ReturnVal = false;
-
-  CurrentPinState = LOCK_PIN;
-  // check for pin high AND different from last time
-  // do the check for difference first so that you don't bother with a test
-  // of a port/variable that is not going to matter, since it hasn't changed
-  if ((CurrentPinState != LastPinState) &&
-      (CurrentPinState == LOCK_PIN_HI)) // event detected, so post detected event
-  {
-    ES_Event ThisEvent;
-    ThisEvent.EventType   = ES_LOCK;
-    ThisEvent.EventParam  = 1;
-    // this could be any of the service post functions, ES_PostListx or
-    // ES_PostAll functions
-    ES_PostAll(ThisEvent);
-    ReturnVal = true;
-  }
-  LastPinState = CurrentPinState; // update the state for next time
-
-  return ReturnVal;
-}
-
-#endif
+static uint8_t Button1Status;
+static uint8_t Button2Status;
+static uint8_t Button3Status;
 
 /****************************************************************************
  Function
@@ -119,3 +77,104 @@ bool Check4Keystroke(void)
   return false;
 }
 
+void InitButton1(void) 
+{
+    // Set Button1 Pin to digital input
+    TRISHSET = _TRISH_TRISH9_MASK;
+    Button1Status = PORTHbits.RH9;
+}
+
+void InitButton2(void) 
+{
+    // Set Button1 Pin to digital input
+    TRISHSET = _TRISH_TRISH10_MASK;
+    Button2Status = PORTHbits.RH10;
+}
+
+void InitButton3(void) 
+{
+    // Set Button1 Pin to digital input
+    TRISHSET = _TRISH_TRISH11_MASK;
+    Button3Status = PORTHbits.RH11;
+}
+
+bool CheckButton1(void)
+{
+    bool ReturnVal = false;
+    
+    // Get current state of button
+    uint8_t CurrentButton1Status = PORTHbits.RH9;
+    
+    if (Button1Status != CurrentButton1Status) {
+        // button state has changed
+        ReturnVal = true;
+        
+        // Post the event of a button up or down
+        ES_Event_t ThisEvent;
+        if (CurrentButton1Status == 1) { // Button is down
+            ThisEvent.EventType = EV_BUTTON1_DOWN;
+            PostButton1DebouncerSM(ThisEvent);
+        } else { // button is now up
+            ThisEvent.EventType = EV_BUTTON1_UP;
+            PostButton1DebouncerSM(ThisEvent);
+        }
+        
+        // update the last button state
+        Button1Status = CurrentButton1Status;
+    }
+    return ReturnVal;
+}
+
+bool CheckButton2(void)
+{
+    bool ReturnVal = false;
+    
+    // Get current state of button
+    uint8_t CurrentButton2Status = PORTHbits.RH10;
+    
+    if (Button2Status != CurrentButton2Status) {
+        // button state has changed
+        ReturnVal = true;
+        
+        // Post the event of a button up or down
+        ES_Event_t ThisEvent;
+        if (CurrentButton2Status == 1) { // Button is down
+            ThisEvent.EventType = EV_BUTTON2_DOWN;
+            PostButton2DebouncerSM(ThisEvent);
+        } else { // button is now up
+            ThisEvent.EventType = EV_BUTTON2_UP;
+            PostButton2DebouncerSM(ThisEvent);
+        }
+        
+        // update the last button state
+        Button2Status = CurrentButton2Status;
+    }
+    return ReturnVal;
+}
+
+bool CheckButton3(void)
+{
+    bool ReturnVal = false;
+    
+    // Get current state of button
+    uint8_t CurrentButton3Status = PORTHbits.RH11;
+    
+    if (Button3Status != CurrentButton3Status) {
+        // button state has changed
+        ReturnVal = true;
+        
+        // Post the event of a button up or down
+        ES_Event_t ThisEvent;
+        if (CurrentButton3Status == 1) { // Button is down
+            ThisEvent.EventType = EV_BUTTON3_DOWN;
+            PostButton3DebouncerSM(ThisEvent);
+        } else { // button is now up
+            ThisEvent.EventType = EV_BUTTON3_UP;
+            PostButton3DebouncerSM(ThisEvent);
+        }
+        
+        // update the last button state
+        Button3Status = CurrentButton3Status;
+    }
+    return ReturnVal;
+}

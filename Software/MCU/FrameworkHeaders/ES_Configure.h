@@ -33,7 +33,7 @@
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 4
+#define NUM_SERVICES 7
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service.
@@ -96,11 +96,11 @@
 // These are the definitions for Service 4
 #if NUM_SERVICES > 4
 // the header file with the public function prototypes
-#define SERV_4_HEADER "TestHarnessService4.h"
+#define SERV_4_HEADER "Button1DebouncerSM.h"
 // the name of the Init function
-#define SERV_4_INIT InitTestHarnessService4
+#define SERV_4_INIT InitButton1DebouncerSM
 // the name of the run function
-#define SERV_4_RUN RunTestHarnessService4
+#define SERV_4_RUN RunButton1DebouncerSM
 // How big should this services Queue be?
 #define SERV_4_QUEUE_SIZE 3
 #endif
@@ -109,11 +109,11 @@
 // These are the definitions for Service 5
 #if NUM_SERVICES > 5
 // the header file with the public function prototypes
-#define SERV_5_HEADER "TestHarnessService5.h"
+#define SERV_5_HEADER "Button2DebouncerSM.h"
 // the name of the Init function
-#define SERV_5_INIT InitTestHarnessService5
+#define SERV_5_INIT InitButton2DebouncerSM
 // the name of the run function
-#define SERV_5_RUN RunTestHarnessService5
+#define SERV_5_RUN RunButton2DebouncerSM
 // How big should this services Queue be?
 #define SERV_5_QUEUE_SIZE 3
 #endif
@@ -122,11 +122,11 @@
 // These are the definitions for Service 6
 #if NUM_SERVICES > 6
 // the header file with the public function prototypes
-#define SERV_6_HEADER "TestHarnessService6.h"
+#define SERV_6_HEADER "Button3DebouncerSM.h"
 // the name of the Init function
-#define SERV_6_INIT InitTestHarnessService6
+#define SERV_6_INIT InitButton3DebouncerSM
 // the name of the run function
-#define SERV_6_RUN RunTestHarnessService6
+#define SERV_6_RUN RunButton3DebouncerSM
 // How big should this services Queue be?
 #define SERV_6_QUEUE_SIZE 3
 #endif
@@ -263,7 +263,20 @@ typedef enum
   ES_LOCK,
   ES_UNLOCK,
   EV_JETSON_MESSAGE_RECEIVED,
-  EV_JETSON_TRANSFER_COMPLETE
+  EV_JETSON_TRANSFER_COMPLETE,
+  EV_BUTTON1_DOWN,
+  EV_BUTTON1_UP,
+  EV_BUTTON1_PRESSED,
+  EV_BUTTON1_RELEASED,
+  EV_BUTTON2_DOWN,
+  EV_BUTTON2_UP,
+  EV_BUTTON2_PRESSED,
+  EV_BUTTON2_RELEASED,
+  EV_BUTTON3_DOWN,
+  EV_BUTTON3_UP,
+  EV_BUTTON3_PRESSED,
+  EV_BUTTON3_RELEASED,
+  EV_UPDATE_MOTOR_SPEED
 }ES_EventType_t;
 
 /****************************************************************************/
@@ -298,7 +311,7 @@ typedef enum
 
 /****************************************************************************/
 // This is the list of event checking functions
-#define EVENT_CHECK_LIST Check4Keystroke
+#define EVENT_CHECK_LIST Check4Keystroke, CheckButton1, CheckButton2, CheckButton3
 
 /****************************************************************************/
 // These are the definitions for the post functions to be executed when the
@@ -318,9 +331,9 @@ typedef enum
 #define TIMER8_RESP_FUNC TIMER_UNUSED
 #define TIMER9_RESP_FUNC TIMER_UNUSED
 #define TIMER10_RESP_FUNC TIMER_UNUSED
-#define TIMER11_RESP_FUNC TIMER_UNUSED
-#define TIMER12_RESP_FUNC TIMER_UNUSED
-#define TIMER13_RESP_FUNC TIMER_UNUSED
+#define TIMER11_RESP_FUNC PostButton3DebouncerSM
+#define TIMER12_RESP_FUNC PostButton2DebouncerSM
+#define TIMER13_RESP_FUNC PostButton1DebouncerSM
 #define TIMER14_RESP_FUNC PostJetsonSM
 #define TIMER15_RESP_FUNC PostUsbService
 
@@ -333,6 +346,8 @@ typedef enum
 
 #define SERVICE0_TIMER 15
 #define JETSON_TIMER 14
-
+#define BUTTON1_TIMER 13
+#define BUTTON2_TIMER 12
+#define BUTTON3_TIMER 11
 
 #endif /* ES_CONFIGURE_H */

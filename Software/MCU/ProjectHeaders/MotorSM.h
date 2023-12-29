@@ -16,7 +16,7 @@
 // State definitions for use with the query function
 typedef enum
 {
-  InitPState_Motor, Motor1, Motor2
+  InitPState_Motor, MotorWait
 }MotorState_t;
 
 typedef struct
