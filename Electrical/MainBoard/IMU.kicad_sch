@@ -391,6 +391,11 @@
     (effects (font (size 3 3)) (justify left bottom))
     (uuid 863e1718-a5dc-491e-a0f2-015fbd10ed12)
   )
+  (text "Next Rev. Consider Connecting Int2 to \nOC so we can do external clock if we want"
+    (at 209.55 131.445 0)
+    (effects (font (size 4 4)) (justify left bottom))
+    (uuid e3e198bb-6687-4632-886e-2534936ca78f)
+  )
 
   (hierarchical_label "SDO1" (shape input) (at 175.26 121.92 0) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify left))

@@ -2397,6 +2397,11 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 088e7811-f18b-45e7-b8cf-796851595330)
   )
+  (text "Next revision: Make Sense Resistor\nseries resistors..."
+    (at 112.395 165.1 0)
+    (effects (font (size 5 5)) (justify left bottom))
+    (uuid 13b653d3-057a-41f6-b4eb-873e0a8bfdc9)
+  )
   (text "Motor Voltage:\n8.2 V min\n45 V max" (at 348.615 45.085 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 4d1a846c-3ba8-4d5a-a470-988eade765e6)
