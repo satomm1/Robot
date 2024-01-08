@@ -276,7 +276,8 @@ typedef enum
   EV_BUTTON3_UP,
   EV_BUTTON3_PRESSED,
   EV_BUTTON3_RELEASED,
-  EV_UPDATE_MOTOR_SPEED
+  EV_UPDATE_MOTOR_SPEED,
+  EV_IMU_DATA_UPDATE
 }ES_EventType_t;
 
 /****************************************************************************/

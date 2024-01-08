@@ -16,8 +16,20 @@
 // State definitions for use with the query function
 typedef enum
 {
-  InitPState_IMU, IMU1, IMU2
+  InitPState_IMU, IMUWait
 }ImuState_t;
+
+typedef struct
+{
+    uint8_t LowerByte;
+    uint8_t UpperByte;
+} DataByBytes_t;
+
+typedef union
+{
+    DataByBytes_t DataStruct;
+    uint16_t FullData;
+} AccelGyroData_t;
 
 // Public Function Prototypes
 

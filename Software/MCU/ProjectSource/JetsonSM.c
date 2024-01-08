@@ -81,9 +81,8 @@ bool InitJetsonSM(uint8_t Priority)
   SPI2CON = 0; // Reset SPI1CON settings
   SPI2CONbits.FRMEN = 0; // Disable framed SPI support
   SPI2CONbits.FRMPOL = 0; // SS1 is active low
-//  SPI2CONbits.MCLKSEL = 0; // Use PBCLK2 for the Baud Rate Generator
-  PB2DIVbits.PBDIV = 4; // Reduce PBCLK2 to 50 MHz
-  SPI2CONbits.ENHBUF = 0; // Enhance buffer disabled
+  SPI2CONbits.MCLKSEL = 0; // Use PBCLK2 for the Baud Rate Generator (50 MHz)
+  SPI2CONbits.ENHBUF = 1; // Enhance buffer enabled
   SPI2CONbits.DISSDO = 0; // SDO1 is used by the module
   SPI2CONbits.MODE32 = 0; // 8 bit mode
   SPI2CONbits.MODE16 = 0; // 8 bit mode
@@ -97,6 +96,13 @@ bool InitJetsonSM(uint8_t Priority)
 
   SPI2CON2 = 0; // Reset SPI2CON2 register settings
   SPI2CON2bits.AUDEN = 0; // Audio protocol is disabled
+  
+  while (!SPI2STATbits.SPIRBE){
+      uint8_t ClearData = SPI2BUF;
+  }
+  SPI2STATbits.SPIROV = 0; // Clear the Receive overflow bit
+  
+  // Don't need to set BRG since acting in client mode
   
   // Setup Interrupts
   INTCONbits.MVEC = 1; // Use multivector mode

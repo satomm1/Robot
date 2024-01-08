@@ -21,15 +21,21 @@
 #include "MotorSM.h"
 #include "dbprintf.h"
 #include <sys/attribs.h>
+#include <math.h>
 
 /*----------------------------- Module Defines ----------------------------*/
 #define IC_PERIOD 65535 // Input capture period
-#define OC_PERIOD 833   // Output compare period
-#define CONTROL_PERIOD 200 // Control update period
-#define NO_SPEED_PERIOD 500 // Period to indicate motor not spinning
+#define OC_PERIOD 800   // Output compare period
+#define CONTROL_PERIOD 1000 // Control update period --- 6250 Hz
+#define NO_SPEED_PERIOD 65535 // Period to indicate motor not spinning
 #define Kp 1 // Proportional constant for PID law
 #define Ki 1 // Integral constant for PID law
 
+#define ENCODER_RESOLUTION 374 // Number of pulses per revolution
+#define WHEEL_BASE 0.254 // Distance between wheels on the robot (m)
+#define WHEEL_RADIUS 0.04 // Radius of wheels (m))
+#define DEAD_RECKONING_TIME 0.00016 // Time between dead reckoning updates in seconds (depends on CONTROL_PERIOD)
+#define DEAD_RECKONING_RATIO 2*3.14159 / ENCODER_RESOLUTION / DEAD_RECKONING_TIME * WHEEL_RADIUS // This number times change in encoder clicks is linear velocity in m/second
 /*---------------------------- Module Functions ---------------------------*/
 /* prototypes for private functions for this machine.They should be functions
    relevant to the behavior of this state machine
@@ -46,6 +52,15 @@ static volatile uint32_t LeftPulseLength = 4294967295;
 static volatile uint32_t RightPulseLength = 4294967295; 
 static volatile uint32_t LeftPrevTime = 0; 
 static volatile uint32_t RightPrevTime = 0; 
+
+// Used for dead reckoning to determine current position
+static volatile int32_t LeftRotations = 0;
+static volatile int32_t RightRotations = 0;
+static volatile int32_t LeftPrevRotations = 0;
+static volatile int32_t RightPrevRotations = 0;
+static volatile float x = 0; // x position of the robot
+static volatile float y = 0; // y position of the robot
+static volatile float theta = 0; // angular position of the robot
 
 static uint16_t DesiredLeftRPM;
 static uint16_t DesiredRightRPM;
@@ -80,6 +95,9 @@ bool InitMotorSM(uint8_t Priority)
   TRISDCLR = _TRISD_TRISD5_MASK;
   TRISJCLR = _TRISJ_TRISJ3_MASK;
   
+  RPF2R = 0b1100; // Set RF2 -> OC1
+  RPD5R = 0b1011; // Set RD5 -> OC2
+  
   LATFbits.LATF8 = 0; // Start direction pins low
   LATJbits.LATJ3 = 0; // Start direction pins low
   
@@ -91,6 +109,9 @@ bool InitMotorSM(uint8_t Priority)
   TRISASET = _TRISA_TRISA4_MASK;
   TRISJSET = _TRISJ_TRISJ12_MASK;
   
+  IC1R = 0b0011; // Set IC1 -> RD0
+  IC3R = 0b1010; // Set IC3 -> RC1
+  
   // Set motor current pins to be analog inputs
   ANSELJSET = _ANSELJ_ANSJ9_MASK;
   ANSELASET = _ANSELA_ANSA1_MASK;
@@ -100,39 +121,39 @@ bool InitMotorSM(uint8_t Priority)
   // Setup Timers
   // Timer 1 (for control update)
   T1CON = 0; // Reset the timer 1 register settings
-  T1CONbits.TCKPS = 0b00; // 1:1 prescale value
-  T1CONbits.TCS = 0; // User internal peripheral clock
-  PR1 = CONTROL_PERIOD; // The amount of time we should do a control update
+  T1CONbits.TCKPS = 0b01; // 1:8 prescale value, 6.25 MHz
+  T1CONbits.TCS = 0; // User internal peripheral clock (PBCLK3, 50 MHz)
+  PR1 = CONTROL_PERIOD; // The amount of time we should do a control update (1000=6250 Hz, 500=12500 Hz)
   TMR1 = 0; // Set TMR1 to 0
   
   // Timer 2 (for Output Compare)
   T2CON = 0; // Reset the timer 2 register settings
-  T2CONbits.TCKPS = 0b000; // 1:1 prescale value
+  T2CONbits.TCKPS = 0b100; // 1:16 prescale value, 3.125 MHz
   T2CONbits.T32 = 0; // Use separate 16 bit timers
-  T2CONbits.TCS = 0; // Use internal peripheral clock
-  PR2 = OC_PERIOD; // Use output compare period
+  T2CONbits.TCS = 0; // Use internal peripheral clock (PBCLK3, 50 MHz)
+  PR2 = OC_PERIOD; // Use output compare period (800 = 3906 Hz, 500=6250 Hz, 200=15625 Hz)
   TMR2 = 0; // Set TMR2 to 0
   
   // Timer 3 (For Input Capture)
   T3CON = 0; // Reset the timer 2 register settings
-  T3CONbits.TCKPS = 0b000; // 1:1 prescale value
-  T3CONbits.TCS = 0; // Use internal peripheral clock
-  PR3 = IC_PERIOD; // Use input capture period
+  T3CONbits.TCKPS = 0b011; // 1:8 prescale value, 6.25 MHz
+  T3CONbits.TCS = 0; // Use internal peripheral clock (PBCLK3, 50 MHz)
+  PR3 = IC_PERIOD; // Use input capture period, just use full time
   TMR3 = 0; // Set TMR3 to 0
   
   // Timer 4 (For Left Motor No Speed)
   T4CON = 0;
-  T4CONbits.TCKPS = 0b000; // 1:1 prescale value
+  T4CONbits.TCKPS = 0b111; // 1:256 prescale value, 195.3125  kHz
   T4CONbits.T32 = 0; // Use separate 16 bit timers
-  T4CONbits.TCS = 0; // Use internal peripheral clock
+  T4CONbits.TCS = 0; // Use internal peripheral clock (PBCLK3, 50 MHz)
   PR4 = NO_SPEED_PERIOD; // Use no speed period
   TMR4 = 0; // Set TMR4 to 0
   
   // Timer 5 (For Right Motor No Speed)
   T5CON = 0;
-  T5CONbits.TCKPS = 0b000; // 1:1 prescale value
-  T5CONbits.TCS = 0; // Use internal peripheral clock
-  PR5 = NO_SPEED_PERIOD; // Use no speed period
+  T5CONbits.TCKPS = 0b111; // 1:256 prescale value, 195.3125  kHz
+  T5CONbits.TCS = 0; // Use internal peripheral clock (PBCLK3, 50 MHz)
+  PR5 = NO_SPEED_PERIOD; // Use no speed period, ~3 Hz @ 65535
   TMR5 = 0; // Set TMR5 to 0
   
   // Setup Output compare
@@ -153,21 +174,21 @@ bool InitMotorSM(uint8_t Priority)
   
   // Setup Input capture
   IC1CON = 0; // Reset IC1CON register settings 
-  IC2CON = 0; // Reset IC2CON register settings 
+//  IC2CON = 0; // Reset IC2CON register settings 
   IC3CON = 0; // Reset IC3CON register settings 
-  IC4CON = 0; // Reset IC4CON register settings 
+//  IC4CON = 0; // Reset IC4CON register settings 
   IC1CONbits.ICTMR = 0; // User timery (timer3)
-  IC2CONbits.ICTMR = 0; // User timery (timer3)
+//  IC2CONbits.ICTMR = 0; // User timery (timer3)
   IC3CONbits.ICTMR = 0; // User timery (timer3)
-  IC4CONbits.ICTMR = 0; // User timery (timer3)
+//  IC4CONbits.ICTMR = 0; // User timery (timer3)
   IC1CONbits.ICI = 0b00; // Interrupt on every capture event
-  IC2CONbits.ICI = 0b00; // Interrupt on every capture event
+//  IC2CONbits.ICI = 0b00; // Interrupt on every capture event
   IC3CONbits.ICI = 0b00; // Interrupt on every capture event
-  IC4CONbits.ICI = 0b00; // Interrupt on every capture event
-  IC1CONbits.ICM = 0b001; // Every edge mode
-  IC2CONbits.ICM = 0b001; // Every edge mode
-  IC3CONbits.ICM = 0b001; // Every edge mode
-  IC4CONbits.ICM = 0b011; // Every edge mode
+//  IC4CONbits.ICI = 0b00; // Interrupt on every capture event
+  IC1CONbits.ICM = 0b011; // Every rising edge mode
+//  IC2CONbits.ICM = 0b001; // Every edge mode
+  IC3CONbits.ICM = 0b011; // Every rising edge mode
+//  IC4CONbits.ICM = 0b011; // Every edge mode
   
   // Setup Interrupts
   INTCONbits.MVEC = 1; // Use multivector mode
@@ -175,12 +196,14 @@ bool InitMotorSM(uint8_t Priority)
   PRISSbits.PRI6SS = 0b0110; // Interrupt with a priority level of 6 uses Shadow Set 6
   
   // Set interrupt priorities
-  IPC1bits.IC1IP = 7; // IC1
-//  IPC2bits.IC2IP = 7; // IC2
+  IPC1bits.IC1IP = 7; // IC1 Priority
+  IPC1bits.IC1IS = 3; // IC1 Sub-priority
   IPC4bits.IC3IP = 7; // IC3
-//  IPC5bits.IC4IP = 7; // IC4
+  IPC4bits.IC3IS = 3; // IC3 Sub-priority
   IPC1bits.T1IP = 7; // T1
+  IPC1bits.T1IS = 2; // T1 Sub-priority
   IPC3bits.T3IP = 7; // T3
+  IPC3bits.T3IS = 3; // T3 Sub-priority
   IPC4bits.T4IP = 6; // T4
   IPC6bits.T5IP = 6; // T5
   
@@ -264,6 +287,9 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
     {
       if (ThisEvent.EventType == ES_INIT) 
       {
+        LeftRotations = 0;
+        RightRotations = 0;
+          
         // now put the machine into the actual initial state
         CurrentState = MotorWait;
       }
@@ -372,6 +398,10 @@ void SetDesiredSpeed(float LinearVelocity, float AngularVelocity)
 ****************************************************************************/
 void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
 {
+    static uint8_t ChannelB = 0; // static for speed
+    
+    ChannelB = PORTHbits.RH8;
+    
     MyTimer.TimeStruct.TimerBits = (uint16_t)IC1BUF; // grab the captured time 
     IFS0CLR = _IFS0_IC1IF_MASK; // Clear the interrupt
     if (IFS0bits.T3IF && MyTimer.TimeStruct.TimerBits < 0x8000) {            
@@ -382,6 +412,13 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
     // Calculate the time length between encoder pulses
     LeftPulseLength = MyTimer.FullTime - LeftPrevTime;         
     LeftPrevTime = MyTimer.FullTime; // update our last time variable 
+    
+    // Update number of rotations for dead reckoning
+    if (ChannelB) {
+        LeftRotations -= 1;
+    } else {
+        LeftRotations += 1;
+    }
     
     // restart Timer4 (timer to indicate if motor is stopped)
     T4CONCLR = _T4CON_ON_MASK;     
@@ -403,6 +440,10 @@ void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL7SRS) IC2Handler(void)
 ****************************************************************************/
 void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
 {
+    static uint8_t ChannelB = 0; // static for speed
+    
+    ChannelB = PORTCbits.RC4;
+    
     MyTimer.TimeStruct.TimerBits = (uint16_t)IC3BUF; // grab the captured time 
     IFS0CLR = _IFS0_IC3IF_MASK; // Clear the interrupt
     if (IFS0bits.T3IF && MyTimer.TimeStruct.TimerBits < 0x8000) {            
@@ -413,6 +454,13 @@ void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
     // Calculate the time length between encoder pulses
     RightPulseLength = MyTimer.FullTime - RightPrevTime;         
     RightPrevTime = MyTimer.FullTime; // update our last time variable 
+    
+    // Update number of rotations for dead reckoning
+    if (ChannelB) {
+        RightRotations -= 1;
+    } else {
+        RightRotations += 1;
+    }
     
     // restart Timer5 (timer to indicate if motor is stopped)
     T5CONCLR = _T5CON_ON_MASK;     
@@ -446,6 +494,16 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     static uint16_t ActualLeftRPM;
     static uint16_t ActualRightRPM;
     
+    static float V_l; // Left wheel linear velocity (m/s)
+    static float V_r; // Right wheel linear velocity (m/s)
+    static float V;   // Robot linear velocity (m/s)
+    static float omega; // Robot angular velocity (rad/second)
+    
+    // Initialize Runge-Kutta Variables (static for speed)
+    static float k00, k01, k02;
+    static float k10, k11, k12;
+    static float k20, k21, k22;
+    static float k30, k31, k32;
     
     IFS0CLR = _IFS0_T1IF_MASK; // Clear the timer interrupt
     
@@ -492,6 +550,35 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
         RightDutyCycle = 100 - RightDutyCycle;
     }
     OC2RS = (OC_PERIOD + 1)/100 * RightDutyCycle;
+    
+    // Calculate linear velocity of both wheels
+    V_l = (LeftRotations - LeftPrevRotations) * DEAD_RECKONING_RATIO; 
+    V_r = (RightRotations - RightPrevRotations) * DEAD_RECKONING_RATIO;
+    
+    // Calculate linear/angular velocity of robot
+    V = (V_l + V_r) / 2; 
+    omega = (V_r - V_l) / WHEEL_BASE;
+    
+    // Now calculate the position of the robot using 4th order Runge Kutta
+    k00 = V * cosf(theta);
+    k01 = V * sinf(theta);
+    k02 = omega;
+    
+    k10 = V * cosf(theta + DEAD_RECKONING_TIME / 2 * k02);
+    k11 = V * sinf(theta + DEAD_RECKONING_TIME / 2 * k02);
+    k12 = omega;
+    
+    k20 = V * cosf(theta + DEAD_RECKONING_TIME / 2 * k12);
+    k21 = V * sinf(theta + DEAD_RECKONING_TIME / 2 * k12);
+    k22 = omega;
+    
+    k30 = V * cosf(theta + DEAD_RECKONING_TIME * k22);
+    k31 = V * sinf(theta + DEAD_RECKONING_TIME * k22);
+    k32 = omega;
+    
+    x = x + DEAD_RECKONING_TIME / 6 * (k00 + 2*(k10 + k20) + k30);
+    y = y + DEAD_RECKONING_TIME / 6 * (k01 + 2*(k11 + k21) + k31);
+    theta = theta + DEAD_RECKONING_TIME / 6 * (k02 + 2*(k12 + k22) + k32);
 }
 
 /****************************************************************************

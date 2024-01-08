@@ -95,7 +95,8 @@
 #include <sys/attribs.h>    // for ISR macors
 
 #include <stdint.h>         // for exact size data types
-#include <stdbool.h>        // for the bool data type
+#include <stdbool.h>
+#include <proc/p32mz0512eff144.h>        // for the bool data type
 
 #include "ES_Port.h"        // the header file for this module
 #include "ES_Types.h"       // framework type definitions
@@ -156,6 +157,65 @@ void _HW_PIC32Init(void)
   }
 #endif
 }
+
+/****************************************************************************
+ Function
+     _PBCLK_Init
+ Parameters
+     none
+ Returns
+     None.
+ Description
+     Sets up the frequency for the PBCLKs
+****************************************************************************/
+void _PBCLK_Init (void)
+{
+  // PBCLK1 (WDT, Deadman Timer, Fash, RTCC, OSC2 Pin)
+  while (!PB1DIVbits.PBDIVRDY) {
+      // Do nothing, wait for clock divisor logic to not be switching
+  }  
+  PB1DIVbits.PBDIV = 0b0000011; // Reduce peripheral clock to 50 MHz (divide by 4)
+  
+  // PBCLK2 (PMP, I2C, UART, SPI)
+  while (!PB2DIVbits.PBDIVRDY) {
+      // Do nothing, wait for clock divisor logic to not be switching
+  }  
+  PB2DIVbits.PBDIV = 0b0000011; // Reduce peripheral clock to 50 MHz (divide by 4)
+    
+  // PBCLK3 (ADC, Comparator, Timers, Output Compare, Input Capture)
+  while (!PB3DIVbits.PBDIVRDY) {
+      // Do nothing, wait for clock divisor logic to not be switching
+  }
+  PB3DIVbits.PBDIV = 0b0000011; // Reduce peripheral clock to 50 MHz (divide by 4)
+  
+  // PBLCK4 (Ports)
+  while (!PB4DIVbits.PBDIVRDY) {
+      // Do nothing, wait for clock divisor logic to not be switching
+  }
+  PB4DIVbits.PBDIV = 0b0000001; // Reduce peripheral clock to 100 MHz (divide by 2)
+  
+  // PBLCK5 (Crypto, RNG, USB, CAN, Ethernet, SQI)
+  while (!PB5DIVbits.PBDIVRDY) {
+      // Do nothing, wait for clock divisor logic to not be switching
+  }
+  PB5DIVbits.ON = 0; // Turn off PBCLK, not needed
+  
+  // PBCLK7 (CPU, Deadman Timer)
+  // Don't do anything --- leave at default (which is divide by 1 for PBCLK7 only)
+  
+  // PBCLK8 (External bus interface)
+  while (!PB8DIVbits.PBDIVRDY) {
+      // Do nothing, wait for clock divisor logic to not be switching
+  }
+  PB8DIVbits.ON = 0; // Turn off PBCLK, not needed
+  
+  // Make sure all PBCLKs have had time to finish switching divisor
+  while (!PB4DIVbits.PBDIVRDY) {
+      // Do nothing, wait for clock divisor logic to not be switching
+  }
+  
+}
+
 /****************************************************************************
  Function
      _HW_Timer_Init

@@ -114,6 +114,7 @@ bool kbhit(void);                // is a charcter ready on the EUSART?
 
 // prototypes for the hardware specific routines
 void _HW_PIC32Init(void);
+void _PBCLK_Init(void);
 void _HW_Timer_Init(const TimerRate_t Rate);
 bool _HW_Process_Pending_Ints(void);
 uint16_t _HW_GetTickCount(void);
