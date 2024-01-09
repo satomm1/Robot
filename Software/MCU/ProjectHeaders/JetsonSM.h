@@ -16,7 +16,7 @@
 // State definitions for use with the query function
 typedef enum
 {
-  InitPState_Jetson, RobotInactive, RobotActive
+  InitPState_Jetson, RobotInactive, RobotPending, RobotActive
 }JetsonState_t;
 
 // Public Function Prototypes

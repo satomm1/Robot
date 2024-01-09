@@ -349,7 +349,8 @@ MotorState_t QueryMotorSM(void)
      None
 
  Description
-     Sets the desired RPM for the two motors
+     Sets the desired RPM for the two motors. Assumes the direction pins are 
+     already correctly set to have wheels moving in correct direction
 ****************************************************************************/
 void SetDesiredRPM(uint16_t LeftRPM, uint16_t RightRPM)
 {
@@ -362,8 +363,8 @@ void SetDesiredRPM(uint16_t LeftRPM, uint16_t RightRPM)
      SetDesiredRPM
 
  Parameters
-     float LinearVelocity: the desired linear velocity
-     float AngularVelocity: the desired angular velocity
+     float V: the desired linear velocity
+     float w: the desired angular velocity, rad/second
 
  Returns
      None
@@ -371,16 +372,41 @@ void SetDesiredRPM(uint16_t LeftRPM, uint16_t RightRPM)
  Description
      Sets the desired RPM for the two motors
 ****************************************************************************/
-void SetDesiredSpeed(float LinearVelocity, float AngularVelocity)
+void SetDesiredSpeed(float V, float w)
 {
-    // TODO: Calculate Left/Right RPM based on input linear/angular velocities
-    SetDesiredRPM(0, 0);
+    // Calculate the angular velocity of the left/right wheel to achieve 
+    // desired linear/angular velocity of the robot
+    float v_r = V / WHEEL_RADIUS;
+    float w_r = WHEEL_BASE * w / 2 / WHEEL_RADIUS;
+    float left_w = v_r - w_r; // (rad/sec)
+    float right_w = v_r + w_r; // (rad/sec)
     
-    // Also set direction pins and update internal representation:
-//    LATFbits.LATF8 = 0; // Start direction pins low
-//    LATJbits.LATJ3 = 0; // Start direction pins low
-//    LeftDirection = Forward;
-//    RightDirection = Forward;
+    // Convert to revolutions per minute
+    left_w = left_w * 3600 / 2 / 3.14159; // (rev/min)
+    right_w = right_w * 3600 / 2 / 3.14159; // (rev/min)
+    
+    // Set the direction pins to the H-Bridge to get correct forward or 
+    // backward motion
+    if (left_w  >= 0) {
+        LATFbits.LATF8 = 0; // Set direction pin forward
+        LeftDirection = Forward;
+    } else {
+        LATFbits.LATF8 = 1; // Set direction pin to backward
+        LeftDirection = Backward;
+        left_w = -left_w;
+    }
+    
+    if (right_w >= 0) {
+        LATJbits.LATJ3 = 0; // Set direction pin forward
+        RightDirection = Forward;
+    } else {
+        LATJbits.LATJ3 = 1; // Set direction pin to backward
+        RightDirection = Backward;
+        right_w = - right_w;
+    }
+    
+    // Last set the desired RPM variables
+    SetDesiredRPM(left_w, right_w);
 }
 
 /***************************************************************************

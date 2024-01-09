@@ -25,12 +25,15 @@
 
 /*----------------------------- Module Defines ----------------------------*/
 #define JETSON_TIMEOUT 10000 // Timeout where no SPI response disconnects us
+#define PENDING_TIMEOUT 1000 // Timeout to receive confirmation that Jetson recieved our confirmation message
 #define YELLOW_LATCH LATJbits.LATJ4
 #define GREEN_LATCH LATJbits.LATJ5
 /*---------------------------- Module Functions ---------------------------*/
 /* prototypes for private functions for this machine.They should be functions
    relevant to the behavior of this state machine
 */
+void WriteImuToBuffer(void);
+void WritePositionToBuffer(void);
 
 /*---------------------------- Module Variables ---------------------------*/
 // everybody needs a state variable, you may need others as well.
@@ -91,8 +94,8 @@ bool InitJetsonSM(uint8_t Priority)
   SPI2CONbits.CKP = 1; // Idle state for the clock is high level
   SPI2CONbits.MSTEN = 0; // Client mode
   SPI2CONbits.DISSDI = 0; // The SDI pin is controlled by the module
-  SPI2CONbits.STXISEL = 0b01; // Interrupt is generated when the buffer is completely empty
-  SPI2CONbits.SRXISEL = 0b10; // Interrupt is generated when the receive buffer is full by one-half or more (8)
+  SPI2CONbits.STXISEL = 0b00; // Onterrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
+  SPI2CONbits.SRXISEL = 0b11; // Interrupt is generated when the receive buffer is full (16)
 
   SPI2CON2 = 0; // Reset SPI2CON2 register settings
   SPI2CON2bits.AUDEN = 0; // Audio protocol is disabled
@@ -191,15 +194,35 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
       {
         case EV_JETSON_MESSAGE_RECEIVED:  
         { 
-          if (ReceiveBuffer[ThisEvent.EventParam][0] == 0b11111111) {
-            SPI2BUF = 0b00000000;
+          if (ReceiveBuffer[ThisEvent.EventParam][1] == 0b11111111) {
+
+            // Send message received message to Jetson
+            SPI2BUF = 0;
             SPI2BUF = 0b11111111;
-            SPI2BUF = 0b00000000;
-            SPI2BUF = 0b00000000;
-            SPI2BUF = 0b00000000;
-            SPI2BUF = 0b00000000;
-            SPI2BUF = 0b00000000;
-            SPI2BUF = 0b00000000;
+            SPI2BUF = 0;
+            
+            // Start pending timeout timer
+            ES_Timer_InitTimer(JETSON_TIMER, PENDING_TIMEOUT);
+            
+            CurrentState = RobotPending;  
+          }
+        }
+        break;
+
+        default:
+          ;
+      } 
+    }
+    break;
+    
+    case RobotPending:
+    {
+      switch (ThisEvent.EventType)
+      {
+        case EV_JETSON_MESSAGE_RECEIVED:  
+        { 
+          if (ReceiveBuffer[ThisEvent.EventParam][1] == 0b10101010) {
+            // We received confirmation that the message was received
             
             YELLOW_LATCH = 0; // Turn yellow LED off
             GREEN_LATCH = 1; // Turn green LED on
@@ -209,7 +232,13 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
           }
         }
         break;
-
+        
+        case ES_TIMEOUT:
+        {
+            CurrentState = RobotInactive;
+        }
+        break;
+            
         default:
           ;
       } 
@@ -225,42 +254,20 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
           // Determine what message type we have
           switch (ReceiveBuffer[ThisEvent.EventParam][0])
           {
-            case 0b00000001: // Received Odom Request message
-            {
-              // Nothing to do, just reset timeout timer
-              ES_Timer_InitTimer(JETSON_TIMER, JETSON_TIMEOUT);
-            }
-            break;
-            
-            case 0b00000010: // Received Velocity Update message
-            {
-              // TODO: Translate message to linear/angular velocity values
-              float lin_vel = 0.;
-              float ang_vel = 0.;
-              SetDesiredSpeed(lin_vel,ang_vel);
-            }
-            break;
-              
-            case 0b10101010: // Received message to shutdown
+            case 0b11110000: // Received Disconnect Message
             {
               SetDesiredRPM(0, 0); // Stop all movement of the robot
-              ES_Timer_StopTimer(JETSON_TIMER);
-            
+              ES_Timer_StopTimer(JETSON_TIMER); // Stop timer
+              
               YELLOW_LATCH = 1; // Turn yellow LED on
               GREEN_LATCH = 0;  // Turn green LED off
-              CurrentState = RobotInactive;      
+              CurrentState = RobotInactive;     
             }
             break;
             
             default:
               ;  
           }       
-        }
-        break;
-
-        case EV_JETSON_TRANSFER_COMPLETE:  
-        { 
-          // TODO: Get Odometry Update and put in TX Buffer
         }
         break;
         
@@ -272,6 +279,15 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
           YELLOW_LATCH = 1; // Turn yellow LED on
           GREEN_LATCH = 0;  // Turn green LED off
           CurrentState = RobotInactive;
+        }
+        break;
+        
+        case EV_JETSON_VELOCITY_RECEIVED:
+        {
+            // TODO Change this to align with way it is being sent
+            float desired_lin_v = ReceiveBuffer[ThisEvent.EventParam][1];
+            float desired_ang_v = ReceiveBuffer[ThisEvent.EventParam][2];
+            SetDesiredSpeed(desired_lin_v, desired_ang_v);
         }
             
         default:
@@ -323,8 +339,7 @@ void __ISR(_SPI2_TX_VECTOR, IPL7SRS) SPI2TXHandler(void)
     // Clear the interrupt
     IFS4CLR = _IFS4_SPI2TXIF_MASK;
     
-    // Tell state machine the transfer buffer is empty
-    PostJetsonSM(TransferEvent);
+    // We may not need this interrupt!
 }
 
 
@@ -334,28 +349,71 @@ void __ISR(_SPI2_TX_VECTOR, IPL7SRS) SPI2TXHandler(void)
 
  Description
    Creates an event when a SPI message is received
+ * 
+ * We are expecting incoming messages to come in the following form. Each 
+ * message will be 16 8-bit words:
+ *  - Message 1: Header message indicating start of sequence and containing the desired velocities
+ *  - Message 2: Message so that IMU data can be passed
+ *  - Message 3: Message so that position can be passed
 ****************************************************************************/
 void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
 {
     // Static for speed
     static ES_Event_t ReceiveEvent = {EV_JETSON_MESSAGE_RECEIVED, 0};
+    static ES_Event_t VelocityUpdateEvent = {EV_JETSON_VELOCITY_RECEIVED, 0};
     static uint8_t buffer_num = 0;
+    
+    // Read the data from the buffer
+    for (uint8_t i=0; i < 16; i++) {
+        ReceiveBuffer[buffer_num][i] = SPI2BUF;
+    }
     
     // Clear the interrupt
     IFS4CLR = _IFS4_SPI2RXIF_MASK; 
     
-    for (uint8_t i=0; i < 8; i++) {
-        ReceiveBuffer[buffer_num][i] = SPI2BUF;
-    }
+    ES_Timer_InitTimer(JETSON_TIMER, JETSON_TIMEOUT); // Restart timeout timer
    
-    // Tell which buffer we just stored the data in
-    ReceiveEvent.EventParam = buffer_num;
-    if (buffer_num) {
-        buffer_num = 0;
-    } else {
-        buffer_num = 1;
+    if (ReceiveBuffer[buffer_num][0] == 1) {
+        // Put in IMU Data
+        WriteImuToBuffer(); // Write data first to make sure we have it in the buffer -- may be unneccesary (i.e. can we just post an event here and do this outside the isr)
+        
+        // This message contains velocity update info:
+        VelocityUpdateEvent.EventParam = buffer_num; // Tell which buffer we just stored the data in
+        if (buffer_num) {
+            buffer_num = 0;
+        } else {
+            buffer_num = 1;
+        }
+        PostJetsonSM(VelocityUpdateEvent); // Tell state machine we have updated velocities   
+    } else if (ReceiveBuffer[buffer_num][0] == 2) {
+        // Put in Position Data
+        WritePositionToBuffer(); // Write data first to make sure we have it in the buffer -- may be unneccesary (i.e. can we just post an event here and do this outside the isr)
+    } else if (ReceiveBuffer[buffer_num][0] == 3) {
+        // Add any information to be passed the next time the sequence is started
+        // Nothing to add here 
+    } else if (ReceiveBuffer[buffer_num][0] == 4) {
+        // This message is not as time sensitive and will lead to end or start of connection
+        
+        // Tell which buffer we just stored the data in
+        ReceiveEvent.EventParam = buffer_num;
+        if (buffer_num) {
+            buffer_num = 0;
+        } else {
+            buffer_num = 1;
+        }
+        
+        // Tell state machine the data is ready
+        PostJetsonSM(ReceiveEvent);
     }
     
-    // Tell state machine the data is ready
-    PostJetsonSM(ReceiveEvent);
+}
+
+void WriteImuToBuffer(void)
+{
+    
+}
+
+void WritePositionToBuffer(void)
+{
+    
 }
