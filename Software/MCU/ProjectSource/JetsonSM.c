@@ -283,9 +283,22 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
         
         case EV_JETSON_VELOCITY_RECEIVED:
         {
-            // TODO Change this to align with way it is being sent
-            float desired_lin_v = ReceiveBuffer[ThisEvent.EventParam][1];
-            float desired_ang_v = ReceiveBuffer[ThisEvent.EventParam][2];
+            float desired_lin_v;
+            float desired_ang_v;
+            
+            // Convert Data to 
+            uint32_t combined_bytes = ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][1] << 24) | 
+                    ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][2] << 16) |
+                    ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][3] << 8) |
+                    ReceiveBuffer[ThisEvent.EventParam][4];
+            *((uint32_t*)&desired_lin_v) = combined_bytes;
+            
+            combined_bytes = ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][5] << 24) | 
+                    ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][6] << 16) |
+                    ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][7] << 8) |
+                    ReceiveBuffer[ThisEvent.EventParam][8];
+            *((uint32_t*)&desired_ang_v) = combined_bytes;
+            
             SetDesiredSpeed(desired_lin_v, desired_ang_v);
         }
             
@@ -372,25 +385,30 @@ void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
     
     ES_Timer_InitTimer(JETSON_TIMER, JETSON_TIMEOUT); // Restart timeout timer
    
-    if (ReceiveBuffer[buffer_num][0] == 1) {
-        // Put in IMU Data
-        WriteImuToSPI(SPI2BUF); // Write data first to make sure we have it in the buffer -- may be unneccesary (i.e. can we just post an event here and do this outside the isr)
-        
-        // This message contains velocity update info:
+    if (ReceiveBuffer[buffer_num][0] == 0) {
+        // This is an update velocity message
         VelocityUpdateEvent.EventParam = buffer_num; // Tell which buffer we just stored the data in
         if (buffer_num) {
             buffer_num = 0;
         } else {
             buffer_num = 1;
         }
-        PostJetsonSM(VelocityUpdateEvent); // Tell state machine we have updated velocities   
+        PostJetsonSM(VelocityUpdateEvent); // Tell state machine we have updated velocities       
+    } else if (ReceiveBuffer[buffer_num][0] == 1) {
+        // Put in Accel Data
+        WriteAccelToSPI(SPI2BUF); // Write data first to make sure we have it in the buffer -- may be unneccesary (i.e. can we just post an event here and do this outside the isr)
     } else if (ReceiveBuffer[buffer_num][0] == 2) {
+        // Put in Gyro Data
+        WriteGyroToSPI(SPI2BUF);
+    } else if (ReceiveBuffer[buffer_num][0] == 3) {
         // Put in Position Data
         WritePositionToSPI(SPI2BUF); // Write data first to make sure we have it in the buffer -- may be unneccesary (i.e. can we just post an event here and do this outside the isr)
-    } else if (ReceiveBuffer[buffer_num][0] == 3) {
+    } else if (ReceiveBuffer[buffer_num][0] == 4) {
+        WriteDeadReckoningVelocityToSPI(SPI2BUF);
+    } else if (ReceiveBuffer[buffer_num][0] == 5) {
         // Add any information to be passed the next time the sequence is started
         // Nothing to add here 
-    } else if (ReceiveBuffer[buffer_num][0] == 4) {
+    }else if (ReceiveBuffer[buffer_num][0] == 99) {
         // This message is not as time sensitive and will lead to end or start of connection
         
         // Tell which buffer we just stored the data in

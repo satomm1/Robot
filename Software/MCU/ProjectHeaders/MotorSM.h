@@ -46,6 +46,7 @@ MotorState_t QueryMotorSM(void);
 void SetDesiredRPM(uint16_t LeftRPM, uint16_t RightRPM);
 void SetDesiredSpeed(float LinearVelocity, float AngularVelocity);
 void WritePositionToSPI(uint32_t Buffer);
+void WriteDeadReckoningVelocityToSPI(uint32_t Buffer);
 
 #endif /* MotorFSM_H */
 

@@ -62,6 +62,10 @@ static volatile float x = 0; // x position of the robot
 static volatile float y = 0; // y position of the robot
 static volatile float theta = 0; // angular position of the robot
 
+// History variables to keep track of current V and w
+static volatile float V_current = 0;
+static volatile float w_current = 0;
+
 static uint16_t DesiredLeftRPM;
 static uint16_t DesiredRightRPM;
 
@@ -448,6 +452,24 @@ void WritePositionToSPI(uint32_t Buffer) {
   }
 }
 
+void WriteDeadReckoningVelocityToSPI(uint32_t Buffer) {
+    Buffer = 7; // 7 indcates the message type (byte 1)
+    
+    // the V/w data are floats. The floats can be sent as 4 chunks of 8 bits
+    
+    // Write V (bytes 2-5)
+    uint32_t V_as_int = *((uint32_t*)&V_current);
+    for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+        Buffer = (V_as_int >> (24-8*j)) & 0xFF;
+    }
+    
+    // Write w (bytes 6-9)
+    uint32_t w_as_int = *((uint32_t*)&w_current);
+    for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+        Buffer = (w_as_int >> (24-8*j)) & 0xFF;
+    }
+}
+
 /***************************************************************************
  private functions
  ***************************************************************************/
@@ -623,6 +645,9 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     // Calculate linear/angular velocity of robot
     V = (V_l + V_r) / 2; 
     omega = (V_r - V_l) / WHEEL_BASE;
+    
+    V_current = V; // used to store current velocity
+    w_current = omega; // used to store current angular velocity
     
     // Now calculate the position of the robot using 4th order Runge Kutta
     k00 = V * cosf(theta);
