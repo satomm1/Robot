@@ -28,7 +28,7 @@ typedef struct
 typedef union
 {
     DataByBytes_t DataStruct;
-    uint16_t FullData;
+    int16_t FullData;
 } AccelGyroData_t;
 
 // Public Function Prototypes
@@ -37,6 +37,8 @@ bool InitImuSM(uint8_t Priority);
 bool PostImuSM(ES_Event_t ThisEvent);
 ES_Event_t RunImuSM(ES_Event_t ThisEvent);
 ImuState_t QueryImuSM(void);
-
+void WriteImuToSPI(uint32_t Buffer);
+void WriteAccelToSPI(uint32_t Buffer);
+void WriteGyroToSPI(uint32_t Buffer);
 #endif /* ImuFSM_H */
 

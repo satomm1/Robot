@@ -21,7 +21,7 @@ class MCU_Comms:
         self.spi.max_speed_hz = BAUD_RATE
 
         # Bringup Message to MCU
-        bringup_message = [0b11111111, 0, 0, 0, 0, 0, 0, 0]
+        bringup_message = [4, 0b11111111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
         # Send bringup message to MCU until received and confirmed
         bringup_confirmed = False
@@ -29,6 +29,8 @@ class MCU_Comms:
             rcvd = self.spi.xfer(bringup_message)
             if rcvd[0] == 0 and rcvd[1] == 255 and rcvd[2] == 0:
                 bringup_confirmed = True  # Mattbot is active
+                confirmation_message = [4, 0b10101010, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                rcvd2 = self.spi.xfer(confirmation_message)
 
         # The node for SPI Comms
         rospy.init_node("mattbot_mcu_comms", anonymous=True)
@@ -64,8 +66,9 @@ class MCU_Comms:
         """
         publishes a shutdown message to MCU via SPI
         """
-        shutdown_message = [0b10101010, 0, 0, 0, 0]  # shutdown message
+        shutdown_message = [4, 0b11110000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # shutdown message
         rcvd = self.spi.xfer(shutdown_message)
+        rcvd = self.spi.xfer(shutdown_message) # Send twice just to be sure
 
         self.spi.close()
 
@@ -74,10 +77,16 @@ class MCU_Comms:
         Periodically retrieves odometry data from the sensors/MCU via SPI
         """
         rate = rospy.Rate(10)  # 10 Hz
-        odom_message = [0b00000001, 0, 0, 0, 0]
+
+        setup_message = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        odom_message = [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        position_message = [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         while not rospy.is_shutdown():
-            rcvd = self.spi.xfer(odom_message)
-            # TODO: Now do something withe the odom data
+            rcvd = self.spi.xfer(setup_message)
+            odom = self.spi.xfer(odom_message)
+            position = self.spi.xfer(position_message)
+
+            # TODO: Now do something withe the odom/position data
 
             rate.sleep()
 

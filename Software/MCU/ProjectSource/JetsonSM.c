@@ -21,6 +21,7 @@
 #include <sys/attribs.h>
 #include "JetsonSM.h"
 #include "MotorSM.h"
+#include "IMU_SM.h"
 #include "dbprintf.h"
 
 /*----------------------------- Module Defines ----------------------------*/
@@ -32,8 +33,6 @@
 /* prototypes for private functions for this machine.They should be functions
    relevant to the behavior of this state machine
 */
-void WriteImuToBuffer(void);
-void WritePositionToBuffer(void);
 
 /*---------------------------- Module Variables ---------------------------*/
 // everybody needs a state variable, you may need others as well.
@@ -375,7 +374,7 @@ void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
    
     if (ReceiveBuffer[buffer_num][0] == 1) {
         // Put in IMU Data
-        WriteImuToBuffer(); // Write data first to make sure we have it in the buffer -- may be unneccesary (i.e. can we just post an event here and do this outside the isr)
+        WriteImuToSPI(SPI2BUF); // Write data first to make sure we have it in the buffer -- may be unneccesary (i.e. can we just post an event here and do this outside the isr)
         
         // This message contains velocity update info:
         VelocityUpdateEvent.EventParam = buffer_num; // Tell which buffer we just stored the data in
@@ -387,7 +386,7 @@ void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
         PostJetsonSM(VelocityUpdateEvent); // Tell state machine we have updated velocities   
     } else if (ReceiveBuffer[buffer_num][0] == 2) {
         // Put in Position Data
-        WritePositionToBuffer(); // Write data first to make sure we have it in the buffer -- may be unneccesary (i.e. can we just post an event here and do this outside the isr)
+        WritePositionToSPI(SPI2BUF); // Write data first to make sure we have it in the buffer -- may be unneccesary (i.e. can we just post an event here and do this outside the isr)
     } else if (ReceiveBuffer[buffer_num][0] == 3) {
         // Add any information to be passed the next time the sequence is started
         // Nothing to add here 
@@ -405,15 +404,5 @@ void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
         // Tell state machine the data is ready
         PostJetsonSM(ReceiveEvent);
     }
-    
-}
-
-void WriteImuToBuffer(void)
-{
-    
-}
-
-void WritePositionToBuffer(void)
-{
     
 }

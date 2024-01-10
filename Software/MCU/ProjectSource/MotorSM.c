@@ -409,6 +409,45 @@ void SetDesiredSpeed(float V, float w)
     SetDesiredRPM(left_w, right_w);
 }
 
+/****************************************************************************
+ Function
+     WritePositionToSPI
+
+ Parameters
+     uint32_t Buffer: the SPI buffer address to write the position data to
+
+ Returns
+     None
+
+ Description
+     Writes the current position data to the specified SPI buffer
+****************************************************************************/
+void WritePositionToSPI(uint32_t Buffer) {
+    
+  Buffer = 8; // 8 indicates we are position data (byte 1)
+    
+  // The x/y/theta data are all floats. The floats can be sent as 4 chunks of 
+  // 8 bits.
+  
+  // Now write the x data (bytes 2-5)
+  uint32_t x_as_int = *((uint32_t*)&x);
+  for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+    Buffer = (x_as_int >> (24-8*j)) & 0xFF;
+  }
+  
+  // Now write the y data (bytes 6-9)
+  uint32_t y_as_int = *((uint32_t*)&y);
+  for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+    Buffer = (y_as_int >> (24-8*j)) & 0xFF;
+  }
+  
+  // Now write the theta data (bytes 10-13)
+  uint32_t theta_as_int = *((uint32_t*)&theta);
+  for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+    Buffer = (theta_as_int >> (24-8*j)) & 0xFF;
+  }
+}
+
 /***************************************************************************
  private functions
  ***************************************************************************/

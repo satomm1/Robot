@@ -25,6 +25,10 @@
 #define READ  0b10000000
 #define WRITE 0b00000000
 #define FIFO_PACKET_SIZE 16
+#define ACCEL_SENSITIVITY 4096 // LSB/g
+#define GYRO_SENSITIVITY 131 // LSB/(deg/s)
+#define ACCEL_MAX 8  // 8g
+#define GYRO_MAX 250 // deg/sec
 
 /*---------------------------- Module Functions ---------------------------*/
 /* prototypes for private functions for this machine.They should be functions
@@ -43,13 +47,15 @@ static ImuState_t CurrentState;
 // with the introduction of Gen2, we need a module level Priority var as well
 static uint8_t MyPriority;
 
-uint8_t FIFO_index = 0;
-uint8_t Active_FIFO = 1;
-uint8_t Readable_FIFO;
-int8_t IMU_FIFO[2][16];
+static uint8_t FIFO_index = 0;
+static uint8_t Active_FIFO = 1;
+static uint8_t Readable_FIFO;
+static int8_t IMU_FIFO[2][16];
 
-AccelGyroData_t Accel[3]; // Holds the current acceleration
-AccelGyroData_t Gyro[3]; // Holds the current gyroscope readings
+static AccelGyroData_t Accel[3]; // Holds the current acceleration data from IMU
+static float Accel_g[3]; // Holds acceleration in g's
+static AccelGyroData_t Gyro[3]; // Holds the current gyroscope readings from IMU
+static float Gyro_deg_s[3]; // Holds the angular velocity in deg/s
 
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
@@ -219,19 +225,24 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
         case EV_IMU_DATA_UPDATE:  
         { 
           uint8_t indx = ThisEvent.EventParam;
-          Accel[0].DataStruct.LowerByte = IMU_FIFO[indx][2];
           Accel[0].DataStruct.UpperByte = IMU_FIFO[indx][1];
-          Accel[1].DataStruct.LowerByte = IMU_FIFO[indx][4];
+          Accel[0].DataStruct.LowerByte = IMU_FIFO[indx][2];
           Accel[1].DataStruct.UpperByte = IMU_FIFO[indx][3];
-          Accel[2].DataStruct.LowerByte = IMU_FIFO[indx][6];
+          Accel[1].DataStruct.LowerByte = IMU_FIFO[indx][4];
           Accel[2].DataStruct.UpperByte = IMU_FIFO[indx][5];
-          
-          Gyro[0].DataStruct.LowerByte = IMU_FIFO[indx][8];
+          Accel[2].DataStruct.LowerByte = IMU_FIFO[indx][6];
+               
           Gyro[0].DataStruct.UpperByte = IMU_FIFO[indx][7];
-          Gyro[1].DataStruct.LowerByte = IMU_FIFO[indx][10];
+          Gyro[0].DataStruct.LowerByte = IMU_FIFO[indx][8];
           Gyro[1].DataStruct.UpperByte = IMU_FIFO[indx][9];
-          Gyro[2].DataStruct.LowerByte = IMU_FIFO[indx][12];
+          Gyro[1].DataStruct.LowerByte = IMU_FIFO[indx][10];
           Gyro[2].DataStruct.UpperByte = IMU_FIFO[indx][11];
+          Gyro[2].DataStruct.LowerByte = IMU_FIFO[indx][12];       
+          
+          for (uint8_t i=1; i<3; i++) {
+            Accel_g[i] = Accel[i].FullData / ACCEL_SENSITIVITY;
+            Gyro_deg_s[i] = Gyro[i].FullData / GYRO_SENSITIVITY;
+          }
         }
         break;
 
@@ -264,6 +275,103 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
 ImuState_t QueryImuSM(void)
 {
   return CurrentState;
+}
+
+/****************************************************************************
+ Function
+     WriteImuToSPI
+
+ Parameters
+     uint32_t Buffer: the SPI buffer address to write the IMU data to
+
+ Returns
+     None
+
+ Description
+     Writes the current IMU data to the specified SPI buffer in a single 16-byte
+     message
+****************************************************************************/
+void WriteImuToSPI(uint32_t Buffer)
+{
+    Buffer = 9; // Header to indicate this is IMU data
+    
+    // Send Accel sensitivity (byte 2/3)
+    uint16_t accel_sensitivity = ACCEL_SENSITIVITY;
+    Buffer = (uint8_t)(accel_sensitivity >> 8); // Upper 8 bits of sensitivity 
+    Buffer = (uint8_t)(accel_sensitivity & 0xFF); // Lower 8 bits of sensitivity
+    
+    // Send the accel data
+    Buffer =  Accel[0].DataStruct.UpperByte; // byte 4 
+    Buffer =  Accel[0].DataStruct.LowerByte;
+    Buffer =  Accel[1].DataStruct.UpperByte;
+    Buffer =  Accel[1].DataStruct.LowerByte;
+    Buffer =  Accel[2].DataStruct.UpperByte;
+    Buffer =  Accel[2].DataStruct.LowerByte; // byte 9
+    
+    // Send Gyro Sensitivity (byte 10)
+    Buffer = (uint8_t)GYRO_SENSITIVITY;
+    
+    // Send the gyro data
+    Buffer = Gyro[0].DataStruct.UpperByte; // byte 11
+    Buffer = Gyro[0].DataStruct.LowerByte;
+    Buffer = Gyro[1].DataStruct.UpperByte;
+    Buffer = Gyro[1].DataStruct.LowerByte;
+    Buffer = Gyro[2].DataStruct.UpperByte;
+    Buffer = Gyro[2].DataStruct.LowerByte; // byte 16
+}
+
+/****************************************************************************
+ Function
+     WriteAccelToSPI
+
+ Parameters
+     uint32_t Buffer: the SPI buffer address to write the accel data to
+
+ Returns
+     None
+
+ Description
+     Writes the current accel data to the specified SPI buffer
+****************************************************************************/
+void WriteAccelToSPI(uint32_t Buffer)
+{
+    Buffer = 10; // Header to indicate this is Accel data (byte 1)
+    
+    // Send the acceleration. Acceleration are floats which can be sent as 
+    // 4 packets of 8 bits. (bytes 2-13)
+    for (uint8_t i=0; i<3; i++) { // iterate through x,y,z
+        uint32_t accel_as_int = *((uint32_t*)&Accel_g[i]);
+        for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+            Buffer = (accel_as_int >> (24-8*j)) & 0xFF;
+        }
+    }
+}
+
+/****************************************************************************
+ Function
+     WriteGyroToSPI
+
+ Parameters
+     uint32_t Buffer: the SPI buffer address to write the gyro data to
+
+ Returns
+     None
+
+ Description
+     Writes the current gyro data to the specified SPI buffer
+****************************************************************************/
+void WriteGyroToSPI(uint32_t Buffer)
+{
+    Buffer = 11; // Header to indicate this is gyro data (byte 1)
+    
+    // Send the gyro. gyro data are floats which can be sent as 
+    // 4 packets of 8 bits. (bytes 2-13)
+    for (uint8_t i=0; i<3; i++) { // iterate through x,y,z
+        uint32_t gyro_as_int = *((uint32_t*)&Gyro_deg_s[i]);
+        for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+            Buffer = (gyro_as_int >> (24-8*j)) & 0xFF;
+        }
+    }
 }
 
 /***************************************************************************
