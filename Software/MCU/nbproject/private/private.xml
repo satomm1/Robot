@@ -11,6 +11,8 @@
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/JetsonSM.c</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectHeaders/JetsonSM.h</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/FrameworkSource/ES_Port.c</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectHeaders/LEDService.h</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/LEDService.c</file>
         </group>
     </open-files>
 </project-private>
