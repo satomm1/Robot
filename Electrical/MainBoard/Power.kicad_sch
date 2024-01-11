@@ -1532,6 +1532,11 @@
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 5a56a24a-0b26-4a3d-8975-cbf5ff3f6df8)
   )
+  (text "May want a small resistor to draw\ncurrent from 5V to keep battery on!"
+    (at 97.79 106.045 0)
+    (effects (font (size 5 5)) (justify left bottom))
+    (uuid 8501aefa-c902-4287-a1d3-eafc57ff5799)
+  )
   (text "Inputs:\n1) Motor Battery: 2x NiMH Battery, 7.2 V Each\n2) Battery For Jetson: 12 V\n3) Battery for MCU: 5 V"
     (at 24.765 24.13 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
