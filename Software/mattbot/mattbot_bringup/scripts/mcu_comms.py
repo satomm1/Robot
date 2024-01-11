@@ -15,6 +15,7 @@ from tf.transformations import quaternion_from_euler
 
 BAUD_RATE = 1000000  # 1 MHz baud rate
 
+
 class MCU_Comms:
     """
     Sets up communication between the Jetson and the MCU
