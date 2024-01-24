@@ -20,6 +20,7 @@
 #include "ES_Framework.h"
 #include "IMU_SM.h"
 #include <sys/attribs.h>
+#include "dbprintf.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 #define READ  0b10000000
@@ -37,6 +38,7 @@
 void InitIMU(void);
 void SetBank(uint8_t Bank);
 void WriteIMU(uint8_t Address, uint8_t Data);
+uint8_t ReadIMU(uint8_t Address);
 void ReadFIFO(void);
 
 /*---------------------------- Module Variables ---------------------------*/
@@ -211,7 +213,11 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
       if (ThisEvent.EventType == ES_INIT) 
       {
         InitIMU();
-
+        
+        SetBank(0);
+        uint8_t data = ReadIMU(0x4F);
+        
+        
         // now put the machine into the actual initial state
         CurrentState = IMUWait;
       }
@@ -224,6 +230,8 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
       {
         case EV_IMU_DATA_UPDATE:  
         { 
+            DB_printf("Received New IMU Data\r\n");
+            
           uint8_t indx = ThisEvent.EventParam;
           Accel[0].DataStruct.UpperByte = IMU_FIFO[indx][1];
           Accel[0].DataStruct.LowerByte = IMU_FIFO[indx][2];
@@ -464,6 +472,8 @@ void SetBank(uint8_t Bank)
     while (SPI1STATbits.SPIBUSY) {
         // Blocking code --- OK Since we are only calling this function during initialization
     }
+    uint8_t data1 = SPI1BUF;
+    uint8_t data2 = SPI1BUF;
     return;
 }
 
@@ -491,7 +501,25 @@ void WriteIMU(uint8_t Address, uint8_t Data)
     while (SPI1STATbits.SPIBUSY) {
         // Blocking code --- OK Since we are only calling this function during initialization
     }
+    uint8_t data1 = SPI1BUF;
+    uint8_t data2 = SPI1BUF;
     return;
+}
+
+uint8_t ReadIMU(uint8_t Address)
+{
+    while (!SPI1STATbits.SPIRBE) {
+        uint8_t temp = SPI1BUF;
+    }
+    
+    SPI1BUF = READ | Address; // Specify the address of data we want to receive
+    SPI1BUF = 0x00; // Just a blank message so we can receive the data
+    while (SPI1STATbits.SPIBUSY) {
+        // Blocking code --- OK Since we are only calling this function during testing
+    }
+    uint8_t temp = SPI1BUF;
+    uint8_t data = SPI1BUF;
+    return data;
 }
 
 /****************************************************************************

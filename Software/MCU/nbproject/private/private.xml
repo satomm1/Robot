@@ -13,6 +13,11 @@
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectHeaders/JetsonSM.h</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/MotorSM.c</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/LEDService.c</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/UsbService.c</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/FrameworkHeaders/terminal.h</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/FrameworkHeaders/ES_Port.h</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/EventCheckers.c</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/FrameworkSource/ES_Framework.c</file>
         </group>
     </open-files>
 </project-private>

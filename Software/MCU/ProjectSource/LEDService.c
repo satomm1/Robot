@@ -34,7 +34,6 @@
 /*---------------------------- Module Variables ---------------------------*/
 // with the introduction of Gen2, we need a module level Priority variable
 static uint8_t MyPriority;
-
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
  Function

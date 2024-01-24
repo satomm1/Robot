@@ -68,18 +68,19 @@ bool InitUsbService(uint8_t Priority)
   ES_Event_t ThisEvent;
 
   MyPriority = Priority;
+  
+  // Set the USB_RST as an output and set high
+  TRISKCLR = _TRISK_TRISK4_MASK;
+  LATKbits.LATK4 = 1;
 
   // When doing testing, it is useful to announce just which program
   // is running.
   clrScrn();
-  puts("\rStarting Test Harness for \r");
-  DB_printf( "the 2nd Generation Events & Services Framework V2.4\r\n");
+  puts("\rSerial Output for MattBot Control Board \r");
   DB_printf( "compiled at %s on %s\n", __TIME__, __DATE__);
   DB_printf( "\n\r\n");
-  DB_printf( "Press any key to post key-stroke events to Service 0\n\r");
-  DB_printf( "Press 'd' to test event deferral \n\r");
-  DB_printf( "Press 'r' to test event recall \n\r");
-  DB_printf( "Press 'p' to test posting from an interrupt \n\r");
+  DB_printf( "Press any key to post key-stroke events\n\r");
+  DB_printf( "Press 'xxx' to test xxx \n\r");
 
   // post the initial transition event
   ThisEvent.EventType = ES_INIT;
@@ -135,14 +136,6 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
 
   switch (ThisEvent.EventType)
   {
-    case ES_INIT:
-    {
-      ES_Timer_InitTimer(SERVICE0_TIMER, HALF_SEC);
-      puts("Service 00:");
-      DB_printf("\rES_INIT received in Service %d\r\n", MyPriority);
-    }
-    break;
-
     case ES_NEW_KEY:   // announce
     {
       DB_printf("ES_NEW_KEY received with -> %c <- in Service 0\r\n",

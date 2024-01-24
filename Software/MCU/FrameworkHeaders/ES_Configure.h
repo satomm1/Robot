@@ -33,7 +33,7 @@
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 8
+#define NUM_SERVICES 3
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service.
@@ -57,11 +57,11 @@
 // These are the definitions for Service 1
 #if NUM_SERVICES > 1
 // the header file with the public function prototypes
-#define SERV_1_HEADER "IMU_SM.h"
+#define SERV_1_HEADER "LEDService.h"
 // the name of the Init function
-#define SERV_1_INIT InitImuSM
+#define SERV_1_INIT InitLEDService
 // the name of the run function
-#define SERV_1_RUN RunImuSM
+#define SERV_1_RUN RunLEDService
 // How big should this services Queue be?
 #define SERV_1_QUEUE_SIZE 3
 #endif
@@ -70,11 +70,11 @@
 // These are the definitions for Service 2
 #if NUM_SERVICES > 2
 // the header file with the public function prototypes
-#define SERV_2_HEADER "MotorSM.h"
+#define SERV_2_HEADER "IMU_SM.h"
 // the name of the Init function
-#define SERV_2_INIT InitMotorSM
+#define SERV_2_INIT InitImuSM
 // the name of the run function
-#define SERV_2_RUN RunMotorSM
+#define SERV_2_RUN RunImuSM
 // How big should this services Queue be?
 #define SERV_2_QUEUE_SIZE 3
 #endif
@@ -135,11 +135,11 @@
 // These are the definitions for Service 7
 #if NUM_SERVICES > 7
 // the header file with the public function prototypes
-#define SERV_7_HEADER "LEDService.h"
+#define SERV_7_HEADER "MotorSM.h"
 // the name of the Init function
-#define SERV_7_INIT InitLEDService
+#define SERV_7_INIT InitMotorSM
 // the name of the run function
-#define SERV_7_RUN RunLEDService
+#define SERV_7_RUN RunMotorSM
 // How big should this services Queue be?
 #define SERV_7_QUEUE_SIZE 3
 #endif
@@ -335,20 +335,19 @@ typedef enum
 #define TIMER8_RESP_FUNC TIMER_UNUSED
 #define TIMER9_RESP_FUNC TIMER_UNUSED
 #define TIMER10_RESP_FUNC TIMER_UNUSED
-#define TIMER11_RESP_FUNC PostButton3DebouncerSM
-#define TIMER12_RESP_FUNC PostButton2DebouncerSM
-#define TIMER13_RESP_FUNC PostButton1DebouncerSM
-#define TIMER14_RESP_FUNC PostJetsonSM
-#define TIMER15_RESP_FUNC PostUsbService
+#define TIMER11_RESP_FUNC TIMER_UNUSED // PostButton3DebouncerSM
+#define TIMER12_RESP_FUNC TIMER_UNUSED // PostButton2DebouncerSM
+#define TIMER13_RESP_FUNC TIMER_UNUSED // PostButton1DebouncerSM
+#define TIMER14_RESP_FUNC TIMER_UNUSED // PostJetsonSM
+#define TIMER15_RESP_FUNC TIMER_UNUSED
 
 /****************************************************************************/
-// Give the timer numbers symbolc names to make it easier to move them
+// Give the timer numbers symbol names to make it easier to move them
 // to different timers if the need arises. Keep these definitions close to the
 // definitions for the response functions to make it easier to check that
 // the timer number matches where the timer event will be routed
 // These symbolic names should be changed to be relevant to your application
 
-#define SERVICE0_TIMER 15
 #define JETSON_TIMER 14
 #define BUTTON1_TIMER 13
 #define BUTTON2_TIMER 12
