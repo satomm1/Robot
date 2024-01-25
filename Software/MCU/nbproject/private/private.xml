@@ -3,10 +3,8 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectHeaders/IMU_SM.h</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/JetsonSM.c</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/FrameworkSource/ES_Port.c</file>
-            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectHeaders/LEDService.h</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/FrameworkHeaders/ES_Configure.h</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/IMU_SM.c</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectHeaders/MotorSM.h</file>
@@ -18,6 +16,7 @@
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/FrameworkHeaders/ES_Port.h</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/EventCheckers.c</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/FrameworkSource/ES_Framework.c</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/FrameworkSource/ES_CheckEvents.c</file>
         </group>
     </open-files>
 </project-private>

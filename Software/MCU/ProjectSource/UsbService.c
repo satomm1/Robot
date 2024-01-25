@@ -140,9 +140,14 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
     {
       DB_printf("ES_NEW_KEY received with -> %c <- in Service 0\r\n",
           (char)ThisEvent.EventParam);
-      if ('d' == ThisEvent.EventParam)
+      if ('a' == ThisEvent.EventParam)
       {
-        
+          SPI1BUF = 0b10000000 | 0x4F;
+          while (SPI1STATbits.SPIBUSY) {
+        // Blocking code --- OK Since we are only calling this function during testing
+            }
+            uint8_t temp = SPI1BUF;
+            DB_printf("Received: %d\r\n", temp);
       }
     }
     break;

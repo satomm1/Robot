@@ -91,6 +91,7 @@ bool InitJetsonSM(uint8_t Priority)
   SPI2CONbits.SMP = 0; // Data sampled at middle of data output time
   SPI2CONbits.CKE = 0; // Output data changes on transition from idle to active clock state
   SPI2CONbits.CKP = 1; // Idle state for the clock is high level
+  SPI2CONbits.SSEN = 1; // SSx pin is used for Client mode
   SPI2CONbits.MSTEN = 0; // Client mode
   SPI2CONbits.DISSDI = 0; // The SDI pin is controlled by the module
   SPI2CONbits.STXISEL = 0b00; // Onterrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
@@ -118,7 +119,7 @@ bool InitJetsonSM(uint8_t Priority)
   IFS4CLR = _IFS4_SPI2TXIF_MASK | _IFS4_SPI2RXIF_MASK;
   
   // Local enable interrupts
-  IEC4SET = _IEC4_SPI2TXIE_MASK | _IEC4_SPI2RXIE_MASK;
+  IEC4SET = _IEC4_SPI2RXIE_MASK; // | _IEC4_SPI2TXIE_MASK; 
   
   __builtin_enable_interrupts(); // Global enable interrupts
   
@@ -375,6 +376,7 @@ void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
     static ES_Event_t VelocityUpdateEvent = {EV_JETSON_VELOCITY_RECEIVED, 0};
     static uint8_t buffer_num = 0;
     
+//    DB_printf("Received 16 Messages!\r\n");
     // Read the data from the buffer
     for (uint8_t i=0; i < 16; i++) {
         ReceiveBuffer[buffer_num][i] = SPI2BUF;

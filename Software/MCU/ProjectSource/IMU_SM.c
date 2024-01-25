@@ -119,11 +119,11 @@ bool InitImuSM(uint8_t Priority)
   }
   SPI1STATbits.SPIROV = 0; // Clear the Receive overflow bit
   
-  SPI1BRG = 15; // 1.56 MHz clock frequency, IMU Has max frequency of 24 MHz
+  SPI1BRG = 511; //15; // 1.56 MHz clock frequency, IMU Has max frequency of 24 MHz
   
   // Setup Timer 6 (Used for integrating the accels)
   T6CON = 0; // Reset the timer register settings
-  T6CONbits.TCKPS = 0b111; // 1:256 p;rescale value
+  T6CONbits.TCKPS = 0b111; // 1:256 prescale value
   T6CONbits.T32 = 0; // Use 16 bit timer not 32 bit
   T6CONbits.TCS = 0; // Internal peripheral clock
     
@@ -212,10 +212,11 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
     {
       if (ThisEvent.EventType == ES_INIT) 
       {
-        InitIMU();
-        
-        SetBank(0);
-        uint8_t data = ReadIMU(0x4F);
+//        SetBank(0);
+//        uint8_t data = ReadIMU(0x4F);
+//        data = ReadIMU(0b0101010);
+//          
+//        InitIMU();        
         
         
         // now put the machine into the actual initial state
@@ -501,8 +502,12 @@ void WriteIMU(uint8_t Address, uint8_t Data)
     while (SPI1STATbits.SPIBUSY) {
         // Blocking code --- OK Since we are only calling this function during initialization
     }
-    uint8_t data1 = SPI1BUF;
-    uint8_t data2 = SPI1BUF;
+    
+    uint8_t data1;
+    while (!SPI1STATbits.SPIRBE) {
+        data1 = SPI1BUF;
+//    uint8_t data2 = SPI1BUF;
+    }
     return;
 }
 
@@ -583,6 +588,8 @@ void __ISR(_SPI1_RX_VECTOR, IPL7SRS) SPI1RXHandler(void)
     Gyro[1].DataStruct.UpperByte = IMU_FIFO[Active_FIFO][9];
     Gyro[2].DataStruct.LowerByte = IMU_FIFO[Active_FIFO][12];
     Gyro[2].DataStruct.UpperByte = IMU_FIFO[Active_FIFO][11];
+    
+    DB_printf("In SPI1RX Handler");
 }
 
 void __ISR(_SPI1_TX_VECTOR, IPL7SRS) SPI1TXHandler(void)
@@ -601,6 +608,8 @@ void __ISR(_SPI1_TX_VECTOR, IPL7SRS) SPI1TXHandler(void)
             SPI1BUF = 0;
         }
     }
+    
+    DB_printf("In SPITX Handler");
 }
 
 // Interrupt indicates new IMU data is read: Initiate FIFO reading
