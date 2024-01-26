@@ -113,10 +113,12 @@ bool CheckButton1(void)
         ES_Event_t ThisEvent;
         if (CurrentButton1Status == 1) { // Button is down
             ThisEvent.EventType = EV_BUTTON1_DOWN;
-//            PostButton1DebouncerSM(ThisEvent);
+//            DB_printf("Button1Down\r\n");
+            PostButton1DebouncerSM(ThisEvent);
         } else { // button is now up
             ThisEvent.EventType = EV_BUTTON1_UP;
-//            PostButton1DebouncerSM(ThisEvent);
+//            DB_printf("Button1Up\r\n");
+            PostButton1DebouncerSM(ThisEvent);
         }
         
         // update the last button state
@@ -140,10 +142,10 @@ bool CheckButton2(void)
         ES_Event_t ThisEvent;
         if (CurrentButton2Status == 1) { // Button is down
             ThisEvent.EventType = EV_BUTTON2_DOWN;
-//            PostButton2DebouncerSM(ThisEvent);
+            PostButton2DebouncerSM(ThisEvent);
         } else { // button is now up
             ThisEvent.EventType = EV_BUTTON2_UP;
-//            PostButton2DebouncerSM(ThisEvent);
+            PostButton2DebouncerSM(ThisEvent);
         }
         
         // update the last button state
@@ -167,10 +169,10 @@ bool CheckButton3(void)
         ES_Event_t ThisEvent;
         if (CurrentButton3Status == 1) { // Button is down
             ThisEvent.EventType = EV_BUTTON3_DOWN;
-//            PostButton3DebouncerSM(ThisEvent);
+            PostButton3DebouncerSM(ThisEvent);
         } else { // button is now up
             ThisEvent.EventType = EV_BUTTON3_UP;
-//            PostButton3DebouncerSM(ThisEvent);
+            PostButton3DebouncerSM(ThisEvent);
         }
         
         // update the last button state

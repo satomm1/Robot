@@ -23,7 +23,7 @@
 #include "dbprintf.h"
 /*----------------------------- Module Defines ----------------------------*/
 #define DEBOUNCE_TIME 50
-
+//#define DEBUG
 /*---------------------------- Module Functions ---------------------------*/
 /* prototypes for private functions for this machine.They should be functions
    relevant to the behavior of this state machine
@@ -166,6 +166,10 @@ ES_Event_t RunButton3DebouncerSM(ES_Event_t ThisEvent)
                 ES_Event_t NewEvent = {EV_BUTTON3_PRESSED, 0};           
                 // TODO: Post to proper SM                 
                 CurrentState = Button3DebouncingWait; 
+                
+                #ifdef DEBUG
+                DB_printf("Button 3 Pressed\r\n");
+                #endif
             }
             break;
         }
@@ -187,6 +191,10 @@ ES_Event_t RunButton3DebouncerSM(ES_Event_t ThisEvent)
                 ES_Event_t NewEvent = {EV_BUTTON3_RELEASED, 0};           
                 // TODO: Post to proper SM         
                 CurrentState = Button3DebouncingWait; 
+                
+                #ifdef DEBUG
+                DB_printf("Button 3 Released\r\n");
+                #endif
             }
             break;
         }

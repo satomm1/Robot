@@ -166,6 +166,10 @@ ES_Event_t RunButton2DebouncerSM(ES_Event_t ThisEvent)
                 ES_Event_t NewEvent = {EV_BUTTON2_PRESSED, 0};           
                 // TODO: Post to proper SM                 
                 CurrentState = Button2DebouncingWait; 
+                
+                #ifdef DEBUG
+                DB_printf("Button 2 Pressed\r\n");
+                #endif
             }
             break;
         }
@@ -187,6 +191,10 @@ ES_Event_t RunButton2DebouncerSM(ES_Event_t ThisEvent)
                 ES_Event_t NewEvent = {EV_BUTTON2_RELEASED, 0};           
                 // TODO: Post to proper SM         
                 CurrentState = Button2DebouncingWait; 
+                
+                #ifdef DEBUG
+                DB_printf("Button 2 Released\r\n");
+                #endif
             }
             break;
         }
