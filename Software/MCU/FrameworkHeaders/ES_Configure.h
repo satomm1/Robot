@@ -33,7 +33,7 @@
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 4
+#define NUM_SERVICES 8
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service.
@@ -335,11 +335,11 @@ typedef enum
 #define TIMER8_RESP_FUNC TIMER_UNUSED
 #define TIMER9_RESP_FUNC TIMER_UNUSED
 #define TIMER10_RESP_FUNC TIMER_UNUSED
-#define TIMER11_RESP_FUNC TIMER_UNUSED // PostButton3DebouncerSM
-#define TIMER12_RESP_FUNC TIMER_UNUSED // PostButton2DebouncerSM
-#define TIMER13_RESP_FUNC TIMER_UNUSED // PostButton1DebouncerSM
-#define TIMER14_RESP_FUNC TIMER_UNUSED // PostJetsonSM
-#define TIMER15_RESP_FUNC TIMER_UNUSED
+#define TIMER11_RESP_FUNC PostButton3DebouncerSM
+#define TIMER12_RESP_FUNC PostButton2DebouncerSM
+#define TIMER13_RESP_FUNC PostButton1DebouncerSM
+#define TIMER14_RESP_FUNC TIMER_UNUSED
+#define TIMER15_RESP_FUNC PostJetsonSM
 
 /****************************************************************************/
 // Give the timer numbers symbol names to make it easier to move them
@@ -348,7 +348,7 @@ typedef enum
 // the timer number matches where the timer event will be routed
 // These symbolic names should be changed to be relevant to your application
 
-#define JETSON_TIMER 14
+#define JETSON_TIMER 15
 #define BUTTON1_TIMER 13
 #define BUTTON2_TIMER 12
 #define BUTTON3_TIMER 11

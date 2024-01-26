@@ -94,7 +94,7 @@ bool InitJetsonSM(uint8_t Priority)
   SPI2CONbits.SSEN = 1; // SSx pin is used for Client mode
   SPI2CONbits.MSTEN = 0; // Client mode
   SPI2CONbits.DISSDI = 0; // The SDI pin is controlled by the module
-  SPI2CONbits.STXISEL = 0b00; // Onterrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
+  SPI2CONbits.STXISEL = 0b00; // Interrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
   SPI2CONbits.SRXISEL = 0b11; // Interrupt is generated when the receive buffer is full (16)
 
   SPI2CON2 = 0; // Reset SPI2CON2 register settings
@@ -184,6 +184,11 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
       {
         // now put the machine into the actual initial state
         CurrentState = RobotInactive;
+        
+        // Preload buffer with 0's
+        for (uint8_t ii = 0; ii < 16; ii++) {
+            SPI2BUF = 0;
+        }
       }
     }
     break;
@@ -199,12 +204,19 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
             // Send message received message to Jetson
             SPI2BUF = 0;
             SPI2BUF = 0b11111111;
-            SPI2BUF = 0;
+            for (uint8_t ii = 0; ii < 14; ii++) {
+                SPI2BUF = 0; // Fill rest of buffer with 0's
+            }
             
             // Start pending timeout timer
             ES_Timer_InitTimer(JETSON_TIMER, PENDING_TIMEOUT);
             
             CurrentState = RobotPending;  
+            DB_printf("Moving to RobotPending\r\n");
+          } else {
+              for (uint8_t ii = 0; ii < 16; ii++) {
+                SPI2BUF = 0; // Fill rest of buffer with 0's
+            }
           }
         }
         break;
@@ -229,6 +241,11 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
             ES_Timer_InitTimer(JETSON_TIMER, JETSON_TIMEOUT); // Start timeout timer
             
             CurrentState = RobotActive;  
+            DB_printf("Moving to RobotActive\r\n");
+          } else {
+              for (uint8_t ii = 0; ii < 16; ii++) {
+                  SPI2BUF = 0;
+              }
           }
         }
         break;
@@ -236,6 +253,17 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
         case ES_TIMEOUT:
         {
             CurrentState = RobotInactive;
+            DB_printf("Moving to RobotInactive");
+            
+//            SPI2CONbits.ON = 0;
+//            while (!SPI2STATbits.SPIRBE) {
+//                uint8_t temp = SPI2BUF; 
+//            }
+//            
+//            while (!SPI2STATbits.SPITBF) {
+//                SPI2BUF = 0;
+//            }
+//            SPI2CONbits.ON = 1;
         }
         break;
             
@@ -261,7 +289,9 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
               
               YELLOW_LATCH = 1; // Turn yellow LED on
               GREEN_LATCH = 0;  // Turn green LED off
-              CurrentState = RobotInactive;     
+              CurrentState = RobotInactive;  
+              
+              DB_printf("Received End Message: goin to RobotInactive\r\n");
             }
             break;
             
@@ -279,6 +309,18 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
           YELLOW_LATCH = 1; // Turn yellow LED on
           GREEN_LATCH = 0;  // Turn green LED off
           CurrentState = RobotInactive;
+          
+          DB_printf("Timed out, moving to Robot Inactive\r\n");
+          
+//          SPI2CONbits.ON = 0;
+//            while (!SPI2STATbits.SPIRBE) {
+//                uint8_t temp = SPI2BUF; 
+//            }
+//            
+//            while (!SPI2STATbits.SPITBF) {
+//                SPI2BUF = 0;
+//            }
+//            SPI2CONbits.ON = 1;
         }
         break;
         
@@ -380,7 +422,9 @@ void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
     // Read the data from the buffer
     for (uint8_t i=0; i < 16; i++) {
         ReceiveBuffer[buffer_num][i] = SPI2BUF;
+        DB_printf("%d, ", ReceiveBuffer[buffer_num][i]);
     }
+    DB_printf("\r\n");
     
     // Clear the interrupt
     IFS4CLR = _IFS4_SPI2RXIF_MASK; 

@@ -24,8 +24,9 @@ class MCU_Comms:
 
         # Create the spi object to facilitate SPI communication via Jetson and MCU
         self.spi = spidev.SpiDev()  # create spi object
-        self.spi.open(0, 0)
+        self.spi.open(0, 0)  # open spi port 0, device (CS) 0
         self.spi.max_speed_hz = BAUD_RATE
+        self.spi.mode = 0b11  # CPOL = 1, CPHA = 1 (i.e. clock is high when idle, data is clocked in on rising edge)
 
         # Bringup Message to MCU
         bringup_message = [99, 0b11111111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
