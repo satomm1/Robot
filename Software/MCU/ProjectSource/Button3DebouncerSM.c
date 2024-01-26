@@ -24,6 +24,7 @@
 /*----------------------------- Module Defines ----------------------------*/
 #define DEBOUNCE_TIME 50
 //#define DEBUG
+
 /*---------------------------- Module Functions ---------------------------*/
 /* prototypes for private functions for this machine.They should be functions
    relevant to the behavior of this state machine

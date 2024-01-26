@@ -119,7 +119,7 @@ bool InitImuSM(uint8_t Priority)
   }
   SPI1STATbits.SPIROV = 0; // Clear the Receive overflow bit
   
-  SPI1BRG = 511; //15; // 1.56 MHz clock frequency, IMU Has max frequency of 24 MHz
+  SPI1BRG = 15; //15; // 1.56 MHz clock frequency, IMU Has max frequency of 24 MHz
   
   // Setup Timer 6 (Used for integrating the accels)
   T6CON = 0; // Reset the timer register settings
@@ -212,9 +212,9 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
     {
       if (ThisEvent.EventType == ES_INIT) 
       {
-//        SetBank(0);
-//        uint8_t data = ReadIMU(0x4F);
-//        data = ReadIMU(0b0101010);
+        SetBank(0);
+        uint8_t data = ReadIMU(0x4F);
+        data = ReadIMU(0b0101010);
 //          
 //        InitIMU();        
         

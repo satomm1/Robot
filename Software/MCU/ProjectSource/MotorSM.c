@@ -228,11 +228,11 @@ bool InitMotorSM(uint8_t Priority)
 //  IC4CONbits.ON = 1; // Turn input capture on
   OC1CONbits.ON = 1; // Turn OC1 on
   OC2CONbits.ON = 1; // Turn OC2 on
-  T1CONbits.ON = 1; // Turn timer 1 on
+//  T1CONbits.ON = 1; // Turn timer 1 on
   T2CONbits.ON = 1; // Turn timer 2 on
-  T3CONbits.ON = 1; // Turn timer 3 on
-  T4CONbits.ON = 1; // Turn timer 4 on
-  T5CONbits.ON = 1; // Turn timer 5 on
+//  T3CONbits.ON = 1; // Turn timer 3 on
+//  T4CONbits.ON = 1; // Turn timer 4 on
+//  T5CONbits.ON = 1; // Turn timer 5 on
   
   MyPriority = Priority;
   // put us into the Initial PseudoState

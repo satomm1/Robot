@@ -149,6 +149,16 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
             uint8_t temp = SPI1BUF;
             DB_printf("Received: %d\r\n", temp);
       }
+      
+      if ('b' == ThisEvent.EventParam) {
+          OC1RS = (800 + 1)/100 * 50;
+          OC2RS = (800 + 1)/100 * 50;
+      }
+      
+      if ('c' == ThisEvent.EventParam) {
+          OC1RS = (800 + 1)/100 * 25;
+          OC2RS = (800 + 1)/100 * 25;
+      }
     }
     break;
     
