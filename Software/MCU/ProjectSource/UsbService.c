@@ -25,6 +25,7 @@
 #include "ES_Port.h"
 #include "terminal.h"
 #include "dbprintf.h"
+#include "MotorSM.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 // these times assume a 10.000mS/tick timing
@@ -151,14 +152,53 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
       }
       
       if ('b' == ThisEvent.EventParam) {
-          OC1RS = (800 + 1)/100 * 50;
-          OC2RS = (800 + 1)/100 * 50;
+          OC1RS = (800 + 1)/100 * 85;
+          OC2RS = (800 + 1)/100 * 85;
+          LATFbits.LATF8 = 1; 
+          LATJbits.LATJ3 = 1; 
       }
       
-      if ('c' == ThisEvent.EventParam) {
-          OC1RS = (800 + 1)/100 * 25;
-          OC2RS = (800 + 1)/100 * 25;
+      if ('f' == ThisEvent.EventParam) {
+          OC1RS = 0;
+          OC2RS = 0;
+          OC1RS = (800 + 1)/100 * 15;
+          OC2RS = (800 + 1)/100 * 15;
       }
+      
+      if ('s' == ThisEvent.EventParam) {
+          SetDesiredRPM(0,0);
+          
+          OC1RS = 0;
+          OC2RS = 0;
+          LATFbits.LATF8 = 0; 
+          LATJbits.LATJ3 = 0; 
+      }
+      
+      if ('1' == ThisEvent.EventParam) {
+          SetDesiredRPM(45, 45);
+      }
+      
+      if ('2' == ThisEvent.EventParam) {
+          SetDesiredRPM(55, 55);
+      }
+      
+      if ('3' == ThisEvent.EventParam) {
+          SetDesiredRPM(65, 65);
+      }
+      
+      if ('4' == ThisEvent.EventParam) {
+          SetDesiredRPM(150, 150);
+      }
+      
+    }
+    break;
+    
+    case ES_TIMEOUT:
+    {
+        OC1RS = 0;
+        OC2RS = 0;
+        LATFbits.LATF8 = 0; 
+        LATJbits.LATJ3 = 0; 
     }
     break;
     

@@ -25,13 +25,15 @@
 
 /*----------------------------- Module Defines ----------------------------*/
 #define IC_PERIOD 65535 // Input capture period
-#define OC_PERIOD 800   // Output compare period
+#define OC_PERIOD 312   // Output compare period (10 kHz)
 #define CONTROL_PERIOD 1000 // Control update period --- 6250 Hz
 #define NO_SPEED_PERIOD 65535 // Period to indicate motor not spinning
-#define Kp 1 // Proportional constant for PID law
-#define Ki 1 // Integral constant for PID law
+#define Kp 3 // Proportional constant for PID law
+#define Ki 0.5 // Integral constant for PID law
 
 #define ENCODER_RESOLUTION 374 // Number of pulses per revolution
+#define GEAR_RATIO 34 // Gear reduction ratio
+#define SPEED_CONVERSION_FACTOR (1.6e7*60)/ENCODER_RESOLUTION
 #define WHEEL_BASE 0.254 // Distance between wheels on the robot (m)
 #define WHEEL_RADIUS 0.04 // Radius of wheels (m))
 #define DEAD_RECKONING_TIME 0.00016 // Time between dead reckoning updates in seconds (depends on CONTROL_PERIOD)
@@ -228,11 +230,11 @@ bool InitMotorSM(uint8_t Priority)
 //  IC4CONbits.ON = 1; // Turn input capture on
   OC1CONbits.ON = 1; // Turn OC1 on
   OC2CONbits.ON = 1; // Turn OC2 on
-//  T1CONbits.ON = 1; // Turn timer 1 on
+  T1CONbits.ON = 1; // Turn timer 1 on
   T2CONbits.ON = 1; // Turn timer 2 on
-//  T3CONbits.ON = 1; // Turn timer 3 on
-//  T4CONbits.ON = 1; // Turn timer 4 on
-//  T5CONbits.ON = 1; // Turn timer 5 on
+  T3CONbits.ON = 1; // Turn timer 3 on
+  T4CONbits.ON = 1; // Turn timer 4 on
+  T5CONbits.ON = 1; // Turn timer 5 on
   
   MyPriority = Priority;
   // put us into the Initial PseudoState
@@ -296,6 +298,8 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
           
         // now put the machine into the actual initial state
         CurrentState = MotorWait;
+        
+        ES_Timer_InitTimer(MOTOR_TIMER, 200);
       }
     }
     break;
@@ -309,7 +313,17 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
           
         }
         break;
-
+        
+        
+        case ES_TIMEOUT:
+        {
+            uint16_t left_rpm = SPEED_CONVERSION_FACTOR / LeftPulseLength;
+            uint16_t right_rpm = SPEED_CONVERSION_FACTOR / RightPulseLength;
+            DB_printf("RPM: %d, %d \r\n", left_rpm, right_rpm);
+            
+            ES_Timer_InitTimer(MOTOR_TIMER, 200);
+        }
+        break;
         
         default:
           ;
@@ -481,7 +495,7 @@ void WriteDeadReckoningVelocityToSPI(uint32_t Buffer) {
     IC1Handler
 
  Description
-   Counts time between encoder pulses for measuring left motor pulse lengths
+   Counts time between encoder pulses for measuring right motor pulse lengths
 ****************************************************************************/
 void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
 {
@@ -497,20 +511,20 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
     }                                                     
     
     // Calculate the time length between encoder pulses
-    LeftPulseLength = MyTimer.FullTime - LeftPrevTime;         
-    LeftPrevTime = MyTimer.FullTime; // update our last time variable 
+    RightPulseLength = MyTimer.FullTime - RightPrevTime;         
+    RightPrevTime = MyTimer.FullTime; // update our last time variable 
     
     // Update number of rotations for dead reckoning
     if (ChannelB) {
-        LeftRotations -= 1;
+        RightRotations -= 1;
     } else {
-        LeftRotations += 1;
+        RightRotations += 1;
     }
     
     // restart Timer4 (timer to indicate if motor is stopped)
     T4CONCLR = _T4CON_ON_MASK;     
     TMR4 = 0;     
-    T4CONSET = _T4CON_ON_MASK; 
+    T4CONSET = _T4CON_ON_MASK;     
 }
 
 void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL7SRS) IC2Handler(void)
@@ -523,7 +537,7 @@ void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL7SRS) IC2Handler(void)
     IC3Handler
 
  Description
-   Counts time between encoder pulses for measuring right motor pulse lengths
+   Counts time between encoder pulses for measuring left motor pulse lengths
 ****************************************************************************/
 void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
 {
@@ -539,14 +553,14 @@ void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
     }                                                     
     
     // Calculate the time length between encoder pulses
-    RightPulseLength = MyTimer.FullTime - RightPrevTime;         
-    RightPrevTime = MyTimer.FullTime; // update our last time variable 
+    LeftPulseLength = MyTimer.FullTime - LeftPrevTime;         
+    LeftPrevTime = MyTimer.FullTime; // update our last time variable 
     
     // Update number of rotations for dead reckoning
     if (ChannelB) {
-        RightRotations -= 1;
+        LeftRotations -= 1;
     } else {
-        RightRotations += 1;
+        LeftRotations += 1;
     }
     
     // restart Timer5 (timer to indicate if motor is stopped)
@@ -595,20 +609,22 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     IFS0CLR = _IFS0_T1IF_MASK; // Clear the timer interrupt
     
     // Calculate Current RPM based on Pulse Lengths from encoders
-    ActualLeftRPM = 0.0;
-    ActualRightRPM = 0.0;
+    ActualLeftRPM = SPEED_CONVERSION_FACTOR / LeftPulseLength;
+    ActualRightRPM = SPEED_CONVERSION_FACTOR / RightPulseLength;
     
     // Calculate error from desired RPM
     LeftError = DesiredLeftRPM - ActualLeftRPM;
-    RightError = DesiredRightRPM - ActualLeftRPM;
+    RightError = DesiredRightRPM - ActualRightRPM;
+    
+//    DB_printf("%d, %d", (int16_t)LeftError, (int16_t)LeftErrorSum);
     
     // Integral of error
     LeftErrorSum += LeftError;
     RightErrorSum += RightError;
     
     // Calculate according to PI Law
-    LeftDutyCycle = Kp*((LeftError)+(Ki*LeftErrorSum)); 
-    RightDutyCycle = Kp*((RightError)+(Ki*RightErrorSum)); 
+    LeftDutyCycle = Kp*(LeftError+(Ki*LeftErrorSum)); 
+    RightDutyCycle = Kp*(RightError+(Ki*RightErrorSum)); 
     
     // Anti-Windup
     if (LeftDutyCycle > 100) {
@@ -631,44 +647,44 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     if (LeftDirection == Backward) {
         LeftDutyCycle = 100 - LeftDutyCycle;
     }
-    OC1RS = (OC_PERIOD + 1)/100 * LeftDutyCycle;
+    OC2RS = (OC_PERIOD + 1)/100 * LeftDutyCycle;
     
     if (RightDirection == Backward) {
         RightDutyCycle = 100 - RightDutyCycle;
     }
-    OC2RS = (OC_PERIOD + 1)/100 * RightDutyCycle;
+    OC1RS = (OC_PERIOD + 1)/100 * RightDutyCycle;
     
-    // Calculate linear velocity of both wheels
-    V_l = (LeftRotations - LeftPrevRotations) * DEAD_RECKONING_RATIO; 
-    V_r = (RightRotations - RightPrevRotations) * DEAD_RECKONING_RATIO;
-    
-    // Calculate linear/angular velocity of robot
-    V = (V_l + V_r) / 2; 
-    omega = (V_r - V_l) / WHEEL_BASE;
-    
-    V_current = V; // used to store current velocity
-    w_current = omega; // used to store current angular velocity
-    
-    // Now calculate the position of the robot using 4th order Runge Kutta
-    k00 = V * cosf(theta);
-    k01 = V * sinf(theta);
-    k02 = omega;
-    
-    k10 = V * cosf(theta + DEAD_RECKONING_TIME / 2 * k02);
-    k11 = V * sinf(theta + DEAD_RECKONING_TIME / 2 * k02);
-    k12 = omega;
-    
-    k20 = V * cosf(theta + DEAD_RECKONING_TIME / 2 * k12);
-    k21 = V * sinf(theta + DEAD_RECKONING_TIME / 2 * k12);
-    k22 = omega;
-    
-    k30 = V * cosf(theta + DEAD_RECKONING_TIME * k22);
-    k31 = V * sinf(theta + DEAD_RECKONING_TIME * k22);
-    k32 = omega;
-    
-    x = x + DEAD_RECKONING_TIME / 6 * (k00 + 2*(k10 + k20) + k30);
-    y = y + DEAD_RECKONING_TIME / 6 * (k01 + 2*(k11 + k21) + k31);
-    theta = theta + DEAD_RECKONING_TIME / 6 * (k02 + 2*(k12 + k22) + k32);
+//    // Calculate linear velocity of both wheels
+//    V_l = (LeftRotations - LeftPrevRotations) * DEAD_RECKONING_RATIO; 
+//    V_r = (RightRotations - RightPrevRotations) * DEAD_RECKONING_RATIO;
+//    
+//    // Calculate linear/angular velocity of robot
+//    V = (V_l + V_r) / 2; 
+//    omega = (V_r - V_l) / WHEEL_BASE;
+//    
+//    V_current = V; // used to store current velocity
+//    w_current = omega; // used to store current angular velocity
+//    
+//    // Now calculate the position of the robot using 4th order Runge Kutta
+//    k00 = V * cosf(theta);
+//    k01 = V * sinf(theta);
+//    k02 = omega;
+//    
+//    k10 = V * cosf(theta + DEAD_RECKONING_TIME / 2 * k02);
+//    k11 = V * sinf(theta + DEAD_RECKONING_TIME / 2 * k02);
+//    k12 = omega;
+//    
+//    k20 = V * cosf(theta + DEAD_RECKONING_TIME / 2 * k12);
+//    k21 = V * sinf(theta + DEAD_RECKONING_TIME / 2 * k12);
+//    k22 = omega;
+//    
+//    k30 = V * cosf(theta + DEAD_RECKONING_TIME * k22);
+//    k31 = V * sinf(theta + DEAD_RECKONING_TIME * k22);
+//    k32 = omega;
+//    
+//    x = x + DEAD_RECKONING_TIME / 6 * (k00 + 2*(k10 + k20) + k30);
+//    y = y + DEAD_RECKONING_TIME / 6 * (k01 + 2*(k11 + k21) + k31);
+//    theta = theta + DEAD_RECKONING_TIME / 6 * (k02 + 2*(k12 + k22) + k32);
 }
 
 /****************************************************************************

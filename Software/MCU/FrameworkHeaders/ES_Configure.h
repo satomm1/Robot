@@ -334,11 +334,11 @@ typedef enum
 #define TIMER7_RESP_FUNC TIMER_UNUSED
 #define TIMER8_RESP_FUNC TIMER_UNUSED
 #define TIMER9_RESP_FUNC TIMER_UNUSED
-#define TIMER10_RESP_FUNC TIMER_UNUSED
+#define TIMER10_RESP_FUNC PostUsbService
 #define TIMER11_RESP_FUNC PostButton3DebouncerSM
 #define TIMER12_RESP_FUNC PostButton2DebouncerSM
 #define TIMER13_RESP_FUNC PostButton1DebouncerSM
-#define TIMER14_RESP_FUNC TIMER_UNUSED
+#define TIMER14_RESP_FUNC PostMotorSM
 #define TIMER15_RESP_FUNC PostJetsonSM
 
 /****************************************************************************/
@@ -349,8 +349,10 @@ typedef enum
 // These symbolic names should be changed to be relevant to your application
 
 #define JETSON_TIMER 15
+#define MOTOR_TIMER 14
 #define BUTTON1_TIMER 13
 #define BUTTON2_TIMER 12
 #define BUTTON3_TIMER 11
+#define USB_TIMER 10
 
 #endif /* ES_CONFIGURE_H */
