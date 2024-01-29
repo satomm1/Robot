@@ -204,7 +204,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
       {
         case EV_JETSON_MESSAGE_RECEIVED:  
         { 
-          if (ReceiveBuffer[ThisEvent.EventParam][1] == 0b11111111) {
+          if (ReceiveBuffer[ThisEvent.EventParam][1] == 0b11111111 && ReceiveBuffer[ThisEvent.EventParam][0] == 90) {
 
             // Send message received message to Jetson
             SPI2BUF = 0;
@@ -238,7 +238,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
       {
         case EV_JETSON_MESSAGE_RECEIVED:  
         { 
-          if (ReceiveBuffer[ThisEvent.EventParam][1] == 0b10101010) {
+          if (ReceiveBuffer[ThisEvent.EventParam][0] == 90 && ReceiveBuffer[ThisEvent.EventParam][1] == 0b10101010) {
             // We received confirmation that the message was received
             
             YELLOW_LATCH = 0; // Turn yellow LED off
@@ -287,18 +287,89 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
           // Determine what message type we have
           switch (ReceiveBuffer[ThisEvent.EventParam][0])
           {
-            case 0b11110000: // Received Disconnect Message
+            case 90: // Operations Message
             {
-              SetDesiredRPM(0, 0); // Stop all movement of the robot
-              ES_Timer_StopTimer(JETSON_TIMER); // Stop timer
-              
-              YELLOW_LATCH = 1; // Turn yellow LED on
-              GREEN_LATCH = 0;  // Turn green LED off
-              CurrentState = RobotInactive;  
-              
-              CurrentMessage = 0;
-              
-              DB_printf("Received End Message: goin to RobotInactive\r\n");
+                if (ReceiveBuffer[ThisEvent.EventParam][1] == 0b11110000) {
+                    // Received Shutdown message
+                    SetDesiredRPM(0, 0); // Stop all movement of the robot
+                    ES_Timer_StopTimer(JETSON_TIMER); // Stop timer
+
+                    YELLOW_LATCH = 1; // Turn yellow LED on
+                    GREEN_LATCH = 0;  // Turn green LED off
+                    CurrentState = RobotInactive;  
+
+                    CurrentMessage = 0;
+
+                    DB_printf("Received End Message: goin to RobotInactive\r\n");
+                }
+            }
+            break;
+            
+            case 45: // Velocity Message
+            {
+                float desired_lin_v;
+                float desired_ang_v;
+
+                switch (CurrentMessage)
+                {
+                    case 0:
+                    {
+                        // TODO: fill buffer with accel data
+                        for(uint8_t ii = 0; ii < 16; ii++) {
+                            SPI2BUF = 1;
+                        }
+                        CurrentMessage = 1;
+                    }
+                    break;
+
+                    case 1:
+                    {
+                        // TODO: fill buffer with gyro data
+                        for(uint8_t ii = 0; ii < 16; ii++) {
+                            SPI2BUF = 2;
+                        }
+                        CurrentMessage = 2;
+                    }
+                    break;
+
+                    case 2:
+                    {
+                        // TODO: fill buffer with position data
+                        for(uint8_t ii = 0; ii < 16; ii++) {
+                            SPI2BUF = 3;
+                        }
+                        CurrentMessage = 3;
+                    }
+                    break;
+
+                    case 3:
+                    {
+                        // TODO: fill buffer with dead reckoning data
+                        for(uint8_t ii = 0; ii < 16; ii++) {
+                            SPI2BUF = 4;
+                        }
+                        CurrentMessage = 0;
+                    }
+                    break;
+                }
+
+
+                // Convert Data to 
+                uint32_t combined_bytes = ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][1] << 24) | 
+                        ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][2] << 16) |
+                        ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][3] << 8) |
+                        ReceiveBuffer[ThisEvent.EventParam][4];
+                *((uint32_t*)&desired_lin_v) = combined_bytes;
+                DB_printf("%d, ", (int)(desired_lin_v));
+
+                combined_bytes = ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][5] << 24) | 
+                        ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][6] << 16) |
+                        ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][7] << 8) |
+                        ReceiveBuffer[ThisEvent.EventParam][8];
+                *((uint32_t*)&desired_ang_v) = combined_bytes;
+
+                DB_printf("%d \r\n", (int)combined_bytes);
+                SetDesiredSpeed(desired_lin_v, desired_ang_v);
             }
             break;
             
@@ -335,55 +406,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
         
         case EV_JETSON_VELOCITY_RECEIVED:
         {
-            float desired_lin_v;
-            float desired_ang_v;
             
-            switch (CurrentMessage)
-            {
-                case 0:
-                {
-                    // TODO: fill buffer with accel data
-                    CurrentMessage = 1;
-                }
-                break;
-                
-                case 1:
-                {
-                    // TODO: fill buffer with gyro data
-                    CurrentMessage = 2;
-                }
-                break;
-                
-                case 2:
-                {
-                    // TODO: fill buffer with position data
-                    CurrentMessage = 3;
-                }
-                break;
-                
-                case 3:
-                {
-                    // TODO: fill buffer with dead reckoning data
-                    CurrentMessage = 0;
-                }
-                break;
-            }
-            
-            
-            // Convert Data to 
-            uint32_t combined_bytes = ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][1] << 24) | 
-                    ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][2] << 16) |
-                    ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][3] << 8) |
-                    ReceiveBuffer[ThisEvent.EventParam][4];
-            *((uint32_t*)&desired_lin_v) = combined_bytes;
-            
-            combined_bytes = ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][5] << 24) | 
-                    ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][6] << 16) |
-                    ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][7] << 8) |
-                    ReceiveBuffer[ThisEvent.EventParam][8];
-            *((uint32_t*)&desired_ang_v) = combined_bytes;
-            
-            SetDesiredSpeed(desired_lin_v, desired_ang_v);
         }
             
         default:
@@ -463,25 +486,25 @@ void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
     // Read the data from the buffer
     for (uint8_t i=0; i < 16; i++) {
         ReceiveBuffer[buffer_num][i] = SPI2BUF;
-        DB_printf("%d, ", ReceiveBuffer[buffer_num][i]);
+//        DB_printf("%d, ", ReceiveBuffer[buffer_num][i]);
     }
-    DB_printf("\r\n");
+//    DB_printf("\r\n");
     
     // Clear the interrupt
     IFS4CLR = _IFS4_SPI2RXIF_MASK; 
     
     ES_Timer_InitTimer(JETSON_TIMER, JETSON_TIMEOUT); // Restart timeout timer
    
-    if (ReceiveBuffer[buffer_num][0] == 45) {
-        // This is an update velocity message
-        VelocityUpdateEvent.EventParam = buffer_num; // Tell which buffer we just stored the data in
-        if (buffer_num) {
-            buffer_num = 0;
-        } else {
-            buffer_num = 1;
-        }
-        PostJetsonSM(VelocityUpdateEvent); // Tell state machine we have updated velocities       
-    } 
+//    if (ReceiveBuffer[buffer_num][0] == 45) {
+//        // This is an update velocity message
+//        VelocityUpdateEvent.EventParam = buffer_num; // Tell which buffer we just stored the data in
+//        if (buffer_num) {
+//            buffer_num = 0;
+//        } else {
+//            buffer_num = 1;
+//        }
+//        PostJetsonSM(VelocityUpdateEvent); // Tell state machine we have updated velocities       
+//    } 
 //        else if (ReceiveBuffer[buffer_num][0] == 1) {
 //        // Put in Accel Data
 //        WriteAccelToSPI(SPI2BUF); // Write data first to make sure we have it in the buffer -- may be unneccesary (i.e. can we just post an event here and do this outside the isr)
@@ -497,7 +520,6 @@ void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
 //        // Add any information to be passed the next time the sequence is started
 //        // Nothing to add here 
 //    }
-        else if (ReceiveBuffer[buffer_num][0] == 90) {
         // This message is not as time sensitive and will lead to end or start of connection
         
         // Tell which buffer we just stored the data in
@@ -510,6 +532,6 @@ void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
         
         // Tell state machine the data is ready
         PostJetsonSM(ReceiveEvent);
-    }
+    
     
 }

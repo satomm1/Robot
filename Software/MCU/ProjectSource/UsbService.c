@@ -152,21 +152,21 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
       }
       
       if ('b' == ThisEvent.EventParam) {
-          OC1RS = (800 + 1)/100 * 85;
-          OC2RS = (800 + 1)/100 * 85;
+          OC1RS = (312 + 1)/100 * 85;
+          OC2RS = (312 + 1)/100 * 85;
           LATFbits.LATF8 = 1; 
           LATJbits.LATJ3 = 1; 
       }
       
       if ('f' == ThisEvent.EventParam) {
-          OC1RS = 0;
-          OC2RS = 0;
-          OC1RS = (800 + 1)/100 * 15;
-          OC2RS = (800 + 1)/100 * 15;
+          LATFbits.LATF8 = 0; 
+          LATJbits.LATJ3 = 0; 
+          OC1RS = (312 + 1)/100 * 15;
+          OC2RS = (312 + 1)/100 * 15;
       }
       
       if ('s' == ThisEvent.EventParam) {
-          SetDesiredRPM(0,0);
+          SetDesiredSpeed(0,0);
           
           OC1RS = 0;
           OC2RS = 0;
@@ -188,6 +188,22 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
       
       if ('4' == ThisEvent.EventParam) {
           SetDesiredRPM(150, 150);
+      }
+      
+      if ('5' == ThisEvent.EventParam) {
+          SetDesiredSpeed(0.1, 0);
+      }
+      
+      if ('6' == ThisEvent.EventParam) {
+          SetDesiredSpeed(-0.1, 0);
+      }
+      
+      if ('c' == ThisEvent.EventParam) {
+          SetDesiredSpeed(0, 1);
+      }
+      
+      if ('w' == ThisEvent.EventParam) {
+          SetDesiredSpeed(0, -1);
       }
       
     }

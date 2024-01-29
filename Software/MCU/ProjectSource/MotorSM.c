@@ -319,7 +319,7 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
         {
             uint16_t left_rpm = SPEED_CONVERSION_FACTOR / LeftPulseLength;
             uint16_t right_rpm = SPEED_CONVERSION_FACTOR / RightPulseLength;
-            DB_printf("RPM: %d, %d \r\n", left_rpm, right_rpm);
+//            DB_printf("RPM: %d, %d \r\n", left_rpm, right_rpm);
             
             ES_Timer_InitTimer(MOTOR_TIMER, 200);
         }
@@ -400,25 +400,26 @@ void SetDesiredSpeed(float V, float w)
     float right_w = v_r + w_r; // (rad/sec)
     
     // Convert to revolutions per minute
-    left_w = left_w * 3600 / 2 / 3.14159; // (rev/min)
-    right_w = right_w * 3600 / 2 / 3.14159; // (rev/min)
+    left_w = left_w * 60 / 2 / 3.14159; // (rev/min)
+    right_w = right_w * 60 / 2 / 3.14159; // (rev/min)
     
     // Set the direction pins to the H-Bridge to get correct forward or 
     // backward motion
     if (left_w  >= 0) {
-        LATFbits.LATF8 = 0; // Set direction pin forward
+        LATJbits.LATJ3 = 0; // Set direction pin forward
         LeftDirection = Forward;
     } else {
-        LATFbits.LATF8 = 1; // Set direction pin to backward
+        LATJbits.LATJ3 = 1; // Set direction pin to backward
         LeftDirection = Backward;
         left_w = -left_w;
     }
     
     if (right_w >= 0) {
-        LATJbits.LATJ3 = 0; // Set direction pin forward
+        
+        LATFbits.LATF8 = 0; // Set direction pin forward
         RightDirection = Forward;
     } else {
-        LATJbits.LATJ3 = 1; // Set direction pin to backward
+        LATFbits.LATF8 = 1; // Set direction pin to backward
         RightDirection = Backward;
         right_w = - right_w;
     }
