@@ -44,6 +44,9 @@ static uint8_t MyPriority;
 
 static uint8_t ReceiveBuffer[2][8];
 
+// Indicates what message we are currently sending from MCU to Jetson
+static uint8_t CurrentMessage; 
+
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
  Function
@@ -185,6 +188,8 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
         // now put the machine into the actual initial state
         CurrentState = RobotInactive;
         
+        CurrentMessage = 0; // Start with message 0
+        
         // Preload buffer with 0's
         for (uint8_t ii = 0; ii < 16; ii++) {
             SPI2BUF = 0;
@@ -291,6 +296,8 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
               GREEN_LATCH = 0;  // Turn green LED off
               CurrentState = RobotInactive;  
               
+              CurrentMessage = 0;
+              
               DB_printf("Received End Message: goin to RobotInactive\r\n");
             }
             break;
@@ -312,6 +319,8 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
           
           DB_printf("Timed out, moving to Robot Inactive\r\n");
           
+          CurrentMessage = 0;
+          
 //          SPI2CONbits.ON = 0;
 //            while (!SPI2STATbits.SPIRBE) {
 //                uint8_t temp = SPI2BUF; 
@@ -328,6 +337,38 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
         {
             float desired_lin_v;
             float desired_ang_v;
+            
+            switch (CurrentMessage)
+            {
+                case 0:
+                {
+                    // TODO: fill buffer with accel data
+                    CurrentMessage = 1;
+                }
+                break;
+                
+                case 1:
+                {
+                    // TODO: fill buffer with gyro data
+                    CurrentMessage = 2;
+                }
+                break;
+                
+                case 2:
+                {
+                    // TODO: fill buffer with position data
+                    CurrentMessage = 3;
+                }
+                break;
+                
+                case 3:
+                {
+                    // TODO: fill buffer with dead reckoning data
+                    CurrentMessage = 0;
+                }
+                break;
+            }
+            
             
             // Convert Data to 
             uint32_t combined_bytes = ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][1] << 24) | 
@@ -431,7 +472,7 @@ void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
     
     ES_Timer_InitTimer(JETSON_TIMER, JETSON_TIMEOUT); // Restart timeout timer
    
-    if (ReceiveBuffer[buffer_num][0] == 0) {
+    if (ReceiveBuffer[buffer_num][0] == 45) {
         // This is an update velocity message
         VelocityUpdateEvent.EventParam = buffer_num; // Tell which buffer we just stored the data in
         if (buffer_num) {
@@ -440,21 +481,23 @@ void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
             buffer_num = 1;
         }
         PostJetsonSM(VelocityUpdateEvent); // Tell state machine we have updated velocities       
-    } else if (ReceiveBuffer[buffer_num][0] == 1) {
-        // Put in Accel Data
-        WriteAccelToSPI(SPI2BUF); // Write data first to make sure we have it in the buffer -- may be unneccesary (i.e. can we just post an event here and do this outside the isr)
-    } else if (ReceiveBuffer[buffer_num][0] == 2) {
-        // Put in Gyro Data
-        WriteGyroToSPI(SPI2BUF);
-    } else if (ReceiveBuffer[buffer_num][0] == 3) {
-        // Put in Position Data
-        WritePositionToSPI(SPI2BUF); // Write data first to make sure we have it in the buffer -- may be unneccesary (i.e. can we just post an event here and do this outside the isr)
-    } else if (ReceiveBuffer[buffer_num][0] == 4) {
-        WriteDeadReckoningVelocityToSPI(SPI2BUF);
-    } else if (ReceiveBuffer[buffer_num][0] == 5) {
-        // Add any information to be passed the next time the sequence is started
-        // Nothing to add here 
-    }else if (ReceiveBuffer[buffer_num][0] == 99) {
+    } 
+//        else if (ReceiveBuffer[buffer_num][0] == 1) {
+//        // Put in Accel Data
+//        WriteAccelToSPI(SPI2BUF); // Write data first to make sure we have it in the buffer -- may be unneccesary (i.e. can we just post an event here and do this outside the isr)
+//    } else if (ReceiveBuffer[buffer_num][0] == 2) {
+//        // Put in Gyro Data
+//        WriteGyroToSPI(SPI2BUF);
+//    } else if (ReceiveBuffer[buffer_num][0] == 3) {
+//        // Put in Position Data
+//        WritePositionToSPI(SPI2BUF); // Write data first to make sure we have it in the buffer -- may be unneccesary (i.e. can we just post an event here and do this outside the isr)
+//    } else if (ReceiveBuffer[buffer_num][0] == 4) {
+//        WriteDeadReckoningVelocityToSPI(SPI2BUF);
+//    } else if (ReceiveBuffer[buffer_num][0] == 5) {
+//        // Add any information to be passed the next time the sequence is started
+//        // Nothing to add here 
+//    }
+        else if (ReceiveBuffer[buffer_num][0] == 90) {
         // This message is not as time sensitive and will lead to end or start of connection
         
         // Tell which buffer we just stored the data in
