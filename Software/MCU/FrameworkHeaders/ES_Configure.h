@@ -25,6 +25,11 @@
 #define ES_CONFIGURE_H
 
 /****************************************************************************/
+// Define the Robot ID, this should be a unique 8 bit ID for each robot
+#define ROBOT_ID 0xAA
+
+
+/****************************************************************************/
 // The maximum number of services sets an upper bound on the number of
 // services that the framework will handle. Reasonable values are 8 and 16
 // corresponding to an 8-bit(uint8_t) and 16-bit(uint16_t) Ready variable size

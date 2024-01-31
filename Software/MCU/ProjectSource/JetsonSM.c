@@ -209,7 +209,9 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
             // Send message received message to Jetson
             SPI2BUF = 0;
             SPI2BUF = 0b11111111;
-            for (uint8_t ii = 0; ii < 14; ii++) {
+            SPI2BUF = 0; 
+            SPI2BUF = ROBOT_ID; // Send Robot ID
+            for (uint8_t ii = 0; ii < 12; ii++) {
                 SPI2BUF = 0; // Fill rest of buffer with 0's
             }
             
@@ -334,20 +336,14 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
 
                     case 2:
                     {
-                        // TODO: fill buffer with position data
-                        for(uint8_t ii = 0; ii < 16; ii++) {
-                            SPI2BUF = 3;
-                        }
+                        WritePositionToSPI(SPI2BUF);
                         CurrentMessage = 3;
                     }
                     break;
 
                     case 3:
                     {
-                        // TODO: fill buffer with dead reckoning data
-                        for(uint8_t ii = 0; ii < 16; ii++) {
-                            SPI2BUF = 4;
-                        }
+                        WriteDeadReckoningVelocityToSPI(SPI2BUF);
                         CurrentMessage = 0;
                     }
                     break;

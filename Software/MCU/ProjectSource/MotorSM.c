@@ -28,6 +28,7 @@
 #define OC_PERIOD 312   // Output compare period (10 kHz)
 #define CONTROL_PERIOD 1000 // Control update period --- 6250 Hz
 #define NO_SPEED_PERIOD 65535 // Period to indicate motor not spinning
+#define DEAD_RECKONING_PERIOD 19531
 #define Kp 3 // Proportional constant for PID law
 #define Ki 0.5 // Integral constant for PID law
 
@@ -36,7 +37,7 @@
 #define SPEED_CONVERSION_FACTOR (1.6e7*60)/ENCODER_RESOLUTION
 #define WHEEL_BASE 0.254 // Distance between wheels on the robot (m)
 #define WHEEL_RADIUS 0.04 // Radius of wheels (m))
-#define DEAD_RECKONING_TIME 0.00016 // Time between dead reckoning updates in seconds (depends on CONTROL_PERIOD)
+#define DEAD_RECKONING_TIME 0.04999936 // Time between dead reckoning updates in seconds (depends on DEAD_RECKONING_PERIOD)
 #define DEAD_RECKONING_RATIO 2*3.14159 / ENCODER_RESOLUTION / DEAD_RECKONING_TIME * WHEEL_RADIUS // This number times change in encoder clicks is linear velocity in m/second
 /*---------------------------- Module Functions ---------------------------*/
 /* prototypes for private functions for this machine.They should be functions
@@ -65,11 +66,14 @@ static volatile float y = 0; // y position of the robot
 static volatile float theta = 0; // angular position of the robot
 
 // History variables to keep track of current V and w
-static volatile float V_current = 0;
-static volatile float w_current = 0;
+static volatile float V_current = 0.;
+static volatile float w_current = 0.;
 
 static uint16_t DesiredLeftRPM;
 static uint16_t DesiredRightRPM;
+
+static uint16_t cumLeftpos = 0;
+static uint16_t cumLeftneg = 0;
 
 static Direction_t LeftDirection = Forward;
 static Direction_t RightDirection = Forward;
@@ -123,7 +127,7 @@ bool InitMotorSM(uint8_t Priority)
   ANSELASET = _ANSELA_ANSA1_MASK;
   TRISJSET = _TRISJ_TRISJ9_MASK;
   TRISASET = _TRISA_TRISA1_MASK;
-  
+      
   // Setup Timers
   // Timer 1 (for control update)
   T1CON = 0; // Reset the timer 1 register settings
@@ -161,6 +165,12 @@ bool InitMotorSM(uint8_t Priority)
   T5CONbits.TCS = 0; // Use internal peripheral clock (PBCLK3, 50 MHz)
   PR5 = NO_SPEED_PERIOD; // Use no speed period, ~3 Hz @ 65535
   TMR5 = 0; // Set TMR5 to 0
+  
+  T7CON = 0;
+  T7CONbits.TCKPS = 0b111; // 1:256 prescale value, 195.3125  kHz
+  T7CONbits.TCS = 0; // Use internal peripheral clock (PBCLK3, 50 MHz)
+  PR7 = DEAD_RECKONING_PERIOD;
+  TMR7 = 0;
   
   // Setup Output compare
   OC1CON = 0; // Reset OC1CON register settings
@@ -212,14 +222,19 @@ bool InitMotorSM(uint8_t Priority)
   IPC3bits.T3IS = 3; // T3 Sub-priority
   IPC4bits.T4IP = 6; // T4
   IPC6bits.T5IP = 6; // T5
+  IPC8bits.T7IP = 6; // T7
   
   // Clear interrupt flags
   IFS0CLR = _IFS0_IC1IF_MASK | _IFS0_IC3IF_MASK | _IFS0_T1IF_MASK | 
           _IFS0_T3IF_MASK | _IFS0_T4IF_MASK | _IFS0_T5IF_MASK; // | _IFS0_IC2IF_MASK | _IFS0_IC4IF_MASK
   
+  IFS1CLR = _IFS1_T7IF_MASK;
+  
   // Local enable interrupts
   IEC0SET = _IEC0_IC1IE_MASK | _IEC0_IC3IE_MASK | _IEC0_T1IE_MASK | 
           _IEC0_T3IE_MASK | _IEC0_T4IE_MASK | _IEC0_T5IE_MASK; //_IEC0_IC2IE_MASK | _IEC0_IC4IE_MASK 
+  
+  IEC1SET = _IEC1_T7IE_MASK;
   
   __builtin_enable_interrupts(); // Global enable interrupts
   
@@ -235,6 +250,7 @@ bool InitMotorSM(uint8_t Priority)
   T3CONbits.ON = 1; // Turn timer 3 on
   T4CONbits.ON = 1; // Turn timer 4 on
   T5CONbits.ON = 1; // Turn timer 5 on
+  T7CONbits.ON = 1; // Turn timer 7 on
   
   MyPriority = Priority;
   // put us into the Initial PseudoState
@@ -295,6 +311,9 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
       {
         LeftRotations = 0;
         RightRotations = 0;
+        
+        LeftPrevRotations = 0;
+        RightPrevRotations = 0;
           
         // now put the machine into the actual initial state
         CurrentState = MotorWait;
@@ -320,8 +339,15 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
             uint16_t left_rpm = SPEED_CONVERSION_FACTOR / LeftPulseLength;
             uint16_t right_rpm = SPEED_CONVERSION_FACTOR / RightPulseLength;
 //            DB_printf("RPM: %d, %d \r\n", left_rpm, right_rpm);
+            DB_printf("Vel: %d\r\n", (uint16_t)(V_current*100));
+            DB_printf("w: %d\r\n", (uint16_t)(w_current*100));
+            DB_printf("x: %d\r\n", (uint16_t)(x*100));
+            DB_printf("y: %d\r\n", (uint16_t)(y*100));
+            DB_printf("theta: %d\r\n", (uint16_t)(theta*100));
+//            DB_printf("LR: %d\r\n", LeftRotations);
+//            DB_printf("RR: %d\r\n", RightRotations);
             
-            ES_Timer_InitTimer(MOTOR_TIMER, 200);
+            ES_Timer_InitTimer(MOTOR_TIMER, 500);
         }
         break;
         
@@ -465,6 +491,10 @@ void WritePositionToSPI(uint32_t Buffer) {
   for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
     Buffer = (theta_as_int >> (24-8*j)) & 0xFF;
   }
+  
+  for (uint8_t j = 0; j < 3; j++) {
+      Buffer = 0; // Fill rest of buffer with 0's
+  }
 }
 
 void WriteDeadReckoningVelocityToSPI(uint32_t Buffer) {
@@ -482,6 +512,10 @@ void WriteDeadReckoningVelocityToSPI(uint32_t Buffer) {
     uint32_t w_as_int = *((uint32_t*)&w_current);
     for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
         Buffer = (w_as_int >> (24-8*j)) & 0xFF;
+    }
+    
+    for (uint8_t j = 0; j < 7; j++) {
+        Buffer = 0; // Fill rest of buffer with 0's
     }
 }
 
@@ -559,9 +593,9 @@ void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
     
     // Update number of rotations for dead reckoning
     if (ChannelB) {
-        LeftRotations -= 1;
-    } else {
         LeftRotations += 1;
+    } else {
+        LeftRotations -= 1;
     }
     
     // restart Timer5 (timer to indicate if motor is stopped)
@@ -595,17 +629,6 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     // Initialize variables used throughout the ISR (Static for speed)
     static uint16_t ActualLeftRPM;
     static uint16_t ActualRightRPM;
-    
-    static float V_l; // Left wheel linear velocity (m/s)
-    static float V_r; // Right wheel linear velocity (m/s)
-    static float V;   // Robot linear velocity (m/s)
-    static float omega; // Robot angular velocity (rad/second)
-    
-    // Initialize Runge-Kutta Variables (static for speed)
-    static float k00, k01, k02;
-    static float k10, k11, k12;
-    static float k20, k21, k22;
-    static float k30, k31, k32;
     
     IFS0CLR = _IFS0_T1IF_MASK; // Clear the timer interrupt
     
@@ -654,38 +677,6 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
         RightDutyCycle = 100 - RightDutyCycle;
     }
     OC1RS = (OC_PERIOD + 1)/100 * RightDutyCycle;
-    
-//    // Calculate linear velocity of both wheels
-//    V_l = (LeftRotations - LeftPrevRotations) * DEAD_RECKONING_RATIO; 
-//    V_r = (RightRotations - RightPrevRotations) * DEAD_RECKONING_RATIO;
-//    
-//    // Calculate linear/angular velocity of robot
-//    V = (V_l + V_r) / 2; 
-//    omega = (V_r - V_l) / WHEEL_BASE;
-//    
-//    V_current = V; // used to store current velocity
-//    w_current = omega; // used to store current angular velocity
-//    
-//    // Now calculate the position of the robot using 4th order Runge Kutta
-//    k00 = V * cosf(theta);
-//    k01 = V * sinf(theta);
-//    k02 = omega;
-//    
-//    k10 = V * cosf(theta + DEAD_RECKONING_TIME / 2 * k02);
-//    k11 = V * sinf(theta + DEAD_RECKONING_TIME / 2 * k02);
-//    k12 = omega;
-//    
-//    k20 = V * cosf(theta + DEAD_RECKONING_TIME / 2 * k12);
-//    k21 = V * sinf(theta + DEAD_RECKONING_TIME / 2 * k12);
-//    k22 = omega;
-//    
-//    k30 = V * cosf(theta + DEAD_RECKONING_TIME * k22);
-//    k31 = V * sinf(theta + DEAD_RECKONING_TIME * k22);
-//    k32 = omega;
-//    
-//    x = x + DEAD_RECKONING_TIME / 6 * (k00 + 2*(k10 + k20) + k30);
-//    y = y + DEAD_RECKONING_TIME / 6 * (k01 + 2*(k11 + k21) + k31);
-//    theta = theta + DEAD_RECKONING_TIME / 6 * (k02 + 2*(k12 + k22) + k32);
 }
 
 /****************************************************************************
@@ -733,4 +724,79 @@ void __ISR(_TIMER_5_VECTOR, IPL6SRS) T5Handler(void)
     IFS0CLR = _IFS0_T5IF_MASK; // clear the interrupt flag     
     T5CONCLR = _T5CON_ON_MASK; // stop the timer 
     RightPulseLength = 4294967295; // set RightPulseLength to max    
+}
+
+/****************************************************************************
+ Function
+    T7Handler
+
+ Description
+    Performs dead reckoning calculations
+****************************************************************************/
+void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
+{
+    static float V_l; // Left wheel linear velocity (m/s)
+    static float V_r; // Right wheel linear velocity (m/s)
+    static float V;   // Robot linear velocity (m/s)
+    static float omega; // Robot angular velocity (rad/second)
+    
+    // Initialize Runge-Kutta Variables (static for speed)
+    static float k00, k01, k02;
+    static float k10, k11, k12;
+    static float k20, k21, k22;
+    static float k30, k31, k32;
+    
+    static int32_t CurLeftRotations;
+    static int32_t CurRightRotations;
+    
+    static bool status = false;
+    
+    IFS1CLR = _IFS1_T7IF_MASK; // clear the interrupt flag 
+    
+    // First thing we do is grab current number of rotations so this doesn't change mid function
+    CurLeftRotations = LeftRotations;
+    CurRightRotations = RightRotations;
+    
+    // Calculate linear velocity of both wheels    
+//    DB_printf("L: %d\r\n", CurLeftRotations- LeftPrevRotations);
+//    DB_printf("R: %d\r\n", CurRightRotations- RightPrevRotations);
+    
+    V_l = (CurLeftRotations - LeftPrevRotations) * DEAD_RECKONING_RATIO; 
+    V_r = (CurRightRotations - RightPrevRotations) * DEAD_RECKONING_RATIO;
+    
+    // Store for next time
+    LeftPrevRotations = CurLeftRotations;
+    RightPrevRotations = CurRightRotations;
+    
+    // Calculate linear/angular velocity of robot
+    V = (V_l + V_r) / 2; 
+    omega = (V_r - V_l) / WHEEL_BASE;
+    
+    if (V > .2) {
+        uint16_t a = 1;
+    }
+    
+    V_current = V; // used to store current velocity
+    w_current = omega; // used to store current angular velocity
+    
+    // Now calculate the position of the robot using 4th order Runge Kutta
+    k00 = V * cosf(theta);
+    k01 = V * sinf(theta);
+    k02 = omega;
+    
+    k10 = V * cosf(theta + DEAD_RECKONING_TIME / 2 * k02);
+    k11 = V * sinf(theta + DEAD_RECKONING_TIME / 2 * k02);
+    k12 = omega;
+    
+    k20 = V * cosf(theta + DEAD_RECKONING_TIME / 2 * k12);
+    k21 = V * sinf(theta + DEAD_RECKONING_TIME / 2 * k12);
+    k22 = omega;
+    
+    k30 = V * cosf(theta + DEAD_RECKONING_TIME * k22);
+    k31 = V * sinf(theta + DEAD_RECKONING_TIME * k22);
+    k32 = omega;
+    
+    x = x + DEAD_RECKONING_TIME / 6 * (k00 + 2*(k10 + k20) + k30);
+    y = y + DEAD_RECKONING_TIME / 6 * (k01 + 2*(k11 + k21) + k31);
+    theta = theta + DEAD_RECKONING_TIME / 6 * (k02 + 2*(k12 + k22) + k32);
 }

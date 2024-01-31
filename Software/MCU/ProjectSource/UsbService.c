@@ -191,7 +191,7 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
       }
       
       if ('5' == ThisEvent.EventParam) {
-          SetDesiredSpeed(0.1, 0);
+          SetDesiredSpeed(0.5, 0);
       }
       
       if ('6' == ThisEvent.EventParam) {
