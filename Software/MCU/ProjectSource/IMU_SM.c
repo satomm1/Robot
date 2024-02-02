@@ -87,6 +87,7 @@ bool InitImuSM(uint8_t Priority)
   TRISDCLR = _TRISD_TRISD1_MASK | _TRISD_TRISD3_MASK | _TRISD_TRISD4_MASK; // Set SCK1, SS1, SDO1 to output
   TRISDSET = _TRISD_TRISD2_MASK; // Set SDI1 to Input
   
+  
   // Map SPI1 Pins to correct function
   // RD1 is mapped to CLK1 by default
   RPD4R = 0b0101; // Map RD4 -> SS1
@@ -212,9 +213,9 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
     {
       if (ThisEvent.EventType == ES_INIT) 
       {
-        SetBank(0);
-        uint8_t data = ReadIMU(0x4F);
-        data = ReadIMU(0b0101010);
+//        SetBank(0);
+//        uint8_t data = ReadIMU(0x4F);
+//        data = ReadIMU(0b0101010);
 //          
 //        InitIMU();        
         

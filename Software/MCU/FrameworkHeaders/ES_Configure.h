@@ -38,7 +38,7 @@
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 8
+#define NUM_SERVICES 9
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service.
@@ -153,11 +153,11 @@
 // These are the definitions for Service 8
 #if NUM_SERVICES > 8
 // the header file with the public function prototypes
-#define SERV_8_HEADER "TestHarnessService8.h"
+#define SERV_8_HEADER "EEPROMSM.h"
 // the name of the Init function
-#define SERV_8_INIT InitTestHarnessService8
+#define SERV_8_INIT InitEEPROMSM
 // the name of the run function
-#define SERV_8_RUN RunTestHarnessService8
+#define SERV_8_RUN RunEEPROMSM
 // How big should this services Queue be?
 #define SERV_8_QUEUE_SIZE 3
 #endif

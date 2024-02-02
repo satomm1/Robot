@@ -39,6 +39,9 @@
 #define WHEEL_RADIUS 0.04 // Radius of wheels (m))
 #define DEAD_RECKONING_TIME 0.04999936 // Time between dead reckoning updates in seconds (depends on DEAD_RECKONING_PERIOD)
 #define DEAD_RECKONING_RATIO 2*3.14159 / ENCODER_RESOLUTION / DEAD_RECKONING_TIME * WHEEL_RADIUS // This number times change in encoder clicks is linear velocity in m/second
+
+#define V_MAX 0.7 // max 1 m/sec
+#define w_MAX 1 // max 1 rad/sec
 /*---------------------------- Module Functions ---------------------------*/
 /* prototypes for private functions for this machine.They should be functions
    relevant to the behavior of this state machine
@@ -71,9 +74,6 @@ static volatile float w_current = 0.;
 
 static uint16_t DesiredLeftRPM;
 static uint16_t DesiredRightRPM;
-
-static uint16_t cumLeftpos = 0;
-static uint16_t cumLeftneg = 0;
 
 static Direction_t LeftDirection = Forward;
 static Direction_t RightDirection = Forward;
@@ -339,11 +339,11 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
             uint16_t left_rpm = SPEED_CONVERSION_FACTOR / LeftPulseLength;
             uint16_t right_rpm = SPEED_CONVERSION_FACTOR / RightPulseLength;
 //            DB_printf("RPM: %d, %d \r\n", left_rpm, right_rpm);
-            DB_printf("Vel: %d\r\n", (uint16_t)(V_current*100));
-            DB_printf("w: %d\r\n", (uint16_t)(w_current*100));
-            DB_printf("x: %d\r\n", (uint16_t)(x*100));
-            DB_printf("y: %d\r\n", (uint16_t)(y*100));
-            DB_printf("theta: %d\r\n", (uint16_t)(theta*100));
+//            DB_printf("Vel: %d\r\n", (uint16_t)(V_current*100));
+//            DB_printf("w: %d\r\n", (uint16_t)(w_current*100));
+//            DB_printf("x: %d\r\n", (uint16_t)(x*100));
+//            DB_printf("y: %d\r\n", (uint16_t)(y*100));
+//            DB_printf("theta: %d\r\n", (uint16_t)(theta*100));
 //            DB_printf("LR: %d\r\n", LeftRotations);
 //            DB_printf("RR: %d\r\n", RightRotations);
             
@@ -418,6 +418,18 @@ void SetDesiredRPM(uint16_t LeftRPM, uint16_t RightRPM)
 ****************************************************************************/
 void SetDesiredSpeed(float V, float w)
 {
+    if (V > V_MAX) {
+        V = V_MAX;
+    } else if (V < -V_MAX) {
+        V = -V_MAX;
+    }
+    
+    if (w > w_MAX) {
+        w = w_MAX;
+    } else if (w < -w_MAX) {
+        w = -w_MAX;
+    }
+    
     // Calculate the angular velocity of the left/right wheel to achieve 
     // desired linear/angular velocity of the robot
     float v_r = V / WHEEL_RADIUS;
@@ -517,6 +529,12 @@ void WriteDeadReckoningVelocityToSPI(uint32_t Buffer) {
     for (uint8_t j = 0; j < 7; j++) {
         Buffer = 0; // Fill rest of buffer with 0's
     }
+}
+
+void ResetPosition(void) {
+    x = 0;
+    y = 0;
+    theta = 0;
 }
 
 /***************************************************************************
