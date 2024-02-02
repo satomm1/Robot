@@ -4,6 +4,16 @@
 
   (paper "A4")
 
+  (title_block
+    (title "MCU Controller")
+    (rev "0.2")
+    (company "satomm@stanford.edu")
+    (comment 1 "Department of Civil and Environmental Engineering")
+    (comment 2 "Engineering Informatics Group")
+    (comment 3 "Stanford University")
+    (comment 4 "Matthew Sato")
+  )
+
   (lib_symbols
     (symbol "Device:C" (pin_numbers hide) (pin_names (offset 0.254)) (in_bom yes) (on_board yes)
       (property "Reference" "C" (at 0.635 2.54 0)

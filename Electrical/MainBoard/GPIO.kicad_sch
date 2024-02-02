@@ -4,6 +4,16 @@
 
   (paper "A4")
 
+  (title_block
+    (title "MCU Controller")
+    (rev "0.2")
+    (company "satomm@stanford.edu")
+    (comment 1 "Department of Civil and Environmental Engineering")
+    (comment 2 "Engineering Informatics Group")
+    (comment 3 "Stanford University")
+    (comment 4 "Matthew Sato")
+  )
+
   (lib_symbols
     (symbol "Connector_Generic:Conn_02x02_Odd_Even" (pin_names (offset 1.016) hide) (in_bom yes) (on_board yes)
       (property "Reference" "J" (at 1.27 2.54 0)
