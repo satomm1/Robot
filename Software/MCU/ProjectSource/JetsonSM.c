@@ -25,7 +25,7 @@
 #include "dbprintf.h"
 
 /*----------------------------- Module Defines ----------------------------*/
-#define JETSON_TIMEOUT 10000 // Timeout where no SPI response disconnects us
+#define JETSON_TIMEOUT 1000 // Timeout where no SPI response disconnects us
 #define PENDING_TIMEOUT 1000 // Timeout to receive confirmation that Jetson recieved our confirmation message
 #define YELLOW_LATCH LATJbits.LATJ4
 #define GREEN_LATCH LATJbits.LATJ5
