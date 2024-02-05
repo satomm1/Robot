@@ -418,6 +418,28 @@ void SetDesiredRPM(uint16_t LeftRPM, uint16_t RightRPM)
 ****************************************************************************/
 void SetDesiredSpeed(float V, float w)
 {
+    // We turn off control for stopped to prevent jittering
+    if (V==0 && w == 0) {
+        
+        // Turn control timer off
+        T1CONbits.ON = 0; // Turn timer 1 off
+        TMR1 = 0;
+                
+        // Manually set drive pins to stopped
+        LATJbits.LATJ3 = 0; // Set direction pin forward
+        LeftDirection = Forward;
+        LATFbits.LATF8 = 0; // Set direction pin forward
+        RightDirection = Forward;
+        
+        OC1RS = 0;
+        OC2RS = 0;
+        
+        return;
+    } else {
+        T1CONbits.ON = 1; // Turn timer 1 back on
+    }
+    
+    
     if (V > V_MAX) {
         V = V_MAX;
     } else if (V < -V_MAX) {
