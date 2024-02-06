@@ -40,8 +40,8 @@
 #define DEAD_RECKONING_TIME 0.04999936 // Time between dead reckoning updates in seconds (depends on DEAD_RECKONING_PERIOD)
 #define DEAD_RECKONING_RATIO 2*3.14159 / ENCODER_RESOLUTION / DEAD_RECKONING_TIME * WHEEL_RADIUS // This number times change in encoder clicks is linear velocity in m/second
 
-#define V_MAX 0.7 // max 1 m/sec
-#define w_MAX 1 // max 1 rad/sec
+#define V_MAX 1 // max 1 m/sec
+#define w_MAX 2 // max 2 rad/sec
 /*---------------------------- Module Functions ---------------------------*/
 /* prototypes for private functions for this machine.They should be functions
    relevant to the behavior of this state machine
@@ -840,4 +840,12 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     x = x + DEAD_RECKONING_TIME / 6 * (k00 + 2*(k10 + k20) + k30);
     y = y + DEAD_RECKONING_TIME / 6 * (k01 + 2*(k11 + k21) + k31);
     theta = theta + DEAD_RECKONING_TIME / 6 * (k02 + 2*(k12 + k22) + k32);
+    
+    // Ensure theta stays within [-pi, pi]
+    if (theta > 3.14159265359) {
+        theta -= 6.28318530718;
+    } else if (theta < -3.14159265359) {
+        theta += 6.28318530718;
+    }
+    
 }
