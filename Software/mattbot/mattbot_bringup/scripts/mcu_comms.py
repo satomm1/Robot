@@ -140,7 +140,7 @@ class MCU_Comms:
             odom.pose.pose = Pose(Point(pos_x, pos_y, 0), quaternion_from_euler(0,0,pos_theta*3.14159/180))  # position/orientation
             odom.twist.twist = Twist(Vector3(V_dr, 0, 0), Vector3(0, 0, w_dr))  # linear/angular velocity
 
-            self.odom_pub.publis(odom)  # actually publish the data
+            self.odom_pub.publish(odom)  # actually publish the data
 
 
             imu = Imu()
