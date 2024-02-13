@@ -31,6 +31,7 @@
 #define DEAD_RECKONING_PERIOD 7812 // Chosen so that we update at 50 Hz rate
 #define Kp 3 // Proportional constant for PID law
 #define Ki 0.5 // Integral constant for PID law
+#define Kd 3 // derivative constant for PID law
 
 #define ENCODER_RESOLUTION 374 // Number of pulses per revolution
 #define GEAR_RATIO 34 // Gear reduction ratio
@@ -554,11 +555,26 @@ void WriteDeadReckoningVelocityToSPI(uint32_t Buffer) {
     }
 }
 
+/* ResetPosition  
+ * 
+ * Sets the current mobile robot position to position (0,0) and angle 0
+ * 
+*/
 void ResetPosition(void) {
-    x = 0;
-    y = 0;
-    theta = 0;
+    SetPosition(0,0,0);
 }
+
+/* SetPosition
+ *  
+ * Sets the current mobile robot position to the provided location and heading
+ * 
+*/
+void SetPosition(float x_new, float y_new, float theta_new) {
+    x = x_new;
+    y = y_new;
+    theta = theta_new;
+}
+
 
 /***************************************************************************
  private functions
@@ -589,7 +605,7 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
     // Calculate the time length between encoder pulses
     RightPulseLength = MyTimer.FullTime - RightPrevTime;         
     RightPrevTime = MyTimer.FullTime; // update our last time variable 
-    
+        
     // Update number of rotations for dead reckoning
     if (ChannelB) {
         RightRotations -= 1;
@@ -662,8 +678,12 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     // Initializes the PI Variables
     static float LeftErrorSum = 0.0;
     static float RightErrorSum = 0.0;
-    static float LeftError;
-    static float RightError;
+    static int16_t LeftError;
+    static int16_t RightError;
+    static int16_t LeftPrevError = 0;
+    static int16_t RightPrevError = 0;
+    static int16_t LeftErrorDiff;
+    static int16_t RightErrorDiff;
     static int16_t LeftDutyCycle; // Only static here for speed
     static int16_t RightDutyCycle; // Only static here for speed
     
@@ -687,9 +707,16 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     LeftErrorSum += LeftError;
     RightErrorSum += RightError;
     
+    // Derivative of error
+    LeftErrorDiff = LeftError - LeftPrevError;
+    RightErrorDiff = RightError - RightPrevError;
+    
+    LeftPrevError = LeftError;
+    RightPrevError = RightError;
+    
     // Calculate according to PI Law
-    LeftDutyCycle = Kp*(LeftError+(Ki*LeftErrorSum)); 
-    RightDutyCycle = Kp*(RightError+(Ki*RightErrorSum)); 
+    LeftDutyCycle  = Kp*LeftError  + Ki*LeftErrorSum  + Kd*LeftErrorDiff; 
+    RightDutyCycle = Kp*RightError + Ki*RightErrorSum + Kd*RightErrorDiff; 
     
     // Anti-Windup
     if (LeftDutyCycle > 100) {

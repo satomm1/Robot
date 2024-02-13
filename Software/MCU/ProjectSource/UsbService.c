@@ -49,6 +49,8 @@ static uint8_t MyPriority;
 // add a deferral queue for up to 3 pending deferrals +1 to allow for overhead
 static ES_Event_t DeferralQueue[3 + 1];
 
+static float desired_speed = 0.2;
+
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
  Function
@@ -204,6 +206,20 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
       
       if ('w' == ThisEvent.EventParam) {
           SetDesiredSpeed(0, -1);
+      }
+      
+      if ('m' == ThisEvent.EventParam) {
+          desired_speed += 0.01;
+          DB_printf("New Speed: %d\r\n", (int16_t)(desired_speed*100));
+      }
+      
+      if ('n' == ThisEvent.EventParam) {
+          desired_speed -= 0.01;
+          DB_printf("New Speed: %d\r\n", (int16_t)(desired_speed*100));
+      }
+      
+      if (',' == ThisEvent.EventParam) {
+          SetDesiredSpeed(desired_speed, 0);
       }
       
     }
