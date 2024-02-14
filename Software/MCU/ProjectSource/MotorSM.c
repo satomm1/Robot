@@ -505,83 +505,54 @@ void SetDesiredSpeed(float V, float w)
 void WritePositionToSPI(uint32_t Buffer) {
   
   SPI2BUF = 8; // 8 indicates we are position data (byte 1)
-  SPI2BUF = 8;
-  SPI2BUF = 8;
-  SPI2BUF = 8;
-  SPI2BUF = 8;
-  SPI2BUF = 8;
-  SPI2BUF = 8;
-  SPI2BUF = 8;
-  SPI2BUF = 8;
-  SPI2BUF = 8;
-  SPI2BUF = 8;
-  SPI2BUF = 8;
-  SPI2BUF = 8;
-  SPI2BUF = 8;
-  SPI2BUF = 8;
-  SPI2BUF = 8;
+    
   // The x/y/theta data are all floats. The floats can be sent as 4 chunks of 
   // 8 bits.
   
   // Now write the x data (bytes 2-5)
-//  uint32_t x_as_int = *((uint32_t*)&x);
-//  for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
-//    SPI2BUF = (x_as_int >> (24-8*j)) & 0xFF;
-//  }
-//  
-//  // Now write the y data (bytes 6-9)
-//  uint32_t y_as_int = *((uint32_t*)&y);
-//  for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
-//    SPI2BUF = (y_as_int >> (24-8*j)) & 0xFF;
-//  }
-//  
-//  // Now write the theta data (bytes 10-13)
-//  uint32_t theta_as_int = *((uint32_t*)&theta);
-//  for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
-//    SPI2BUF = (theta_as_int >> (24-8*j)) & 0xFF;
-//  }
-//  
-//  for (uint8_t j = 0; j < 3; j++) {
-//    SPI2BUF = 0; // Fill rest of buffer with 0's
-//  }
+  uint32_t x_as_int = *((uint32_t*)&x);
+  for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+    SPI2BUF = (x_as_int >> (24-8*j)) & 0xFF;
+  }
+  
+  // Now write the y data (bytes 6-9)
+  uint32_t y_as_int = *((uint32_t*)&y);
+  for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+    SPI2BUF = (y_as_int >> (24-8*j)) & 0xFF;
+  }
+  
+  // Now write the theta data (bytes 10-13)
+  uint32_t theta_as_int = *((uint32_t*)&theta);
+  for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+    SPI2BUF = (theta_as_int >> (24-8*j)) & 0xFF;
+  }
+  
+  for (uint8_t j = 0; j < 3; j++) {
+    SPI2BUF = 0; // Fill rest of buffer with 0's
+  }
 }
 
 void WriteDeadReckoningVelocityToSPI(uint32_t Buffer) {
     
     SPI2BUF = 7; // 7 indcates the message type (byte 1)
-    SPI2BUF = 7;
-    SPI2BUF = 7;
-    SPI2BUF = 7;
-    SPI2BUF = 7;
-    SPI2BUF = 7;
-    SPI2BUF = 7;
-    SPI2BUF = 7;
-    SPI2BUF = 7;
-    SPI2BUF = 7;
-    SPI2BUF = 7;
-    SPI2BUF = 7;
-    SPI2BUF = 7;
-    SPI2BUF = 7;
-    SPI2BUF = 7;
-    SPI2BUF = 7;
     
     // the V/w data are floats. The floats can be sent as 4 chunks of 8 bits
     
     // Write V (bytes 2-5)
-//    uint32_t V_as_int = *((uint32_t*)&V_current);
-//    for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
-//        SPI2BUF = (V_as_int >> (24-8*j)) & 0xFF;
-//    }
-//    
-//    // Write w (bytes 6-9)
-//    uint32_t w_as_int = *((uint32_t*)&w_current);
-//    for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
-//        SPI2BUF = (w_as_int >> (24-8*j)) & 0xFF;
-//    }
-//    
-//    for (uint8_t j = 0; j < 7; j++) {
-//        SPI2BUF = 0; // Fill rest of buffer with 0's
-//    }
+    uint32_t V_as_int = *((uint32_t*)&V_current);
+    for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+        SPI2BUF = (V_as_int >> (24-8*j)) & 0xFF;
+    }
+    
+    // Write w (bytes 6-9)
+    uint32_t w_as_int = *((uint32_t*)&w_current);
+    for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+        SPI2BUF = (w_as_int >> (24-8*j)) & 0xFF;
+    }
+    
+    for (uint8_t j = 0; j < 7; j++) {
+        SPI2BUF = 0; // Fill rest of buffer with 0's
+    }
 }
 
 /* ResetPosition  

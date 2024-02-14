@@ -99,7 +99,7 @@ bool InitJetsonSM(uint8_t Priority)
   SPI2CONbits.MSTEN = 0; // Client mode
   SPI2CONbits.DISSDI = 0; // The SDI pin is controlled by the module
   SPI2CONbits.STXISEL = 0b00; // Interrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
-  SPI2CONbits.SRXISEL = 0b10; // Interrupt is generated when the buffer is full by one-half or more (8 or more)
+  SPI2CONbits.SRXISEL = 0b11; // Interrupt is generated when the receive buffer is full (16)
 
   SPI2CON2 = 0; // Reset SPI2CON2 register settings
   SPI2CON2bits.AUDEN = 0; // Audio protocol is disabled
@@ -314,42 +314,42 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
                 float desired_ang_v;
 
                 // DB_printf("Received 45\r\n");
-//                switch (CurrentMessage)
-//                {
-//                    case 0:
-//                    {
-//                        // TODO: fill buffer with accel data
-//                        for(uint8_t ii = 0; ii < 16; ii++) {
-//                            SPI2BUF = 1;
-//                        }
-//                        CurrentMessage = 1;
-//                    }
-//                    break;
-//
-//                    case 1:
-//                    {
-//                        // TODO: fill buffer with gyro data
-//                        for(uint8_t ii = 0; ii < 16; ii++) {
-//                            SPI2BUF = 2;
-//                        }
-//                        CurrentMessage = 2;
-//                    }
-//                    break;
-//
-//                    case 2:
-//                    {
-//                        WritePositionToSPI(SPI2BUF);
-//                        CurrentMessage = 3;
-//                    }
-//                    break;
-//
-//                    case 3:
-//                    {
-//                        WriteDeadReckoningVelocityToSPI(SPI2BUF);
-//                        CurrentMessage = 0;
-//                    }
-//                    break;
-//                }
+                switch (CurrentMessage)
+                {
+                    case 0:
+                    {
+                        // TODO: fill buffer with accel data
+                        for(uint8_t ii = 0; ii < 16; ii++) {
+                            SPI2BUF = 1;
+                        }
+                        CurrentMessage = 1;
+                    }
+                    break;
+
+                    case 1:
+                    {
+                        // TODO: fill buffer with gyro data
+                        for(uint8_t ii = 0; ii < 16; ii++) {
+                            SPI2BUF = 2;
+                        }
+                        CurrentMessage = 2;
+                    }
+                    break;
+
+                    case 2:
+                    {
+                        WritePositionToSPI(SPI2BUF);
+                        CurrentMessage = 3;
+                    }
+                    break;
+
+                    case 3:
+                    {
+                        WriteDeadReckoningVelocityToSPI(SPI2BUF);
+                        CurrentMessage = 0;
+                    }
+                    break;
+                }
 
 
                 // Convert Data to a float
@@ -390,11 +390,6 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
           
           DB_printf("Timed out, moving to Robot Inactive\r\n");
           
-          SPI2CONbits.ON = 0;
-          while (SPI2STATbits.RXBUFELM > 0) {
-              uint8_t tempData = SPI2BUF;
-          }
-          SPI2CONbits.ON = 1;
 //          ES_Event_t new_event = {EV_LED_ON, 0};
 //          if (SPI2STATbits.SPIRBF) {
 //              new_event.EventParam = 1;
@@ -471,337 +466,36 @@ void __ISR(_SPI2_TX_VECTOR, IPL7SRS) SPI2TXHandler(void)
  *  - Message 2: Message so that IMU data can be passed
  *  - Message 3: Message so that position can be passed
 ****************************************************************************/
-//void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
-//{
-//    // Static for speed
-//    static ES_Event_t ReceiveEvent = {EV_JETSON_MESSAGE_RECEIVED, 0};
-//    static uint8_t buffer_num = 0;
-//    static uint8_t buffer_indx = 0;
-//    static uint8_t tempData = 0;
-//    static bool inMessage = false;
-//    
-//    tempData = SPI2BUF;
-//    
-//    if (inMessage) {
-//        
-//    } else {
-//        if (tempData == 55){
-//            // Store message to send
-//        }
-//    }
-//    
-//    while (SPI2STATbits.RXBUFELM > 0) {
-//        
-//        if (buffer_indx == 0) {
-//            // Make sure we are at start of message by only accepting 45 and 90 in first position
-//            tempData = SPI2BUF;
-//            if (tempData == 45 || tempData == 90) {
-//                ReceiveBuffer[buffer_num][0] = tempData;
-//            } else {
-//                // TODO: May need to write to SPI2BUF just as a placeholder
-//                // SPI2BUF = 0;
-//                continue;
-//            }
-//        } else if (buffer_indx < 12) {
-//            ReceiveBuffer[buffer_num][buffer_indx] = SPI2BUF;
-//        } else if (buffer_indx == 15) {
-//            tempData = SPI2BUF;
-//            if (tempData == 55) {
-//                buffer_indx = 0;
-//                
-//                ReceiveEvent.EventParam = buffer_num;// Tell which buffer we just stored the data in
-//                PostJetsonSM(ReceiveEvent); // Tell state machine the data is ready
-//                
-//                // Switch the buffer we are storing in
-//                if (buffer_num) {
-//                    buffer_num = 0;
-//                } else {
-//                    buffer_num = 1;
-//                }
-//                
-//                if (CurrentState == RobotActive) {
-//                    switch (CurrentMessage)
-//                    {
-//                        case 0:
-//                        {
-//                            // TODO: fill buffer with accel data
-//                            for(uint8_t ii = 0; ii < 16; ii++) {
-//                                SPI2BUF = 1;
-//                            }
-//                            CurrentMessage = 1;
-//                        }
-//                        break;
-//
-//                        case 1:
-//                        {
-//                            // TODO: fill buffer with gyro data
-//                            for(uint8_t ii = 0; ii < 16; ii++) {
-//                                SPI2BUF = 2;
-//                            }
-//                            CurrentMessage = 2;
-//                        }
-//                        break;
-//
-//                        case 2:
-//                        {
-//                            WritePositionToSPI(SPI2BUF);
-//                            CurrentMessage = 3;
-//                        }
-//                        break;
-//
-//                        case 3:
-//                        {
-//                            WriteDeadReckoningVelocityToSPI(SPI2BUF);
-//                            CurrentMessage = 0;
-//                        }
-//                        break;
-//                    }
-//                }
-//                
-//            }
-//            continue;
-//        }
-//        
-//        buffer_indx += 1;
-//        
-//    }
-////        if (buffer_indx == 15) {
-////            // Completed a whole message
-////            
-////            buffer_indx = 0;
-////            ReceiveEvent.EventParam = buffer_num;// Tell which buffer we just stored the data in
-////            PostJetsonSM(ReceiveEvent); // Tell state machine the data is ready
-////            
-////            // Switch the buffer we are storing in
-////            if (buffer_num) {
-////                buffer_num = 0;
-////            } else {
-////                buffer_num = 1;
-////            }
-////            
-////            if (CurrentState == RobotActive) {
-////                switch (CurrentMessage)
-////                {
-////                    case 0:
-////                    {
-////                        // TODO: fill buffer with accel data
-////                        for(uint8_t ii = 0; ii < 16; ii++) {
-////                            SPI2BUF = 1;
-////                        }
-////                        CurrentMessage = 1;
-////                    }
-////                    break;
-////
-////                    case 1:
-////                    {
-////                        // TODO: fill buffer with gyro data
-////                        for(uint8_t ii = 0; ii < 16; ii++) {
-////                            SPI2BUF = 2;
-////                        }
-////                        CurrentMessage = 2;
-////                    }
-////                    break;
-////
-////                    case 2:
-////                    {
-////                        WritePositionToSPI(SPI2BUF);
-////                        CurrentMessage = 3;
-////                    }
-////                    break;
-////
-////                    case 3:
-////                    {
-////                        WriteDeadReckoningVelocityToSPI(SPI2BUF);
-////                        CurrentMessage = 0;
-////                    }
-////                    break;
-////                }
-////            }
-////            
-////        } else {
-////            buffer_indx += 1;
-////        }
-//    
-//    
-//    // Clear the interrupt
-//    IFS4CLR = _IFS4_SPI2RXIF_MASK; 
-//    
-//    ES_Timer_InitTimer(JETSON_TIMER, JETSON_TIMEOUT); // Restart timeout timer
-//   
-////    // Tell which buffer we just stored the data in
-////    ReceiveEvent.EventParam = buffer_num;
-////    if (buffer_num) {
-////        buffer_num = 0;
-////    } else {
-////        buffer_num = 1;
-////    }
-////
-////    // Tell state machine the data is ready
-////    PostJetsonSM(ReceiveEvent);    
-//}
-
 void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
 {
     // Static for speed
     static ES_Event_t ReceiveEvent = {EV_JETSON_MESSAGE_RECEIVED, 0};
     static uint8_t buffer_num = 0;
-    static uint8_t buffer_indx = 0;
-    static uint8_t tempData = 0;
     
-//    DB_printf("Received 16 Messages!\r\n");
+    DB_printf("Received 16 Messages!\r\n");
     // Read the data from the buffer
-//    for (uint8_t i=0; i < 16; i++) {
-//        ReceiveBuffer[buffer_num][i] = SPI2BUF;
+    for (uint8_t i=0; i < 16; i++) {
+        ReceiveBuffer[buffer_num][i] = SPI2BUF;
 //        DB_printf("%d, ", ReceiveBuffer[buffer_num][i]);
-//    }
-//    DB_printf("\r\n");
-    
-    while (SPI2STATbits.RXBUFELM > 0) {
-        
-        if (buffer_indx == 0) {
-            // Make sure we are at start of message by only accepting 45 and 90 in first position
-            tempData = SPI2BUF;
-            if (tempData == 45 || tempData == 90) {
-                ReceiveBuffer[buffer_num][0] = tempData;
-            } else {
-                // TODO: May need to write to SPI2BUF just as a placeholder
-                // SPI2BUF = 0;
-                continue;
-            }
-        } else if (buffer_indx < 12) {
-            ReceiveBuffer[buffer_num][buffer_indx] = SPI2BUF;
-        } else if (buffer_indx == 15) {
-            tempData = SPI2BUF;
-            if (tempData == 55) {
-                buffer_indx = 0;
-                
-                ReceiveEvent.EventParam = buffer_num;// Tell which buffer we just stored the data in
-                PostJetsonSM(ReceiveEvent); // Tell state machine the data is ready
-                
-                // Switch the buffer we are storing in
-                if (buffer_num) {
-                    buffer_num = 0;
-                } else {
-                    buffer_num = 1;
-                }
-                
-                if (CurrentState == RobotActive) {
-                    switch (CurrentMessage)
-                    {
-                        case 0:
-                        {
-                            // TODO: fill buffer with accel data
-                            for(uint8_t ii = 0; ii < 16; ii++) {
-                                SPI2BUF = 1;
-                            }
-                            CurrentMessage = 1;
-                        }
-                        break;
-
-                        case 1:
-                        {
-                            // TODO: fill buffer with gyro data
-                            for(uint8_t ii = 0; ii < 16; ii++) {
-                                SPI2BUF = 2;
-                            }
-                            CurrentMessage = 2;
-                        }
-                        break;
-
-                        case 2:
-                        {
-                            WritePositionToSPI(SPI2BUF);
-                            CurrentMessage = 3;
-                        }
-                        break;
-
-                        case 3:
-                        {
-                            WriteDeadReckoningVelocityToSPI(SPI2BUF);
-                            CurrentMessage = 0;
-                        }
-                        break;
-                    }
-                }
-                
-            }
-            continue;
-        }
-        
-        buffer_indx += 1;
-        
     }
-//        if (buffer_indx == 15) {
-//            // Completed a whole message
-//            
-//            buffer_indx = 0;
-//            ReceiveEvent.EventParam = buffer_num;// Tell which buffer we just stored the data in
-//            PostJetsonSM(ReceiveEvent); // Tell state machine the data is ready
-//            
-//            // Switch the buffer we are storing in
-//            if (buffer_num) {
-//                buffer_num = 0;
-//            } else {
-//                buffer_num = 1;
-//            }
-//            
-//            if (CurrentState == RobotActive) {
-//                switch (CurrentMessage)
-//                {
-//                    case 0:
-//                    {
-//                        // TODO: fill buffer with accel data
-//                        for(uint8_t ii = 0; ii < 16; ii++) {
-//                            SPI2BUF = 1;
-//                        }
-//                        CurrentMessage = 1;
-//                    }
-//                    break;
-//
-//                    case 1:
-//                    {
-//                        // TODO: fill buffer with gyro data
-//                        for(uint8_t ii = 0; ii < 16; ii++) {
-//                            SPI2BUF = 2;
-//                        }
-//                        CurrentMessage = 2;
-//                    }
-//                    break;
-//
-//                    case 2:
-//                    {
-//                        WritePositionToSPI(SPI2BUF);
-//                        CurrentMessage = 3;
-//                    }
-//                    break;
-//
-//                    case 3:
-//                    {
-//                        WriteDeadReckoningVelocityToSPI(SPI2BUF);
-//                        CurrentMessage = 0;
-//                    }
-//                    break;
-//                }
-//            }
-//            
-//        } else {
-//            buffer_indx += 1;
-//        }
-    
+//    DB_printf("\r\n");
     
     // Clear the interrupt
     IFS4CLR = _IFS4_SPI2RXIF_MASK; 
     
     ES_Timer_InitTimer(JETSON_TIMER, JETSON_TIMEOUT); // Restart timeout timer
    
-//    // Tell which buffer we just stored the data in
-//    ReceiveEvent.EventParam = buffer_num;
-//    if (buffer_num) {
-//        buffer_num = 0;
-//    } else {
-//        buffer_num = 1;
-//    }
-//
-//    // Tell state machine the data is ready
-//    PostJetsonSM(ReceiveEvent);    
+        
+    // Tell which buffer we just stored the data in
+    ReceiveEvent.EventParam = buffer_num;
+    if (buffer_num) {
+        buffer_num = 0;
+    } else {
+        buffer_num = 1;
+    }
+
+    // Tell state machine the data is ready
+    PostJetsonSM(ReceiveEvent);
+    
+    
 }
