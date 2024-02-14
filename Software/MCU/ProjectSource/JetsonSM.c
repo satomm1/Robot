@@ -23,7 +23,6 @@
 #include "MotorSM.h"
 #include "IMU_SM.h"
 #include "dbprintf.h"
-#include "LEDService.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 #define JETSON_TIMEOUT 1000 // Timeout where no SPI response disconnects us
@@ -307,13 +306,12 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
                 }
             }
             break;
-           
+            
             case 45: // Velocity Message
             {
                 float desired_lin_v;
                 float desired_ang_v;
 
-                // DB_printf("Received 45\r\n");
                 switch (CurrentMessage)
                 {
                     case 0:
@@ -352,21 +350,21 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
                 }
 
 
-                // Convert Data to a float
+                // Convert Data to 
                 uint32_t combined_bytes = ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][1] << 24) | 
                         ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][2] << 16) |
                         ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][3] << 8) |
                         ReceiveBuffer[ThisEvent.EventParam][4];
                 *((uint32_t*)&desired_lin_v) = combined_bytes;
-//                DB_printf("%d, ", (int)(desired_lin_v));
+                DB_printf("%d, ", (int)(desired_lin_v));
 
                 combined_bytes = ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][5] << 24) | 
                         ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][6] << 16) |
                         ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][7] << 8) |
                         ReceiveBuffer[ThisEvent.EventParam][8];
                 *((uint32_t*)&desired_ang_v) = combined_bytes;
-//                DB_printf("%d \r\n", (int)desired_ang_v);
-                
+
+                DB_printf("%d \r\n", (int)combined_bytes);
                 SetDesiredSpeed(desired_lin_v, desired_ang_v);
             }
             break;
@@ -389,12 +387,6 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
           ResetPosition();
           
           DB_printf("Timed out, moving to Robot Inactive\r\n");
-          
-//          ES_Event_t new_event = {EV_LED_ON, 0};
-//          if (SPI2STATbits.SPIRBF) {
-//              new_event.EventParam = 1;
-//              PostLEDService(new_event);
-//          }
           
           CurrentMessage = 0;
         }
@@ -472,7 +464,7 @@ void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
     static ES_Event_t ReceiveEvent = {EV_JETSON_MESSAGE_RECEIVED, 0};
     static uint8_t buffer_num = 0;
     
-    DB_printf("Received 16 Messages!\r\n");
+//    DB_printf("Received 16 Messages!\r\n");
     // Read the data from the buffer
     for (uint8_t i=0; i < 16; i++) {
         ReceiveBuffer[buffer_num][i] = SPI2BUF;
