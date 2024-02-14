@@ -42,7 +42,7 @@ static JetsonState_t CurrentState;
 // with the introduction of Gen2, we need a module level Priority var as well
 static uint8_t MyPriority;
 
-static uint8_t ReceiveBuffer[2][8];
+static uint8_t ReceiveBuffer[2][16];
 
 // Indicates what message we are currently sending from MCU to Jetson
 static uint8_t CurrentMessage; 
