@@ -31,6 +31,7 @@
 #define DEAD_RECKONING_PERIOD 7812 // Chosen so that we update at 50 Hz rate
 #define Kp 3 // Proportional constant for PID law
 #define Ki 0.5 // Integral constant for PID law
+#define Kd 3 // Derivative constant for PID law
 
 #define ENCODER_RESOLUTION 374 // Number of pulses per revolution
 #define GEAR_RATIO 34 // Gear reduction ratio
@@ -664,6 +665,10 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     static float RightErrorSum = 0.0;
     static float LeftError;
     static float RightError;
+    static float LeftPrevError = 0.0;
+    static float RightPrevError = 0.0;
+    static float LeftErrorDiff;
+    static float RightErrorDiff;
     static int16_t LeftDutyCycle; // Only static here for speed
     static int16_t RightDutyCycle; // Only static here for speed
     
@@ -687,9 +692,17 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     LeftErrorSum += LeftError;
     RightErrorSum += RightError;
     
+    // Derivative of Error
+    LeftErrorDiff = LeftError - LeftPrevError;
+    RightErrorDiff = RightError - RightPrevError;
+    
+    // Update for next time
+    LeftPrevError = LeftError;
+    RightPrevError = RightError;
+    
     // Calculate according to PI Law
-    LeftDutyCycle = Kp*(LeftError+(Ki*LeftErrorSum)); 
-    RightDutyCycle = Kp*(RightError+(Ki*RightErrorSum)); 
+    LeftDutyCycle = Kp*LeftError + Ki*LeftErrorSum + Kd*LeftErrorDiff; 
+    RightDutyCycle = Kp*RightError + Ki*RightErrorSum + Kd*RightErrorDiff;
     
     // Anti-Windup
     if (LeftDutyCycle > 100) {
