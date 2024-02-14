@@ -43,6 +43,7 @@ static JetsonState_t CurrentState;
 static uint8_t MyPriority;
 
 static uint8_t ReceiveBuffer[2][16];
+static uint8_t MessageToSend[16];
 
 // Indicates what message we are currently sending from MCU to Jetson
 static uint8_t CurrentMessage; 
@@ -53,7 +54,7 @@ static uint8_t CurrentMessage;
      InitJetsonSM
 
  Parameters
-     uint8_t : the priorty of this service
+     uint8_t : the priority of this service
 
  Returns
      bool, false if error in initialization, true otherwise
@@ -97,8 +98,8 @@ bool InitJetsonSM(uint8_t Priority)
   SPI2CONbits.SSEN = 1; // SSx pin is used for Client mode
   SPI2CONbits.MSTEN = 0; // Client mode
   SPI2CONbits.DISSDI = 0; // The SDI pin is controlled by the module
-  SPI2CONbits.STXISEL = 0b00; // Interrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
-  SPI2CONbits.SRXISEL = 0b11; // Interrupt is generated when the receive buffer is full (16)
+  SPI2CONbits.STXISEL = 0b11; // Interrupt is generated when the buffer is not full
+  SPI2CONbits.SRXISEL = 0b01; // Interrupt is generated when the receive buffer is not empty 
 
   SPI2CON2 = 0; // Reset SPI2CON2 register settings
   SPI2CON2bits.AUDEN = 0; // Audio protocol is disabled
@@ -190,10 +191,8 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
         
         CurrentMessage = 0; // Start with message 0
         
-        // Preload buffer with 0's
-        for (uint8_t ii = 0; ii < 16; ii++) {
-            SPI2BUF = 0;
-        }
+        // Preload buffer with 0
+        SPI2BUF = 0;
       }
     }
     break;
@@ -207,12 +206,12 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
           if (ReceiveBuffer[ThisEvent.EventParam][1] == 0b11111111 && ReceiveBuffer[ThisEvent.EventParam][0] == 90) {
 
             // Send message received message to Jetson
-            SPI2BUF = 0;
-            SPI2BUF = 0b11111111;
-            SPI2BUF = 0; 
-            SPI2BUF = ROBOT_ID; // Send Robot ID
-            for (uint8_t ii = 0; ii < 12; ii++) {
-                SPI2BUF = 0; // Fill rest of buffer with 0's
+            MessageToSend[0] = 0;
+            MessageToSend[1] = 0b11111111;
+            MessageToSend[2] = 0; 
+            MessageToSend[3] = ROBOT_ID; // Send Robot ID
+            for (uint8_t ii = 4; ii < 16; ii++) {
+                MessageToSend[ii] = 0; // Fill rest of buffer with 0's
             }
             
             // Start pending timeout timer
@@ -222,7 +221,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
             DB_printf("Moving to RobotPending\r\n");
           } else {
               for (uint8_t ii = 0; ii < 16; ii++) {
-                SPI2BUF = 0; // Fill rest of buffer with 0's
+                MessageToSend[ii] = 0; // Fill rest of buffer with 0's
             }
           }
         }
@@ -251,7 +250,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
             DB_printf("Moving to RobotActive\r\n");
           } else {
               for (uint8_t ii = 0; ii < 16; ii++) {
-                  SPI2BUF = 0;
+                  MessageToSend[ii] = 0;
               }
           }
         }
@@ -318,7 +317,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
                     {
                         // TODO: fill buffer with accel data
                         for(uint8_t ii = 0; ii < 16; ii++) {
-                            SPI2BUF = 1;
+                            MessageToSend[ii] = 1;
                         }
                         CurrentMessage = 1;
                     }
@@ -328,7 +327,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
                     {
                         // TODO: fill buffer with gyro data
                         for(uint8_t ii = 0; ii < 16; ii++) {
-                            SPI2BUF = 2;
+                            MessageToSend[ii] = 2;
                         }
                         CurrentMessage = 2;
                     }
@@ -336,14 +335,20 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
 
                     case 2:
                     {
-                        WritePositionToSPI(SPI2BUF);
+//                        for(uint8_t ii = 0; ii < 16; ii++) {
+//                            MessageToSend[ii] = 2;
+//                        }
+                        WritePositionToSPI(MessageToSend);
                         CurrentMessage = 3;
                     }
                     break;
 
                     case 3:
                     {
-                        WriteDeadReckoningVelocityToSPI(SPI2BUF);
+//                        for(uint8_t ii = 0; ii < 16; ii++) {
+//                            MessageToSend[ii] = 4;
+//                        }
+                        WriteDeadReckoningVelocityToSPI(MessageToSend);
                         CurrentMessage = 0;
                     }
                     break;
@@ -356,7 +361,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
                         ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][3] << 8) |
                         ReceiveBuffer[ThisEvent.EventParam][4];
                 *((uint32_t*)&desired_lin_v) = combined_bytes;
-                DB_printf("%d, ", (int)(desired_lin_v));
+                // DB_printf("%d, ", (int)(desired_lin_v));
 
                 combined_bytes = ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][5] << 24) | 
                         ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][6] << 16) |
@@ -364,7 +369,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
                         ReceiveBuffer[ThisEvent.EventParam][8];
                 *((uint32_t*)&desired_ang_v) = combined_bytes;
 
-                DB_printf("%d \r\n", (int)combined_bytes);
+                // DB_printf("%d \r\n", (int)combined_bytes);
                 SetDesiredSpeed(desired_lin_v, desired_ang_v);
             }
             break;
@@ -438,10 +443,13 @@ void __ISR(_SPI2_TX_VECTOR, IPL7SRS) SPI2TXHandler(void)
     // Static for speed
     static ES_Event_t TransferEvent = {EV_JETSON_TRANSFER_COMPLETE, 0};
     
-    // Clear the interrupt
+    // Turn the interrupt off
+    IEC4CLR = _IEC4_SPI2TXIE_MASK;
+    // Clear the interrupt 
     IFS4CLR = _IFS4_SPI2TXIF_MASK;
     
-    // We may not need this interrupt!
+    // Load Data into buffer
+//    SPI2BUF = 0x00;
 }
 
 
@@ -460,34 +468,63 @@ void __ISR(_SPI2_TX_VECTOR, IPL7SRS) SPI2TXHandler(void)
 ****************************************************************************/
 void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
 {
+    static bool InMessage = false;
+    
     // Static for speed
     static ES_Event_t ReceiveEvent = {EV_JETSON_MESSAGE_RECEIVED, 0};
     static uint8_t buffer_num = 0;
+    static uint8_t MessageIndex = 0;
+    static uint8_t TempData;
+    
+    if (InMessage) {
+        while (!SPI2STATbits.SPIRBE && MessageIndex <= 15) {
+            ReceiveBuffer[buffer_num][MessageIndex] = SPI2BUF;
+            MessageIndex += 1;
+        }
+    } else {
+        TempData = SPI2BUF;
+        if (TempData == 55) {
+            while (!SPI2STATbits.SPIRBE) {
+                TempData = SPI2BUF;
+            }
+            
+            for (uint8_t ii = 0; ii < 16; ii++) {
+                SPI2BUF = MessageToSend[ii];
+            }
+//            IEC4SET = _IEC4_SPI2TXIE_MASK;  // Turn TX interrupt on to add extra 0x00 once buffer not full
+            InMessage = true; // Now we are accepting message bytes
+        }
+//        } else if (TempData == 66) {
+//            
+//        } else {
+//            SPI2BUF = 0x00;
+//        }
+    }
+    
+    IFS4CLR = _IFS4_SPI2RXIF_MASK; // Clear the interrupt
+    ES_Timer_InitTimer(JETSON_TIMER, JETSON_TIMEOUT); // Restart timeout timer
+    
+    if (MessageIndex == 16) {
+        MessageIndex = 0; // Reset Message index once full
+        InMessage = false; // No longer accepting message bytes
+        
+        // Tell which buffer we just stored the data in
+        ReceiveEvent.EventParam = buffer_num;
+        if (buffer_num) {
+            buffer_num = 0;
+        } else {
+            buffer_num = 1;
+        }
+
+        // Tell state machine the data is ready
+        PostJetsonSM(ReceiveEvent);
+    }
     
 //    DB_printf("Received 16 Messages!\r\n");
     // Read the data from the buffer
-    for (uint8_t i=0; i < 16; i++) {
-        ReceiveBuffer[buffer_num][i] = SPI2BUF;
+//    for (uint8_t i=0; i < 16; i++) {
+//        ReceiveBuffer[buffer_num][i] = SPI2BUF;
 //        DB_printf("%d, ", ReceiveBuffer[buffer_num][i]);
-    }
-//    DB_printf("\r\n");
-    
-    // Clear the interrupt
-    IFS4CLR = _IFS4_SPI2RXIF_MASK; 
-    
-    ES_Timer_InitTimer(JETSON_TIMER, JETSON_TIMEOUT); // Restart timeout timer
-   
-        
-    // Tell which buffer we just stored the data in
-    ReceiveEvent.EventParam = buffer_num;
-    if (buffer_num) {
-        buffer_num = 0;
-    } else {
-        buffer_num = 1;
-    }
-
-    // Tell state machine the data is ready
-    PostJetsonSM(ReceiveEvent);
-    
-    
+//    }
+//    DB_printf("\r\n");    
 }

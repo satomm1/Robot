@@ -167,7 +167,7 @@ ES_Event_t RunButton2DebouncerSM(ES_Event_t ThisEvent)
                 ES_Event_t NewEvent = {EV_BUTTON2_PRESSED, 0};           
                 // TODO: Post to proper SM                 
                 CurrentState = Button2DebouncingWait; 
-                
+                U1MODEbits.ON = 0; // turn peripheral off
                 #ifdef DEBUG
                 DB_printf("Button 2 Pressed\r\n");
                 #endif
