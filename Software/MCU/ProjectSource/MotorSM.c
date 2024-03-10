@@ -787,18 +787,86 @@ void __ISR(_TIMER_5_VECTOR, IPL6SRS) T5Handler(void)
  Description
     Performs dead reckoning calculations
 ****************************************************************************/
+// Dead reckoning via Runge Kutta to solve differential equations
+//void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
+//{
+//    static float V_l; // Left wheel linear velocity (m/s)
+//    static float V_r; // Right wheel linear velocity (m/s)
+//    static float V;   // Robot linear velocity (m/s)
+//    static float omega; // Robot angular velocity (rad/second)
+//    
+//    // Initialize Runge-Kutta Variables (static for speed)
+//    static float k00, k01, k02;
+//    static float k10, k11, k12;
+//    static float k20, k21, k22;
+//    static float k30, k31, k32;
+//    
+//    static int32_t CurLeftRotations;
+//    static int32_t CurRightRotations;
+//    
+//    static bool status = false;
+//    
+//    IFS1CLR = _IFS1_T7IF_MASK; // clear the interrupt flag 
+//    
+//    // First thing we do is grab current number of rotations so this doesn't change mid function
+//    CurLeftRotations = LeftRotations;
+//    CurRightRotations = RightRotations;
+//    
+//    // Calculate linear velocity of both wheels    
+////    DB_printf("L: %d\r\n", CurLeftRotations- LeftPrevRotations);
+////    DB_printf("R: %d\r\n", CurRightRotations- RightPrevRotations);
+//    
+//    V_l = (CurLeftRotations - LeftPrevRotations) * DEAD_RECKONING_RATIO; 
+//    V_r = (CurRightRotations - RightPrevRotations) * DEAD_RECKONING_RATIO;
+//    
+//    // Store for next time
+//    LeftPrevRotations = CurLeftRotations;
+//    RightPrevRotations = CurRightRotations;
+//    
+//    // Calculate linear/angular velocity of robot
+//    V = (V_l + V_r) / 2; 
+//    omega = (V_r - V_l) / WHEEL_BASE;
+//    
+//    V_current = V; // used to store current velocity
+//    w_current = omega; // used to store current angular velocity
+//    
+//    // Now calculate the position of the robot using 4th order Runge Kutta
+//    k00 = V * cosf(theta);
+//    k01 = V * sinf(theta);
+//    k02 = omega;
+//    
+//    k10 = V * cosf(theta + DEAD_RECKONING_TIME / 2 * k02);
+//    k11 = V * sinf(theta + DEAD_RECKONING_TIME / 2 * k02);
+//    k12 = omega;
+//    
+//    k20 = V * cosf(theta + DEAD_RECKONING_TIME / 2 * k12);
+//    k21 = V * sinf(theta + DEAD_RECKONING_TIME / 2 * k12);
+//    k22 = omega;
+//    
+//    k30 = V * cosf(theta + DEAD_RECKONING_TIME * k22);
+//    k31 = V * sinf(theta + DEAD_RECKONING_TIME * k22);
+//    k32 = omega;
+//    
+//    x = x + DEAD_RECKONING_TIME / 6 * (k00 + 2*(k10 + k20) + k30);
+//    y = y + DEAD_RECKONING_TIME / 6 * (k01 + 2*(k11 + k21) + k31);
+//    theta = theta + DEAD_RECKONING_TIME / 6 * (k02 + 2*(k12 + k22) + k32);
+//    
+//    // Ensure theta stays within [-pi, pi]
+//    if (theta > 3.14159265359) {
+//        theta -= 6.28318530718;
+//    } else if (theta < -3.14159265359) {
+//        theta += 6.28318530718;
+//    }
+//    
+//}
+
+// Using an exact method to solve the differential equations
 void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
 {
     static float V_l; // Left wheel linear velocity (m/s)
     static float V_r; // Right wheel linear velocity (m/s)
     static float V;   // Robot linear velocity (m/s)
     static float omega; // Robot angular velocity (rad/second)
-    
-    // Initialize Runge-Kutta Variables (static for speed)
-    static float k00, k01, k02;
-    static float k10, k11, k12;
-    static float k20, k21, k22;
-    static float k30, k31, k32;
     
     static int32_t CurLeftRotations;
     static int32_t CurRightRotations;
@@ -811,50 +879,31 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     CurLeftRotations = LeftRotations;
     CurRightRotations = RightRotations;
     
-    // Calculate linear velocity of both wheels    
-//    DB_printf("L: %d\r\n", CurLeftRotations- LeftPrevRotations);
-//    DB_printf("R: %d\r\n", CurRightRotations- RightPrevRotations);
-    
+    // Next we calculate the linear velocity of each wheel
     V_l = (CurLeftRotations - LeftPrevRotations) * DEAD_RECKONING_RATIO; 
     V_r = (CurRightRotations - RightPrevRotations) * DEAD_RECKONING_RATIO;
     
-    // Store for next time
+    // Store the current number of rotations for next time
     LeftPrevRotations = CurLeftRotations;
     RightPrevRotations = CurRightRotations;
     
-    // Calculate linear/angular velocity of robot
+    // Calculate the instantaneous linear/angular velocity of robot
     V = (V_l + V_r) / 2; 
     omega = (V_r - V_l) / WHEEL_BASE;
     
     V_current = V; // used to store current velocity
     w_current = omega; // used to store current angular velocity
     
-    // Now calculate the position of the robot using 4th order Runge Kutta
-    k00 = V * cosf(theta);
-    k01 = V * sinf(theta);
-    k02 = omega;
-    
-    k10 = V * cosf(theta + DEAD_RECKONING_TIME / 2 * k02);
-    k11 = V * sinf(theta + DEAD_RECKONING_TIME / 2 * k02);
-    k12 = omega;
-    
-    k20 = V * cosf(theta + DEAD_RECKONING_TIME / 2 * k12);
-    k21 = V * sinf(theta + DEAD_RECKONING_TIME / 2 * k12);
-    k22 = omega;
-    
-    k30 = V * cosf(theta + DEAD_RECKONING_TIME * k22);
-    k31 = V * sinf(theta + DEAD_RECKONING_TIME * k22);
-    k32 = omega;
-    
-    x = x + DEAD_RECKONING_TIME / 6 * (k00 + 2*(k10 + k20) + k30);
-    y = y + DEAD_RECKONING_TIME / 6 * (k01 + 2*(k11 + k21) + k31);
-    theta = theta + DEAD_RECKONING_TIME / 6 * (k02 + 2*(k12 + k22) + k32);
-    
-    // Ensure theta stays within [-pi, pi]
-    if (theta > 3.14159265359) {
-        theta -= 6.28318530718;
-    } else if (theta < -3.14159265359) {
-        theta += 6.28318530718;
+    // Calculate the update in theta and ensure theta stays within [-pi, pi]
+    float prev_theta = theta;
+    theta = theta + omega * DEAD_RECKONING_TIME;
+    while (theta > M_PI) {
+        theta -= 2*M_PI;
+    }
+    while (theta < -M_PI) {
+        theta += 2*M_PI;
     }
     
+    x = x + V/omega * (sinf(theta) - sinf(prev_theta));
+    y = y - V/omega * (cosf(theta) - cosf(prev_theta));
 }
