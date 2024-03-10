@@ -5,7 +5,8 @@
   (paper "B")
 
   (title_block
-    (title "Test sheet")
+    (title "BMI323 Breakout Board")
+    (date "2024-03-10")
     (rev "0.1")
     (company "satomm@stanford.edu")
     (comment 1 "Department of Civil and Environmental Engineering")
