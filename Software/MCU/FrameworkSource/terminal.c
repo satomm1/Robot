@@ -81,7 +81,7 @@ void Terminal_HWInit(void)
   // enable the UART module
   U1STAbits.UTXEN = 1; // enable transmit 
   U1STAbits.URXEN = 1; // enable receive
-  U1MODEbits.ON = 0; // turn peripheral on
+  U1MODEbits.ON = 1; // turn peripheral on
   
   // now initialize the circular buffer for transmitting
   xmitBufferHandle = circular_buf_init( xmitBuffer, ARRAY_SIZE(xmitBuffer) );

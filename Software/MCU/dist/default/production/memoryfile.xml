@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <project>                                  
-  <executable name="dist/default/debug/MCU.debug.elf">                 
+  <executable name="dist/default/production/MCU.production.elf">                 
     <memory name="program">                 
       <units>bytes</units>                 
       <length>525440</length>                 
-      <used>54112</used>                     
-      <free>471328</free>                     
+      <used>53712</used>                     
+      <free>471728</free>                     
     </memory>                              
     <memory name="data">              
       <units>bytes</units>                 
-      <length>131968</length>                 
-      <used>5668</used>                     
-      <free>126300</free>                     
+      <length>131072</length>                 
+      <used>2084</used>                     
+      <free>128988</free>                     
     </memory>                              
   </executable>                            
 </project>                                 

@@ -28,7 +28,7 @@
 #define OC_PERIOD 312   // Output compare period (10 kHz)
 #define CONTROL_PERIOD 1000 // Control update period --- 6250 Hz
 #define NO_SPEED_PERIOD 65535 // Period to indicate motor not spinning
-#define DEAD_RECKONING_PERIOD 7812 // Chosen so that we update at 50 Hz rate
+#define DEAD_RECKONING_PERIOD 3906 // 7812 // Chosen so that we update at 50 Hz rate
 #define Kp 3 // Proportional constant for PID law
 #define Ki 0.5 // Integral constant for PID law
 #define Kd 3 // Derivative constant for PID law
@@ -38,7 +38,7 @@
 #define SPEED_CONVERSION_FACTOR (1.6e7*60)/ENCODER_RESOLUTION
 #define WHEEL_BASE 0.258572 // Distance between wheels on the robot (m)
 #define WHEEL_RADIUS 0.04 // Radius of wheels (m))
-#define DEAD_RECKONING_TIME 0.01999872 // Time between dead reckoning updates in seconds (depends on DEAD_RECKONING_PERIOD)
+#define DEAD_RECKONING_TIME 0.00999936 //0.01999872 // Time between dead reckoning updates in seconds (depends on DEAD_RECKONING_PERIOD)
 #define DEAD_RECKONING_RATIO 2*3.14159 / ENCODER_RESOLUTION / DEAD_RECKONING_TIME * WHEEL_RADIUS // This number times change in encoder clicks is linear velocity in m/second
 
 #define V_MAX 1 // max 1 m/sec
@@ -904,6 +904,11 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
         theta += 2*M_PI;
     }
     
-    x = x + V/omega * (sinf(theta) - sinf(prev_theta));
-    y = y - V/omega * (cosf(theta) - cosf(prev_theta));
+    if (omega < 0.01) {
+        x = x + V * cosf(prev_theta) * DEAD_RECKONING_TIME;
+        y = y + V * sinf(prev_theta) * DEAD_RECKONING_TIME;
+    } else {
+        x = x + V/omega * (sinf(theta) - sinf(prev_theta));
+        y = y - V/omega * (cosf(theta) - cosf(prev_theta));
+    }
 }
