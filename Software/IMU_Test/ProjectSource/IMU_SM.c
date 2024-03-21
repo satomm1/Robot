@@ -36,9 +36,9 @@
    relevant to the behavior of this state machine
 */
 void InitIMU(void);
-void SetBank(uint8_t Bank);
-void WriteIMU(uint8_t Address, uint8_t Data);
-uint8_t ReadIMU(uint8_t Address);
+void WriteIMU(uint8_t Address, uint8_t LowerByte, uint8_t UpperByte, uint8_t NumBytes);
+uint8_t ReadIMU1(uint8_t Address);
+uint16_t ReadIMU2(uint8_t Address);
 void ReadFIFO(void);
 
 /*---------------------------- Module Variables ---------------------------*/
@@ -105,7 +105,7 @@ bool InitImuSM(uint8_t Priority)
   SPI1CONbits.MODE32 = 0; // 8 bit mode
   SPI1CONbits.MODE16 = 0; // 8 bit mode
   SPI1CONbits.SMP = 0; // Data sampled at middle of data output time
-  SPI1CONbits.CKE = 0; // Output data changes on transition from idle to active clock state
+  SPI1CONbits.CKE = 1; // Serial output data changes on transition from active clock state to idle clock state
   SPI1CONbits.CKP = 1; // Idle state for the clock is high level
   SPI1CONbits.MSTEN = 1; // Host mode
   SPI1CONbits.DISSDI = 0; // The SDI pin is controlled by the module
@@ -120,13 +120,7 @@ bool InitImuSM(uint8_t Priority)
   }
   SPI1STATbits.SPIROV = 0; // Clear the Receive overflow bit
   
-  SPI1BRG = 15; //15; // 1.56 MHz clock frequency, IMU Has max frequency of 24 MHz
-  
-  // Setup Timer 6 (Used for integrating the accels)
-  T6CON = 0; // Reset the timer register settings
-  T6CONbits.TCKPS = 0b111; // 1:256 prescale value
-  T6CONbits.T32 = 0; // Use 16 bit timer not 32 bit
-  T6CONbits.TCS = 0; // Internal peripheral clock
+  SPI1BRG = 15; //15; // 1.56 MHz clock frequency, IMU Has max frequency of 10 MHz
     
   // Setup Interrupts
   INTCONbits.MVEC = 1; // Use multivector mode
@@ -139,11 +133,10 @@ bool InitImuSM(uint8_t Priority)
   
   // Clear interrupt flags
   IFS3CLR = _IFS3_SPI1RXIF_MASK | _IFS3_SPI1TXIF_MASK;
-  IFS0CLR = _IFS0_INT2IF_MASK | _IFS0_T6IF_MASK;
+  IFS0CLR = _IFS0_INT2IF_MASK;
   
-  // Local enable interrupts
-  IEC3SET = _IEC3_SPI1RXIE_MASK;
-  IEC0SET = _IEC0_T6IE_MASK;
+  // Disable the RX interrupt
+  IEC3CLR = _IEC3_SPI1RXIE_MASK;
   
   // Disable TX interrupt
   IEC3CLR = _IEC3_SPI1TXIE_MASK;
@@ -213,12 +206,10 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
     {
       if (ThisEvent.EventType == ES_INIT) 
       {
-//        SetBank(0);
-//        uint8_t data = ReadIMU(0x4F);
-//        data = ReadIMU(0b0101010);
-//          
-//        InitIMU();        
+        uint8_t data = ReadIMU1(0x4F);
+        DB_printf("Chip ID: %d", data);
         
+        InitIMU();        
         
         // now put the machine into the actual initial state
         CurrentState = IMUWait;
@@ -404,78 +395,21 @@ void WriteGyroToSPI(uint32_t Buffer)
 ****************************************************************************/
 void InitIMU(void)
 {
-    /************************ Bank 0 Registers ************************/
-    SetBank(0);
+    // Get the chip id
+    uint8_t chipID = ReadIMU1(0x00);
     
-    // Configure interrupt types:
-    WriteIMU(0x14, 0b00110110); // Push-Pull, Active Low, Latched Interrupt
+    // Configure accelerometer: ODR rate to 25 Hz and sensitivity to +/- 8g
+    WriteIMU(0x20, 0b00100110, 0b01110000, 2); 
     
-    // Set up the IMU to write to FIFO (FIFO_CONFIG)
-    WriteIMU(0x16, 0b01000000); // Stream to FIFO
+    // Configure gyroscope: ODR rate to 25 Hz and sensitivity to +/- 250 deg/sec
+    WriteIMU(0x21, 0b00010110, 0b01110000, 2); 
     
-    // Needed for correct operation of Interrupts (INT_CONFIG1)
-    WriteIMU(0x64, 0b00000000);
-    
-    // Set Gyro ODR rate to 25 Hz and sensitivity to +/- 250 degrees/sec (GYRO_CONFIG0)
-    WriteIMU(0x4F, 0b01101010);
-    
-    // Set Accel ODR rate to 25 Hz and sensitivity to +/- 8g (Accel_CONFIG0)
-    WriteIMU(0x50, 0b00101010);
-    
-    // Set the FIFO watermark threshold (FIFO_CONFIG2)
-    WriteIMU(0x60, 1); // Set to watermark of 1
-    
-    // Set the FIFO threshold interrupt to clear after reading a byte (INT_CONFIG0)
-    WriteIMU(0x63, 0b00001000);
-    
-    // Route the FIFO threshold interrupt to Int1 (INT_SOURCE0)
-    WriteIMU(0x65, 0b00000100); 
-    
-    // Set FIFO Config settings (FIFO_CONFIG1 register)
-    WriteIMU(0x5F, 0b00100111);
-    
-    // Turn Accel and Gyro on (PWR_MGMT0 register)
-    WriteIMU(0x4E, 0b00001111);
-    
-    
-    /************************ Bank 1 Registers ************************/
-    SetBank(1);
-    
-    // Set pin 9 to be Interrupt 2 functionality (Rather than FSYNC or CLKIN)
-    WriteIMU(0x7B, 0b00000000);
-    
-    SetBank(0); // Return to Bank 0
+    // TODO Other imu settings
     
     // Enable the Int 2 Interrupt on the PIC32
     IFS0CLR = _IFS0_INT2IF_MASK; // Clear the interrupt flag
     IEC0SET = _IEC0_INT2IE_MASK;
     
-    return;
-}
-
-/****************************************************************************
- Function
-     SetBank
-
- Parameters
-     uint8_t Bank: The bank number that we will send to
-
- Returns
-     None
-
- Description
-     Sends the correct sequence of writes to the IMU via SPI to correctly set 
-     the bank for the next write or read
-****************************************************************************/
-void SetBank(uint8_t Bank)
-{
-    SPI1BUF = WRITE | 0x76;
-    SPI1BUF = Bank;
-    while (SPI1STATbits.SPIBUSY) {
-        // Blocking code --- OK Since we are only calling this function during initialization
-    }
-    uint8_t data1 = SPI1BUF;
-    uint8_t data2 = SPI1BUF;
     return;
 }
 
@@ -496,10 +430,13 @@ void SetBank(uint8_t Bank)
  
     ***Assumes the Bank is already correctly selected***
 ****************************************************************************/
-void WriteIMU(uint8_t Address, uint8_t Data)
+void WriteIMU(uint8_t Address, uint8_t LowerByte, uint8_t UpperByte, uint8_t NumBytes)
 {
     SPI1BUF = WRITE | Address;
-    SPI1BUF = Data;
+    SPI1BUF = LowerByte;
+    if (NumBytes == 2) {
+        SPI1BUF = UpperByte;
+    }
     while (SPI1STATbits.SPIBUSY) {
         // Blocking code --- OK Since we are only calling this function during initialization
     }
@@ -507,25 +444,62 @@ void WriteIMU(uint8_t Address, uint8_t Data)
     uint8_t data1;
     while (!SPI1STATbits.SPIRBE) {
         data1 = SPI1BUF;
-//    uint8_t data2 = SPI1BUF;
     }
     return;
 }
 
-uint8_t ReadIMU(uint8_t Address)
+/**
+ * Reads 1 byte (the lower byte) from the specified address
+ * 
+ * @param Address
+ * @return 
+ */
+uint8_t ReadIMU1(uint8_t Address)
 {
     while (!SPI1STATbits.SPIRBE) {
         uint8_t temp = SPI1BUF;
     }
     
     SPI1BUF = READ | Address; // Specify the address of data we want to receive
-    SPI1BUF = 0x00; // Just a blank message so we can receive the data
+    SPI1BUF = 0x00; // This is for the dummy message
+    SPI1BUF = 0x00;
+    
     while (SPI1STATbits.SPIBUSY) {
         // Blocking code --- OK Since we are only calling this function during testing
     }
     uint8_t temp = SPI1BUF;
+    uint8_t dummy_data = SPI1BUF;
     uint8_t data = SPI1BUF;
     return data;
+}
+
+/**
+ * Reads both the lower byte and the upper byte from the specified address
+ * 
+ * @param Address
+ * @return 
+ */
+uint16_t ReadIMU2(uint8_t Address)
+{
+    while (!SPI1STATbits.SPIRBE) {
+        uint8_t temp = SPI1BUF;
+    }
+    
+    SPI1BUF = READ | Address; // Specify the address of data we want to receive
+    SPI1BUF = 0x00; // This is for the dummy message
+    SPI1BUF = 0x00;
+    SPI1BUF = 0x00;
+    
+    while (SPI1STATbits.SPIBUSY) {
+        // Blocking code --- OK Since we are only calling this function during testing
+    }
+    uint8_t temp = SPI1BUF;
+    uint8_t dummy_data = SPI1BUF;
+    
+    AccelGyroData_t data;
+    data.DataStruct.LowerByte = SPI1BUF;
+    data.DataStruct.UpperByte = SPI1BUF;
+    return data.FullData;
 }
 
 /****************************************************************************
