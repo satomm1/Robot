@@ -52,6 +52,8 @@
       <itemPath>ProjectHeaders/Button3DebouncerSM.h</itemPath>
       <itemPath>ProjectHeaders/LEDService.h</itemPath>
       <itemPath>ProjectHeaders/EEPROMSM.h</itemPath>
+      <itemPath>ProjectHeaders/ReflectService.h</itemPath>
+      <itemPath>ProjectHeaders/ADC_HAL.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -71,6 +73,8 @@
       <itemPath>ProjectSource/Button3DebouncerSM.c</itemPath>
       <itemPath>ProjectSource/LEDService.c</itemPath>
       <itemPath>ProjectSource/EEPROMSM.c</itemPath>
+      <itemPath>ProjectSource/ReflectService.c</itemPath>
+      <itemPath>ProjectSource/ADC_HAL.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

@@ -38,7 +38,7 @@
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 9
+#define NUM_SERVICES 10
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service.
@@ -166,11 +166,11 @@
 // These are the definitions for Service 9
 #if NUM_SERVICES > 9
 // the header file with the public function prototypes
-#define SERV_9_HEADER "TestHarnessService9.h"
+#define SERV_9_HEADER "ReflectService.h"
 // the name of the Init function
-#define SERV_9_INIT InitTestHarnessService9
+#define SERV_9_INIT InitReflectService
 // the name of the run function
-#define SERV_9_RUN RunTestHarnessService9
+#define SERV_9_RUN RunReflectService
 // How big should this services Queue be?
 #define SERV_9_QUEUE_SIZE 3
 #endif
@@ -338,7 +338,7 @@ typedef enum
 #define TIMER6_RESP_FUNC TIMER_UNUSED
 #define TIMER7_RESP_FUNC TIMER_UNUSED
 #define TIMER8_RESP_FUNC TIMER_UNUSED
-#define TIMER9_RESP_FUNC TIMER_UNUSED
+#define TIMER9_RESP_FUNC PostReflectService
 #define TIMER10_RESP_FUNC PostUsbService
 #define TIMER11_RESP_FUNC PostButton3DebouncerSM
 #define TIMER12_RESP_FUNC PostButton2DebouncerSM
@@ -359,5 +359,6 @@ typedef enum
 #define BUTTON2_TIMER 12
 #define BUTTON3_TIMER 11
 #define USB_TIMER 10
+#define REFLECT_TIMER 9
 
 #endif /* ES_CONFIGURE_H */

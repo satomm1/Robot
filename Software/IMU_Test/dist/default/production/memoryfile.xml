@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <project>                                  
-  <executable name="dist/default/production/MCU.production.elf">                 
+  <executable name="dist/default/production/IMU_Test.production.elf">                 
     <memory name="program">                 
       <units>bytes</units>                 
       <length>525440</length>                 
-      <used>55124</used>                     
-      <free>470316</free>                     
+      <used>32892</used>                     
+      <free>492548</free>                     
     </memory>                              
     <memory name="data">              
       <units>bytes</units>                 
       <length>131072</length>                 
-      <used>2128</used>                     
-      <free>128944</free>                     
+      <used>1608</used>                     
+      <free>129464</free>                     
     </memory>                              
   </executable>                            
 </project>                                 

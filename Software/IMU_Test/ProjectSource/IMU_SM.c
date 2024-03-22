@@ -206,10 +206,13 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
     {
       if (ThisEvent.EventType == ES_INIT) 
       {
-        uint8_t data = ReadIMU1(0x4F);
-        DB_printf("Chip ID: %d", data);
+//        uint16_t data = ReadIMU2(0x00);
+//        DB_printf("Chip ID: %d\r\n", data);
+//        
+//        data = ReadIMU2(0x21);
+//        DB_printf("Status: %d", data);
         
-        InitIMU();        
+        //InitIMU();        
         
         // now put the machine into the actual initial state
         CurrentState = IMUWait;

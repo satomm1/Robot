@@ -12,6 +12,9 @@
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/Button2DebouncerSM.c</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/Button1DebouncerSM.c</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/FrameworkSource/terminal.c</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectHeaders/ReflectService.h</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/ReflectService.c</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/ADC_HAL.c</file>
         </group>
     </open-files>
 </project-private>
