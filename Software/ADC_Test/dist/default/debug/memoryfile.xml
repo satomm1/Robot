@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<project>                                  
+  <executable name="dist/default/debug/ADC_Test.debug.elf">                 
+    <memory name="program">                 
+      <units>bytes</units>                 
+      <length>525440</length>                 
+      <used>55968</used>                     
+      <free>469472</free>                     
+    </memory>                              
+    <memory name="data">              
+      <units>bytes</units>                 
+      <length>131968</length>                 
+      <used>5712</used>                     
+      <free>126256</free>                     
+    </memory>                              
+  </executable>                            
+</project>                                 
