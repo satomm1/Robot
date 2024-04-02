@@ -103,7 +103,7 @@ bool InitImuSM(uint8_t Priority)
   SPI1CONbits.DISSDO = 0; // SDO1 is used by the module
   SPI1CONbits.MODE32 = 0; // 8 bit mode
   SPI1CONbits.MODE16 = 0; // 8 bit mode
-  SPI1CONbits.SMP = 0; // Data sampled at middle of data output time
+  SPI1CONbits.SMP = 1; // Data sampled at middle of data output time
   SPI1CONbits.CKE = 1; // Serial output data changes on transition from active clock state to idle clock state
   SPI1CONbits.CKP = 1; // Idle state for the clock is high level
   SPI1CONbits.MSTEN = 1; // Host mode
@@ -208,16 +208,16 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
         uint16_t data = ReadIMU1(0x00);
         DB_printf("Chip ID: %d\r\n", data);
         
-        data = ReadIMU2(0x00);
+        data = ReadIMU1(0x00);
         DB_printf("Chip ID: %d\r\n", data);
         
-        data = ReadIMU2(0x00);
+        data = ReadIMU1(0x00);
         DB_printf("Chip ID: %d\r\n", data);
         
-        data = ReadIMU2(0x00);
+        data = ReadIMU1(0x00);
         DB_printf("Chip ID: %d\r\n", data);
         
-        data = ReadIMU2(0x00);
+        data = ReadIMU1(0x00);
         DB_printf("Chip ID: %d\r\n", data);
         
         
