@@ -40,5 +40,7 @@ ImuState_t QueryImuSM(void);
 void WriteImuToSPI(uint32_t Buffer);
 void WriteAccelToSPI(uint32_t Buffer);
 void WriteGyroToSPI(uint32_t Buffer);
+uint8_t ReadIMU1(uint8_t Address);
+uint16_t ReadIMU2(uint8_t Address);
 #endif /* ImuFSM_H */
 

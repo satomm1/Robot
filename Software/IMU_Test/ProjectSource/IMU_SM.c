@@ -37,8 +37,7 @@
 */
 void InitIMU(void);
 void WriteIMU(uint8_t Address, uint8_t LowerByte, uint8_t UpperByte, uint8_t NumBytes);
-uint8_t ReadIMU1(uint8_t Address);
-uint16_t ReadIMU2(uint8_t Address);
+void WriteIMU2(uint8_t Address, AccelGyroData_t data);
 void ReadFIFO(void);
 
 /*---------------------------- Module Variables ---------------------------*/
@@ -206,13 +205,50 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
     {
       if (ThisEvent.EventType == ES_INIT) 
       {
-//        uint16_t data = ReadIMU2(0x00);
-//        DB_printf("Chip ID: %d\r\n", data);
-//        
-//        data = ReadIMU2(0x21);
-//        DB_printf("Status: %d", data);
+        uint16_t data = ReadIMU1(0x00);
+        DB_printf("Chip ID: %d\r\n", data);
         
-        //InitIMU();        
+        data = ReadIMU2(0x00);
+        DB_printf("Chip ID: %d\r\n", data);
+        
+        data = ReadIMU2(0x00);
+        DB_printf("Chip ID: %d\r\n", data);
+        
+        data = ReadIMU2(0x00);
+        DB_printf("Chip ID: %d\r\n", data);
+        
+        data = ReadIMU2(0x00);
+        DB_printf("Chip ID: %d\r\n", data);
+        
+        
+        data = ReadIMU2(0x02);
+        DB_printf("Status: %d\r\n", data);
+//        
+        AccelGyroData_t data2send;
+        data2send.DataStruct.LowerByte = 0b00010110;
+        data2send.DataStruct.UpperByte = 0b01110000;
+        WriteIMU2(0x20, data2send);
+//        
+        data = ReadIMU2(0x20);
+        DB_printf("Accel Settings: %d\r\n", data);
+        
+//        while (1) {
+            data = ReadIMU2(0x03);
+            DB_printf("Accel x: %d\r\n", data);
+            
+            data = ReadIMU2(0x03);
+            DB_printf("Accel x: %d\r\n", data);
+            
+            data = ReadIMU2(0x03);
+            DB_printf("Accel x: %d\r\n", data);
+            
+            data = ReadIMU2(0x03);
+            DB_printf("Accel x: %d\r\n", data);
+//            
+//            for (uint8_t i = 0; i < 10000; i++){}
+//        }
+        
+//        InitIMU();        
         
         // now put the machine into the actual initial state
         CurrentState = IMUWait;
@@ -400,18 +436,25 @@ void InitIMU(void)
 {
     // Get the chip id
     uint8_t chipID = ReadIMU1(0x00);
+    DB_printf("Chip ID: %d\r\n", chipID);
     
     // Configure accelerometer: ODR rate to 25 Hz and sensitivity to +/- 8g
-    WriteIMU(0x20, 0b00100110, 0b01110000, 2); 
+//    AccelGyroData_t data2send;
+//    data2send.FullData = 0x4027;
+//    WriteIMU2(0x20, data2send);
+//    WriteIMU(0x20, 0b00100110, 0b01110000, 2); 
     
     // Configure gyroscope: ODR rate to 25 Hz and sensitivity to +/- 250 deg/sec
-    WriteIMU(0x21, 0b00010110, 0b01110000, 2); 
+//    WriteIMU(0x21, 0b00010110, 0b01110000, 2); 
     
     // TODO Other imu settings
     
+    
+    // TODO setup interrupt
+    
     // Enable the Int 2 Interrupt on the PIC32
-    IFS0CLR = _IFS0_INT2IF_MASK; // Clear the interrupt flag
-    IEC0SET = _IEC0_INT2IE_MASK;
+//    IFS0CLR = _IFS0_INT2IF_MASK; // Clear the interrupt flag
+//    IEC0SET = _IEC0_INT2IE_MASK;
     
     return;
 }
@@ -435,13 +478,30 @@ void InitIMU(void)
 ****************************************************************************/
 void WriteIMU(uint8_t Address, uint8_t LowerByte, uint8_t UpperByte, uint8_t NumBytes)
 {
-    SPI1BUF = WRITE | Address;
+    SPI1BUF = Address;
     SPI1BUF = LowerByte;
     if (NumBytes == 2) {
         SPI1BUF = UpperByte;
     }
     while (SPI1STATbits.SPIBUSY) {
         // Blocking code --- OK Since we are only calling this function during initialization
+    }
+    
+    uint8_t data1;
+    while (!SPI1STATbits.SPIRBE) {
+        data1 = SPI1BUF;
+    }
+    return;
+}
+
+void WriteIMU2(uint8_t Address, AccelGyroData_t data)
+{
+    SPI1BUF = Address;
+    SPI1BUF = data.DataStruct.LowerByte;
+    SPI1BUF = data.DataStruct.UpperByte;
+    
+    while (SPI1STATbits.SPIBUSY) {
+        // Blocking code --- OK Since we are only calling this function during testing
     }
     
     uint8_t data1;
@@ -467,9 +527,11 @@ uint8_t ReadIMU1(uint8_t Address)
     SPI1BUF = 0x00; // This is for the dummy message
     SPI1BUF = 0x00;
     
+    
     while (SPI1STATbits.SPIBUSY) {
         // Blocking code --- OK Since we are only calling this function during testing
     }
+    
     uint8_t temp = SPI1BUF;
     uint8_t dummy_data = SPI1BUF;
     uint8_t data = SPI1BUF;
@@ -493,9 +555,11 @@ uint16_t ReadIMU2(uint8_t Address)
     SPI1BUF = 0x00;
     SPI1BUF = 0x00;
     
+    
     while (SPI1STATbits.SPIBUSY) {
         // Blocking code --- OK Since we are only calling this function during testing
     }
+    
     uint8_t temp = SPI1BUF;
     uint8_t dummy_data = SPI1BUF;
     
