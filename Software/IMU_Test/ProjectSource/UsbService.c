@@ -144,31 +144,31 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
           (char)ThisEvent.EventParam);
       if ('a' == ThisEvent.EventParam)
       {
-        uint16_t data = ReadIMU2(0x03);
+        uint16_t data = ReadIMU16(0x03);
         DB_printf("Accel x: %d\r\n", data);
       }
       
       if ('s' == ThisEvent.EventParam)
       {
-        uint16_t data = ReadIMU2(0x01);
+        uint16_t data = ReadIMU16(0x01);
         DB_printf("Status : %d\r\n", data);
       }
       
       if ('d' == ThisEvent.EventParam)
       {
-        uint16_t data = ReadIMU2(0x02);
+        uint16_t data = ReadIMU16(0x02);
         DB_printf("Status : %d\r\n", data);
       }
       
       if ('g' == ThisEvent.EventParam)
       {
-        uint8_t data = ReadIMU1(0x00);
+        uint8_t data = ReadIMU8(0x00);
         DB_printf("Chip ID : %d\r\n", data);
       }
       
       if ('z' == ThisEvent.EventParam)
       {
-        uint16_t data = ReadIMU2(0x21);
+        uint16_t data = ReadIMU16(0x21);
         DB_printf("Settings : %d\r\n", data);
       }
       

@@ -16,7 +16,7 @@
 // State definitions for use with the query function
 typedef enum
 {
-  InitPState_IMU, IMUWait
+  InitPState_IMU, IMUReset, IMUWait, IMURun
 }ImuState_t;
 
 typedef struct
@@ -28,8 +28,14 @@ typedef struct
 typedef union
 {
     DataByBytes_t DataStruct;
-    int16_t FullData;
+    uint16_t FullData;
 } AccelGyroData_t;
+
+typedef union
+{
+    DataByBytes_t DataStruct;
+    uint16_t FullData;
+} ReceivedData_t;
 
 // Public Function Prototypes
 
@@ -37,10 +43,8 @@ bool InitImuSM(uint8_t Priority);
 bool PostImuSM(ES_Event_t ThisEvent);
 ES_Event_t RunImuSM(ES_Event_t ThisEvent);
 ImuState_t QueryImuSM(void);
-void WriteImuToSPI(uint32_t Buffer);
-void WriteAccelToSPI(uint32_t Buffer);
-void WriteGyroToSPI(uint32_t Buffer);
-uint8_t ReadIMU1(uint8_t Address);
-uint16_t ReadIMU2(uint8_t Address);
+void GetIMUData(float *ImuResults);
+uint8_t ReadIMU8(uint8_t Address);
+uint16_t ReadIMU16(uint8_t Address);
 #endif /* ImuFSM_H */
 
