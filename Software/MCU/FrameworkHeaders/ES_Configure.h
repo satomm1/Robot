@@ -337,7 +337,7 @@ typedef enum
 #define TIMER5_RESP_FUNC TIMER_UNUSED
 #define TIMER6_RESP_FUNC TIMER_UNUSED
 #define TIMER7_RESP_FUNC TIMER_UNUSED
-#define TIMER8_RESP_FUNC TIMER_UNUSED
+#define TIMER8_RESP_FUNC PostImuSM
 #define TIMER9_RESP_FUNC PostReflectService
 #define TIMER10_RESP_FUNC PostUsbService
 #define TIMER11_RESP_FUNC PostButton3DebouncerSM
@@ -360,5 +360,6 @@ typedef enum
 #define BUTTON3_TIMER 11
 #define USB_TIMER 10
 #define REFLECT_TIMER 9
+#define IMU_TIMER 8
 
 #endif /* ES_CONFIGURE_H */

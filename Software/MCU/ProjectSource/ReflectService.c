@@ -71,7 +71,7 @@ bool InitReflectService(uint8_t Priority)
   ANSELBSET = _ANSELB_ANSB4_MASK | _ANSELB_ANSB11_MASK;
   
   // Setup the ADC
-  InitADC();
+//  InitADC();
   ES_Timer_InitTimer(REFLECT_TIMER, 500); // Init timer to tell when to read
   
   // post the initial transition event
@@ -131,13 +131,13 @@ ES_Event_t RunReflectService(ES_Event_t ThisEvent)
   ReturnEvent.EventType = ES_NO_EVENT; // assume no errors
   
   if (ThisEvent.EventType == ES_TIMEOUT) {
-      ReadADC(ReflectiveResults);
+//      ReadADC(ReflectiveResults);
       
-      DB_printf("Reflect 1: %d\r\n", ReflectiveResults[0]);
-      DB_printf("Reflect 2: %d\r\n", ReflectiveResults[1]);
-      DB_printf("Reflect 3: %d\r\n", ReflectiveResults[2]);
+//      DB_printf("Reflect 1: %d\r\n", ReflectiveResults[0]);
+//      DB_printf("Reflect 2: %d\r\n", ReflectiveResults[1]);
+//      DB_printf("Reflect 3: %d\r\n", ReflectiveResults[2]);
       
-      ES_Timer_InitTimer(REFLECT_TIMER, 1000); // Init Timer to read again
+//      ES_Timer_InitTimer(REFLECT_TIMER, 1000); // Init Timer to read again
   }
   
   return ReturnEvent;

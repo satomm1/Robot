@@ -325,10 +325,11 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
 
                     case 1:
                     {
-                        // TODO: fill buffer with gyro data
-                        for(uint8_t ii = 0; ii < 16; ii++) {
-                            MessageToSend[ii] = 2;
-                        }
+                        // Fill buffer with imu data
+//                        for(uint8_t ii = 0; ii < 16; ii++) {
+//                            MessageToSend[ii] = 2;
+//                        }
+                        WriteImuToSPI(MessageToSend);
                         CurrentMessage = 2;
                     }
                     break;

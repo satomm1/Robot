@@ -3,7 +3,7 @@
    IMU_SM.c
 
  Description
-   This is a file for implementing reading from the ICM-42688-P 6-axis IMU
+   This is a file for implementing reading from the Bosch BMI323 6-axis IMU
 
  Notes
 
@@ -36,9 +36,10 @@
    relevant to the behavior of this state machine
 */
 void InitIMU(void);
-void SetBank(uint8_t Bank);
-void WriteIMU(uint8_t Address, uint8_t Data);
-uint8_t ReadIMU(uint8_t Address);
+void ResetIMU(void);
+void WriteIMU(uint8_t Address, uint8_t LowerByte, uint8_t UpperByte, uint8_t NumBytes);
+void WriteIMU2(uint8_t Address, AccelGyroData_t data);
+void WriteIMU2Transfer(uint8_t Address, AccelGyroData_t data1, AccelGyroData_t data2);
 void ReadFIFO(void);
 
 /*---------------------------- Module Variables ---------------------------*/
@@ -58,6 +59,10 @@ static AccelGyroData_t Accel[3]; // Holds the current acceleration data from IMU
 static float Accel_g[3]; // Holds acceleration in g's
 static AccelGyroData_t Gyro[3]; // Holds the current gyroscope readings from IMU
 static float Gyro_deg_s[3]; // Holds the angular velocity in deg/s
+
+static bool IntStatusReading = false;
+static bool FifoReading = false;
+static uint8_t rx_data[16];
 
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
@@ -88,12 +93,16 @@ bool InitImuSM(uint8_t Priority)
   TRISDSET = _TRISD_TRISD2_MASK; // Set SDI1 to Input
   
   
+  TRISHCLR = _TRISH_TRISH5_MASK | _TRISH_TRISH4_MASK | _TRISH_TRISH6_MASK |_TRISH_TRISH7_MASK;
+  ANSELHCLR = _ANSELH_ANSH5_MASK |_ANSELH_ANSH4_MASK|_ANSELH_ANSH6_MASK;
+  LATHbits.LATH5 = 0;
+  
   // Map SPI1 Pins to correct function
   // RD1 is mapped to CLK1 by default
   RPD4R = 0b0101; // Map RD4 -> SS1
   RPD3R = 0b0101; // Map RD3 -> SDO1
   SDI1R = 0b0000; // Map SDI1 -> RD2
-  
+    
   // Initialize SPI1
   SPI1CON = 0; // Reset SPI1CON settings
   SPI1CONbits.FRMEN = 0; // Disable framed SPI support
@@ -104,13 +113,13 @@ bool InitImuSM(uint8_t Priority)
   SPI1CONbits.DISSDO = 0; // SDO1 is used by the module
   SPI1CONbits.MODE32 = 0; // 8 bit mode
   SPI1CONbits.MODE16 = 0; // 8 bit mode
-  SPI1CONbits.SMP = 0; // Data sampled at middle of data output time
-  SPI1CONbits.CKE = 0; // Output data changes on transition from idle to active clock state
+  SPI1CONbits.SMP = 1; // Data sampled at middle of data output time
+  SPI1CONbits.CKE = 1; // Serial output data changes on transition from active clock state to idle clock state
   SPI1CONbits.CKP = 1; // Idle state for the clock is high level
   SPI1CONbits.MSTEN = 1; // Host mode
   SPI1CONbits.DISSDI = 0; // The SDI pin is controlled by the module
   SPI1CONbits.STXISEL = 0b00; // Interrupt generated when last transfer shifted out of SPISR and transmit operations are complete
-  SPI1CONbits.SRXISEL = 0b11; // Interrupt is generated when the buffer is full
+  SPI1CONbits.SRXISEL = 0b01; // Interrupt is generated when the buffer is not empty
 
   SPI1CON2 = 0; // Reset SPI1CON2 register settings
   SPI1CON2bits.AUDEN = 0; // Audio protocol is disabled
@@ -120,37 +129,34 @@ bool InitImuSM(uint8_t Priority)
   }
   SPI1STATbits.SPIROV = 0; // Clear the Receive overflow bit
   
-  SPI1BRG = 15; //15; // 1.56 MHz clock frequency, IMU Has max frequency of 24 MHz
-  
-  // Setup Timer 6 (Used for integrating the accels)
-  T6CON = 0; // Reset the timer register settings
-  T6CONbits.TCKPS = 0b111; // 1:256 prescale value
-  T6CONbits.T32 = 0; // Use 16 bit timer not 32 bit
-  T6CONbits.TCS = 0; // Internal peripheral clock
+  SPI1BRG = 15; //15; // 1.56 MHz clock frequency, IMU Has max frequency of 10 MHz
     
+  
+  // Setup Timer 6
+  T6CON = 0;
+  T6CONbits.TCKPS = 0b111; // 1:256 prescale value, 195.3125  kHz
+  T6CONbits.TCS = 0; // Use internal peripheral clock (PBCLK3, 50 MHz)
+  PR6 = 3906; // ~50 Hz
+  TMR6 = 0; // Set TMR5 to 0
+  
   // Setup Interrupts
   INTCONbits.MVEC = 1; // Use multivector mode
   PRISSbits.PRI7SS = 0b0111; // Priority 7 interrupt use shadow set 7
   
   // Set interrupt priorities
+  IPC27bits.SPI1TXIP = 7; // SPI2TX
   IPC27bits.SPI1RXIP = 7; // SPI2RX
-  IPC3bits.INT2IP = 7; // External Interrupt 2
   IPC7bits.T6IP = 7; // T6
   
   // Clear interrupt flags
   IFS3CLR = _IFS3_SPI1RXIF_MASK | _IFS3_SPI1TXIF_MASK;
-  IFS0CLR = _IFS0_INT2IF_MASK | _IFS0_T6IF_MASK;
+  IFS0CLR = _IFS0_T6IF_MASK;
   
-  // Local enable interrupts
-  IEC3SET = _IEC3_SPI1RXIE_MASK;
+  // Disable the RX/TX interrupt
+  IEC3CLR = _IEC3_SPI1RXIE_MASK | _IEC3_SPI1TXIE_MASK;
+  
+  // Enable the T6 interrupt
   IEC0SET = _IEC0_T6IE_MASK;
-  
-  // Disable TX interrupt
-  IEC3CLR = _IEC3_SPI1TXIE_MASK;
-  
-  // Disable Int 2 Interrupt
-  IEC0CLR = _IEC0_INT2IE_MASK;
-  INTCONbits.INT2EP = 0; // Interrupt on falling edge
   
   __builtin_enable_interrupts(); // Global enable interrupts
   
@@ -213,53 +219,94 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
     {
       if (ThisEvent.EventType == ES_INIT) 
       {
-//        SetBank(0);
-//        uint8_t data = ReadIMU(0x4F);
-//        data = ReadIMU(0b0101010);
-//          
-//        InitIMU();        
-        
+        ResetIMU(); // Perform a soft reset of the IMU
         
         // now put the machine into the actual initial state
-        CurrentState = IMUWait;
+        CurrentState = IMUReset;
+        ES_Timer_InitTimer(IMU_TIMER, 500);
       }
     }
     break;
 
-    case IMUWait:      
+    case IMUReset:      
     {
       switch (ThisEvent.EventType)
       {
-        case EV_IMU_DATA_UPDATE:  
-        { 
-            DB_printf("Received New IMU Data\r\n");
-            
-          uint8_t indx = ThisEvent.EventParam;
-          Accel[0].DataStruct.UpperByte = IMU_FIFO[indx][1];
-          Accel[0].DataStruct.LowerByte = IMU_FIFO[indx][2];
-          Accel[1].DataStruct.UpperByte = IMU_FIFO[indx][3];
-          Accel[1].DataStruct.LowerByte = IMU_FIFO[indx][4];
-          Accel[2].DataStruct.UpperByte = IMU_FIFO[indx][5];
-          Accel[2].DataStruct.LowerByte = IMU_FIFO[indx][6];
                
-          Gyro[0].DataStruct.UpperByte = IMU_FIFO[indx][7];
-          Gyro[0].DataStruct.LowerByte = IMU_FIFO[indx][8];
-          Gyro[1].DataStruct.UpperByte = IMU_FIFO[indx][9];
-          Gyro[1].DataStruct.LowerByte = IMU_FIFO[indx][10];
-          Gyro[2].DataStruct.UpperByte = IMU_FIFO[indx][11];
-          Gyro[2].DataStruct.LowerByte = IMU_FIFO[indx][12];       
-          
-          for (uint8_t i=1; i<3; i++) {
-            Accel_g[i] = Accel[i].FullData / ACCEL_SENSITIVITY;
-            Gyro_deg_s[i] = Gyro[i].FullData / GYRO_SENSITIVITY;
-          }
+        case ES_TIMEOUT:
+        {
+            InitIMU(); // After giving some time from resetting, apply custom settings
+            CurrentState = IMUWait;
+            ES_Timer_InitTimer(IMU_TIMER, 500);
         }
         break;
-
         
         default:
           ;
-      } 
+      }
+      
+    }
+    break;
+    
+    case IMUWait:
+    {
+      switch (ThisEvent.EventType)
+      {
+        case ES_TIMEOUT:
+        {
+            T6CONbits.ON = 1; // Turn T6 on
+            IEC3SET = _IEC3_SPI1RXIE_MASK; // Enable the RX interrupt
+            ES_Timer_InitTimer(IMU_TIMER, 1000); // Init timer
+            CurrentState = IMURun;
+        }
+      }
+    }
+    break;
+    
+    case IMURun:      
+    {
+      switch (ThisEvent.EventType)
+      {
+               
+        case ES_TIMEOUT:
+        {
+            // Periodically print out gyro values.
+//            DB_printf("Status: %d\r\n", ReadIMU16(0x02));
+//                    
+//            int16_t signed_data;
+//            if (Accel[0].FullData & 0x8000) {
+//                signed_data = -((~Accel[0].FullData & 0xFFFF) + 1);
+//            } else {
+//                signed_data = Accel[0].FullData;
+//            }
+//            float x_accel = (float)signed_data / 8.19 * 9.81 / 1000;
+//            DB_printf("Accel x: %d m/s^2\r\n", (int16_t)x_accel);
+//            
+//            if (Accel[1].FullData & 0x8000) {
+//                signed_data = -((~Accel[1].FullData & 0xFFFF) + 1);
+//            } else {
+//                signed_data = Accel[1].FullData;
+//            }
+//            float y_accel = (float)signed_data / 8.19 * 9.81 / 1000;
+//            DB_printf("Accel y: %d m/s^2\r\n", (int16_t)y_accel);
+//            
+//            
+//            if (Gyro[2].FullData & 0x8000) {
+//                signed_data = -((~Gyro[2].FullData & 0xFFFF) + 1);
+//            } else {
+//                signed_data = Gyro[2].FullData;
+//            }
+//            float z_vel = (float)signed_data / 131.2;
+//            DB_printf("Vel z: %d deg/sec\r\n\r\n", (int16_t)z_vel);
+//            
+//            ES_Timer_InitTimer(IMU_TIMER, 1000);
+        }
+        break;
+
+        default:
+          ;
+      }
+      
     }
     break;
     
@@ -287,101 +334,79 @@ ImuState_t QueryImuSM(void)
   return CurrentState;
 }
 
-/****************************************************************************
- Function
-     WriteImuToSPI
-
- Parameters
-     uint32_t Buffer: the SPI buffer address to write the IMU data to
-
- Returns
-     None
-
- Description
-     Writes the current IMU data to the specified SPI buffer in a single 16-byte
-     message
-****************************************************************************/
-void WriteImuToSPI(uint32_t Buffer)
+void GetIMUData(float *ImuResults)
 {
-    Buffer = 9; // Header to indicate this is IMU data
+    int16_t signed_data;
     
-    // Send Accel sensitivity (byte 2/3)
-    uint16_t accel_sensitivity = ACCEL_SENSITIVITY;
-    Buffer = (uint8_t)(accel_sensitivity >> 8); // Upper 8 bits of sensitivity 
-    Buffer = (uint8_t)(accel_sensitivity & 0xFF); // Lower 8 bits of sensitivity
+    uint16_t accel_x_unsigned = Accel[0].FullData;
+    uint16_t accel_y_unsigned = Accel[1].FullData;
+    uint16_t vel_z_unsigned = Gyro[2].FullData;
     
-    // Send the accel data
-    Buffer =  Accel[0].DataStruct.UpperByte; // byte 4 
-    Buffer =  Accel[0].DataStruct.LowerByte;
-    Buffer =  Accel[1].DataStruct.UpperByte;
-    Buffer =  Accel[1].DataStruct.LowerByte;
-    Buffer =  Accel[2].DataStruct.UpperByte;
-    Buffer =  Accel[2].DataStruct.LowerByte; // byte 9
+    // X acceleration
+    if (accel_x_unsigned & 0x8000) {
+        signed_data = -((~accel_x_unsigned & 0xFFFF) + 1);
+    } else {
+        signed_data = accel_x_unsigned;
+    }
+    float x_accel = (float)signed_data / 8.19 * 9.81 / 1000;
+//    DB_printf("Accel x: %d m/s^2\r\n", (int16_t)x_accel);
+
+    // Y acceleration
+    if (accel_y_unsigned & 0x8000) {
+        signed_data = -((~accel_y_unsigned & 0xFFFF) + 1);
+    } else {
+        signed_data = accel_y_unsigned;
+    }
+    float y_accel = (float)signed_data / 8.19 * 9.81 / 1000;
+//    DB_printf("Accel y: %d mG's\r\n", (int16_t)y_accel);
+
+    // Z angular velocity
+    if (vel_z_unsigned & 0x8000) {
+        signed_data = -((~vel_z_unsigned & 0xFFFF) + 1);
+    } else {
+        signed_data = vel_z_unsigned;
+    }
+    float z_vel = (float)signed_data / 131.2;
+//    DB_printf("Vel z: %d deg/sec\r\n\r\n", (int16_t)z_vel);
     
-    // Send Gyro Sensitivity (byte 10)
-    Buffer = (uint8_t)GYRO_SENSITIVITY;
+    ImuResults[0] = x_accel;
+    ImuResults[1] = y_accel;
+    ImuResults[2] = z_vel;
     
-    // Send the gyro data
-    Buffer = Gyro[0].DataStruct.UpperByte; // byte 11
-    Buffer = Gyro[0].DataStruct.LowerByte;
-    Buffer = Gyro[1].DataStruct.UpperByte;
-    Buffer = Gyro[1].DataStruct.LowerByte;
-    Buffer = Gyro[2].DataStruct.UpperByte;
-    Buffer = Gyro[2].DataStruct.LowerByte; // byte 16
+    return;
 }
 
-/****************************************************************************
- Function
-     WriteAccelToSPI
-
- Parameters
-     uint32_t Buffer: the SPI buffer address to write the accel data to
-
- Returns
-     None
-
- Description
-     Writes the current accel data to the specified SPI buffer
-****************************************************************************/
-void WriteAccelToSPI(uint32_t Buffer)
+void WriteImuToSPI(uint8_t *Message2Send)
 {
-    Buffer = 10; // Header to indicate this is Accel data (byte 1)
+    float imu_data[3];
+    GetIMUData(imu_data);
     
-    // Send the acceleration. Acceleration are floats which can be sent as 
-    // 4 packets of 8 bits. (bytes 2-13)
-    for (uint8_t i=0; i<3; i++) { // iterate through x,y,z
-        uint32_t accel_as_int = *((uint32_t*)&Accel_g[i]);
-        for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
-            Buffer = (accel_as_int >> (24-8*j)) & 0xFF;
-        }
-    }
-}
-
-/****************************************************************************
- Function
-     WriteGyroToSPI
-
- Parameters
-     uint32_t Buffer: the SPI buffer address to write the gyro data to
-
- Returns
-     None
-
- Description
-     Writes the current gyro data to the specified SPI buffer
-****************************************************************************/
-void WriteGyroToSPI(uint32_t Buffer)
-{
-    Buffer = 11; // Header to indicate this is gyro data (byte 1)
+    Message2Send[0] = 9; // 9 indicates we are imu data (byte 1)
     
-    // Send the gyro. gyro data are floats which can be sent as 
-    // 4 packets of 8 bits. (bytes 2-13)
-    for (uint8_t i=0; i<3; i++) { // iterate through x,y,z
-        uint32_t gyro_as_int = *((uint32_t*)&Gyro_deg_s[i]);
-        for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
-            Buffer = (gyro_as_int >> (24-8*j)) & 0xFF;
-        }
-    }
+  // The x/y accel and z vel data are all floats. The floats can be sent as 4 
+  // chunks of 8 bits.
+  
+  // Now write the x accel data (bytes 2-5)
+  uint32_t x_as_int = *((uint32_t*)&imu_data[0]);
+  for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+    Message2Send[j+1] = (x_as_int >> (24-8*j)) & 0xFF;
+  }
+  
+  // Now write the y accel data (bytes 6-9)
+  uint32_t y_as_int = *((uint32_t*)&imu_data[1]);
+  for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+    Message2Send[j+5] = (y_as_int >> (24-8*j)) & 0xFF;
+  }
+  
+  // Now write the z angular velocity data (bytes 10-13)
+  uint32_t z_as_int = *((uint32_t*)&imu_data[2]);
+  for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+    Message2Send[j+9] = (z_as_int >> (24-8*j)) & 0xFF;
+  }
+  
+  for (uint8_t j = 0; j < 3; j++) {
+    Message2Send[j+13] = 0; // Fill rest of buffer with 0's
+  }
 }
 
 /***************************************************************************
@@ -404,78 +429,58 @@ void WriteGyroToSPI(uint32_t Buffer)
 ****************************************************************************/
 void InitIMU(void)
 {
-    /************************ Bank 0 Registers ************************/
-    SetBank(0);
+    AccelGyroData_t data2send;
+    AccelGyroData_t data2send2;
     
-    // Configure interrupt types:
-    WriteIMU(0x14, 0b00110110); // Push-Pull, Active Low, Latched Interrupt
+    uint16_t data = ReadIMU16(0x00); // Dummy call to set up SPI  
     
-    // Set up the IMU to write to FIFO (FIFO_CONFIG)
-    WriteIMU(0x16, 0b01000000); // Stream to FIFO
-    
-    // Needed for correct operation of Interrupts (INT_CONFIG1)
-    WriteIMU(0x64, 0b00000000);
-    
-    // Set Gyro ODR rate to 25 Hz and sensitivity to +/- 250 degrees/sec (GYRO_CONFIG0)
-    WriteIMU(0x4F, 0b01101010);
-    
-    // Set Accel ODR rate to 25 Hz and sensitivity to +/- 8g (Accel_CONFIG0)
-    WriteIMU(0x50, 0b00101010);
-    
-    // Set the FIFO watermark threshold (FIFO_CONFIG2)
-    WriteIMU(0x60, 1); // Set to watermark of 1
-    
-    // Set the FIFO threshold interrupt to clear after reading a byte (INT_CONFIG0)
-    WriteIMU(0x63, 0b00001000);
-    
-    // Route the FIFO threshold interrupt to Int1 (INT_SOURCE0)
-    WriteIMU(0x65, 0b00000100); 
-    
-    // Set FIFO Config settings (FIFO_CONFIG1 register)
-    WriteIMU(0x5F, 0b00100111);
-    
-    // Turn Accel and Gyro on (PWR_MGMT0 register)
-    WriteIMU(0x4E, 0b00001111);
-    
-    
-    /************************ Bank 1 Registers ************************/
-    SetBank(1);
-    
-    // Set pin 9 to be Interrupt 2 functionality (Rather than FSYNC or CLKIN)
-    WriteIMU(0x7B, 0b00000000);
-    
-    SetBank(0); // Return to Bank 0
-    
-    // Enable the Int 2 Interrupt on the PIC32
-    IFS0CLR = _IFS0_INT2IF_MASK; // Clear the interrupt flag
-    IEC0SET = _IEC0_INT2IE_MASK;
-    
+    data = ReadIMU8(0x00); // Get chip ID
+    while (data != 0b01000011) {
+        DB_printf("Incorrect Chip ID: %d\r\n", data);
+        data = ReadIMU16(0x00); // Get chip ID
+    }
+    DB_printf("Chip ID: %d\r\n", data);
+
+    // Get the status of the chip
+    data = ReadIMU16(0x02);
+    DB_printf("IMU Status: %d\r\n", data);
+                  
+    // Setup the accelerometer/gyro settings for the IMU, do a burst write since 
+    // addresses are consecutive:
+    // Accel
+    data2send.DataStruct.LowerByte = 0b00011000; // cutoff = acc_odr/2, acc_range = +/- 4g, 8.19 LSB/mg, Sample Rate = 100 Hz
+    data2send.DataStruct.UpperByte = 0b01000001; // Normal mode, averaging of 2 samples
+
+    // Gyro
+    data2send2.DataStruct.LowerByte = 0b00011000; // cutoff = gyr_odr/2, gyr_range = +/- 250 deg/s, 131.2 LSB/deg/s, Sample Rate = 100 Hz
+    data2send2.DataStruct.UpperByte = 0b01000001; // Normal mode, averaging of 2 samples
+    WriteIMU2Transfer(0x20, data2send, data2send2);
+
     return;
 }
 
 /****************************************************************************
  Function
-     SetBank
+     ResetImu
 
  Parameters
-     uint8_t Bank: The bank number that we will send to
+     None
 
  Returns
      None
 
  Description
-     Sends the correct sequence of writes to the IMU via SPI to correctly set 
-     the bank for the next write or read
+     Sends the correct sequence of writes to the IMU via SPI to correctly soft
+     reset the IMU
 ****************************************************************************/
-void SetBank(uint8_t Bank)
-{
-    SPI1BUF = WRITE | 0x76;
-    SPI1BUF = Bank;
-    while (SPI1STATbits.SPIBUSY) {
-        // Blocking code --- OK Since we are only calling this function during initialization
-    }
-    uint8_t data1 = SPI1BUF;
-    uint8_t data2 = SPI1BUF;
+void ResetIMU(void) {
+    AccelGyroData_t data2send;
+    uint16_t data = ReadIMU16(0x00); // Dummy call to set up SPI
+    
+    // Reset IMU
+    data2send.FullData = 0xDEAF;
+    WriteIMU2(0x7E, data2send);
+    
     return;
 }
 
@@ -496,10 +501,16 @@ void SetBank(uint8_t Bank)
  
     ***Assumes the Bank is already correctly selected***
 ****************************************************************************/
-void WriteIMU(uint8_t Address, uint8_t Data)
+void WriteIMU(uint8_t Address, uint8_t LowerByte, uint8_t UpperByte, uint8_t NumBytes)
 {
-    SPI1BUF = WRITE | Address;
-    SPI1BUF = Data;
+    __builtin_disable_interrupts();
+    SPI1BUF = Address;
+    SPI1BUF = LowerByte;
+    if (NumBytes == 2) {
+        SPI1BUF = UpperByte;
+    }
+    __builtin_enable_interrupts();
+    
     while (SPI1STATbits.SPIBUSY) {
         // Blocking code --- OK Since we are only calling this function during initialization
     }
@@ -507,115 +518,154 @@ void WriteIMU(uint8_t Address, uint8_t Data)
     uint8_t data1;
     while (!SPI1STATbits.SPIRBE) {
         data1 = SPI1BUF;
-//    uint8_t data2 = SPI1BUF;
     }
     return;
 }
 
-uint8_t ReadIMU(uint8_t Address)
+void WriteIMU2(uint8_t Address, AccelGyroData_t data)
+{
+    __builtin_disable_interrupts();
+    SPI1BUF = Address;
+    SPI1BUF = data.DataStruct.LowerByte;
+    SPI1BUF = data.DataStruct.UpperByte;
+    __builtin_enable_interrupts();
+    
+    while (SPI1STATbits.SPIBUSY) {
+        // Blocking code --- OK Since we are only calling this function during testing
+    }
+    
+    uint8_t data1;
+    while (!SPI1STATbits.SPIRBE) {
+        data1 = SPI1BUF;
+    }
+    return;
+}
+
+void WriteIMU2Transfer(uint8_t Address, AccelGyroData_t data1, AccelGyroData_t data2)
+{
+    __builtin_disable_interrupts();
+    SPI1BUF = Address;
+    SPI1BUF = data1.DataStruct.LowerByte;
+    SPI1BUF = data1.DataStruct.UpperByte;
+    SPI1BUF = data2.DataStruct.LowerByte;
+    SPI1BUF = data2.DataStruct.UpperByte;
+    __builtin_enable_interrupts();
+    
+    while (SPI1STATbits.SPIBUSY) {
+        // Blocking code --- OK Since we are only calling this function during testing
+    }
+    
+    uint8_t data;
+    while (!SPI1STATbits.SPIRBE) {
+        data = SPI1BUF;
+    }
+    return;
+}
+
+/**
+ * Reads 1 byte (the lower byte) from the specified address
+ * 
+ * @param Address
+ * @return 
+ */
+uint8_t ReadIMU8(uint8_t Address)
 {
     while (!SPI1STATbits.SPIRBE) {
         uint8_t temp = SPI1BUF;
     }
     
+    __builtin_disable_interrupts();
     SPI1BUF = READ | Address; // Specify the address of data we want to receive
-    SPI1BUF = 0x00; // Just a blank message so we can receive the data
+    SPI1BUF = 0x00; // This is for the dummy message
+    SPI1BUF = 0x00;
+    __builtin_enable_interrupts();
+    
     while (SPI1STATbits.SPIBUSY) {
         // Blocking code --- OK Since we are only calling this function during testing
     }
+
+    
     uint8_t temp = SPI1BUF;
+    uint8_t dummy_data = SPI1BUF;
     uint8_t data = SPI1BUF;
     return data;
 }
 
-/****************************************************************************
- Function
-     ReadFIFO
-
- Parameters
-     None
-
- Returns
-     None
-
- Description
-     Sends the correct sequence of bytes to read from the IMU FIFO
- 
-    ***Assumes the Bank is already correctly selected***
-****************************************************************************/
-void ReadFIFO(void)
+/**
+ * Reads both the lower byte and the upper byte from the specified address
+ * 
+ * @param Address
+ * @return 
+ */
+uint16_t ReadIMU16(uint8_t Address)
 {
-    FIFO_index = 0;
-    if (Active_FIFO) {
-        Active_FIFO = 0;
-    } else {
-        Active_FIFO = 1;
+    while (!SPI1STATbits.SPIRBE) {
+        uint8_t temp = SPI1BUF;
     }
     
-    // Turn on TX interrupt -- Interrupt will be generated after this is 
-    // completely transferred
-    IEC3SET = _IEC3_SPI1TXIE_MASK;
+    __builtin_disable_interrupts();
+    SPI1BUF = READ | Address; // Specify the address of data we want to receive
+    SPI1BUF = 0x00; // This is for the dummy message
+    SPI1BUF = 0x00;
+    SPI1BUF = 0x00;
+    __builtin_enable_interrupts();
     
-    // Write To FIFO_Data Register
-    SPI1BUF = READ | 0x30;
+    while (SPI1STATbits.SPIBUSY) {
+        // Blocking code --- OK Since we are only calling this function during testing
+    }
+    
+    uint8_t temp = SPI1BUF;
+    uint8_t dummy_data = SPI1BUF;
+    
+    AccelGyroData_t data;
+    data.DataStruct.LowerByte = SPI1BUF;
+    data.DataStruct.UpperByte = SPI1BUF;
+    return data.FullData;
 }
 
 void __ISR(_SPI1_RX_VECTOR, IPL7SRS) SPI1RXHandler(void)
 {
-    static ES_Event_t NewEvent = {EV_IMU_DATA_UPDATE, 0}; // static for speed
+    static uint8_t data_read = 0;
     
-    // Read all the data from SPI1Buffer -- Must make sure we visit this before 
-    // sending more data to ensure we don't have overflow
-    for (uint8_t i=0; i<16; i++) {
-        IMU_FIFO[Active_FIFO][FIFO_index] = SPI1BUF;
+    while (SPI1STATbits.SPIRBE == 0){
+        rx_data[data_read] = SPI1BUF;
+        data_read += 1;
+        if (data_read == 14) {
+            data_read = 0;
+            Accel[0].DataStruct.LowerByte = rx_data[2];
+            Accel[0].DataStruct.UpperByte = rx_data[3];
+            Accel[1].DataStruct.LowerByte = rx_data[4];
+            Accel[1].DataStruct.UpperByte = rx_data[5];
+            Accel[2].DataStruct.LowerByte = rx_data[6];
+            Accel[2].DataStruct.UpperByte = rx_data[7];
+            Gyro[0].DataStruct.LowerByte = rx_data[8];
+            Gyro[0].DataStruct.UpperByte = rx_data[9];
+            Gyro[1].DataStruct.LowerByte = rx_data[10];
+            Gyro[1].DataStruct.UpperByte = rx_data[11];
+            Gyro[2].DataStruct.LowerByte = rx_data[12];
+            Gyro[2].DataStruct.UpperByte = rx_data[13];
+        }
     }
-    
-    Readable_FIFO = Active_FIFO; // Update what FIFO contains valid info
-    IFS3CLR = _IFS3_SPI1RXIF_MASK; // clear the interrupt flag
-    
-    NewEvent.EventParam = Active_FIFO;
-    PostImuSM(NewEvent);
-    
-    Accel[0].DataStruct.LowerByte = IMU_FIFO[Active_FIFO][2];
-    Accel[0].DataStruct.UpperByte = IMU_FIFO[Active_FIFO][1];
-    Accel[1].DataStruct.LowerByte = IMU_FIFO[Active_FIFO][4];
-    Accel[1].DataStruct.UpperByte = IMU_FIFO[Active_FIFO][3];
-    Accel[2].DataStruct.LowerByte = IMU_FIFO[Active_FIFO][6];
-    Accel[2].DataStruct.UpperByte = IMU_FIFO[Active_FIFO][5];
-
-    Gyro[0].DataStruct.LowerByte = IMU_FIFO[Active_FIFO][8];
-    Gyro[0].DataStruct.UpperByte = IMU_FIFO[Active_FIFO][7];
-    Gyro[1].DataStruct.LowerByte = IMU_FIFO[Active_FIFO][10];
-    Gyro[1].DataStruct.UpperByte = IMU_FIFO[Active_FIFO][9];
-    Gyro[2].DataStruct.LowerByte = IMU_FIFO[Active_FIFO][12];
-    Gyro[2].DataStruct.UpperByte = IMU_FIFO[Active_FIFO][11];
-    
-    DB_printf("In SPI1RX Handler");
+    IFS3CLR = _IFS3_SPI1RXIF_MASK; // clear the interrupt flag 
 }
 
 void __ISR(_SPI1_TX_VECTOR, IPL7SRS) SPI1TXHandler(void)
 {
-    uint8_t temp; // static for speed
-    
-    IEC3CLR = _IEC3_SPI1TXIE_MASK; // Disable TX interrupt
-    
-    temp = SPI1BUF; // Empty buffer that holds junk data
-
-    IFS3CLR = _IFS3_SPI1TXIF_MASK; // clear the interrupt flag
-    
-    // Write 16 times via SPI to get data from IMU FIFO
-    while (!SPI1STATbits.SPIRBE) {
-        for (uint8_t i=0; i<FIFO_PACKET_SIZE; i++) {
-            SPI1BUF = 0;
-        }
-    }
-    
-    DB_printf("In SPITX Handler");
+    IEC3CLR = _IEC3_SPI1TXIE_MASK; // Disable the interrupt
+    IFS3CLR = _IFS3_SPI1TXIF_MASK; // clear the interrupt flag 
 }
 
-// Interrupt indicates new IMU data is read: Initiate FIFO reading
-void __ISR(_EXTERNAL_2_VECTOR, IPL7SRS) External2Handler(void)
+void __ISR(_TIMER_6_VECTOR, IPL7SRS) T6Handler(void)
 {
-    IFS0CLR = _IFS0_INT2IF_MASK; // Clear the interrupt flag
-    ReadFIFO();   
+    // Clear the interrupt flag
+    IFS0CLR = _IFS0_T6IF_MASK;
+    
+    // Get the current accel/gyroscope readings
+    __builtin_disable_interrupts();
+    SPI1BUF = READ | 0x03; // Accel x address
+    SPI1BUF = 0x00; // This is for the dummy message
+    for (uint8_t i=0; i<12; i++) {
+        SPI1BUF = 0x00; // 12 Messages for 12 bytes of accel/gyro data
+    }
+    __builtin_enable_interrupts();
 }

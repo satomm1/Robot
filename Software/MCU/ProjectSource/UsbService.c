@@ -161,8 +161,8 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
       if ('f' == ThisEvent.EventParam) {
           LATFbits.LATF8 = 0; 
           LATJbits.LATJ3 = 0; 
-          OC1RS = (312 + 1)/100 * 15;
-          OC2RS = (312 + 1)/100 * 15;
+          OC1RS = (312 + 1)/100 * 85;
+          OC2RS = (312 + 1)/100 * 85;
       }
       
       if ('s' == ThisEvent.EventParam) {
