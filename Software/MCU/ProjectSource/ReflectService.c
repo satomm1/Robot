@@ -25,8 +25,10 @@
 #include "ReflectService.h"
 #include "ADC_HAL.h"
 #include "dbprintf.h"
+#include <sys/attribs.h>
 
 /*----------------------------- Module Defines ----------------------------*/
+#define CLIFF_THRESHOLD 1000
 
 /*---------------------------- Module Functions ---------------------------*/
 /* prototypes for private functions for this service.They should be functions
@@ -71,7 +73,7 @@ bool InitReflectService(uint8_t Priority)
   ANSELBSET = _ANSELB_ANSB4_MASK | _ANSELB_ANSB11_MASK;
   
   // Setup the ADC
-//  InitADC();
+  InitADC();
   ES_Timer_InitTimer(REFLECT_TIMER, 500); // Init timer to tell when to read
   
   // post the initial transition event
@@ -131,22 +133,75 @@ ES_Event_t RunReflectService(ES_Event_t ThisEvent)
   ReturnEvent.EventType = ES_NO_EVENT; // assume no errors
   
   if (ThisEvent.EventType == ES_TIMEOUT) {
-//      ReadADC(ReflectiveResults);
+      ReadADC(ReflectiveResults);
       
 //      DB_printf("Reflect 1: %d\r\n", ReflectiveResults[0]);
 //      DB_printf("Reflect 2: %d\r\n", ReflectiveResults[1]);
 //      DB_printf("Reflect 3: %d\r\n", ReflectiveResults[2]);
       
-//      ES_Timer_InitTimer(REFLECT_TIMER, 1000); // Init Timer to read again
+      if (ReflectiveResults[0] > CLIFF_THRESHOLD) {
+          
+      } else if (ReflectiveResults[1] > CLIFF_THRESHOLD) {
+          
+      } else if (ReflectiveResults[2] > CLIFF_THRESHOLD) {
+          
+      } else {
+          
+      }
+      
+      ES_Timer_InitTimer(REFLECT_TIMER, 10); // Init Timer to read again
   }
   
   return ReturnEvent;
 }
 
+void WriteCliffToSPI(uint8_t *Message2Send) 
+{    
+  Message2Send[0] = 10; // 9 indicates we are cliff sensor data (byte 1)
+    
+  // The x/y accel and z vel data are all floats. The floats can be sent as 4 
+  // chunks of 8 bits.
+  
+  // Now write the status of cliff sensors (bytes 2-4)
+  if (ReflectiveResults[0] > CLIFF_THRESHOLD) {
+    Message2Send[1] = 0b11111111;
+  } else { 
+    Message2Send[1] = 0;
+  }
+  
+  if (ReflectiveResults[1] > CLIFF_THRESHOLD) {
+    Message2Send[2] = 0b11111111;
+  } else { 
+    Message2Send[2] = 0;
+  }
+  
+  if (ReflectiveResults[2] > CLIFF_THRESHOLD) {
+    Message2Send[3] = 0b11111111;
+  } else { 
+    Message2Send[3] = 0;
+  }
+  
+  for (uint8_t j = 0; j < 12; j++) {
+    Message2Send[j+3] = 0; // Fill rest of buffer with 0's
+  }
+}
+
 /***************************************************************************
  private functions
  ***************************************************************************/
-
+void __ISR(_ADC_VECTOR, IPL4SRS) ADCHandler(void) {
+    uint32_t status = ADCCON2;
+    if ((status>>29) & 1) { 
+        IFS1CLR = _IFS1_ADCIF_MASK; // Clear interrupt flag
+        IEC1CLR = _IEC1_ADCIE_MASK; // Disable the interrupt
+        
+        ReflectiveResults[0] = ADCDATA6; // fetch the result
+        ReflectiveResults[1] = ADCDATA37; // fetch the result
+        ReflectiveResults[2] = ADCDATA4; // fetch the result
+    } else {
+        DB_printf("Some other ADC interrupt is active!\r\n");
+    }
+}
 /*------------------------------- Footnotes -------------------------------*/
 /*------------------------------ End of file ------------------------------*/
 

@@ -22,6 +22,7 @@
 #include "JetsonSM.h"
 #include "MotorSM.h"
 #include "IMU_SM.h"
+#include "ReflectService.h"
 #include "dbprintf.h"
 
 /*----------------------------- Module Defines ----------------------------*/
@@ -315,10 +316,11 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
                 {
                     case 0:
                     {
-                        // TODO: fill buffer with accel data
-                        for(uint8_t ii = 0; ii < 16; ii++) {
-                            MessageToSend[ii] = 1;
-                        }
+                        // Fill buffer with cliff sensor data
+//                        for(uint8_t ii = 0; ii < 16; ii++) {
+//                            MessageToSend[ii] = 1;
+//                        }
+                        WriteCliffToSPI(MessageToSend);
                         CurrentMessage = 1;
                     }
                     break;

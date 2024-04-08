@@ -13,6 +13,7 @@
 ****************************************************************************/
 #include "ES_Configure.h"
 #include "ES_Framework.h"
+#include "dbprintf.h"
 
 /**************************************************************************
   Function
@@ -63,26 +64,33 @@ void InitADC(void) {
    ADCCON1bits.SELRES = 0b11; // ADC7 resolution is 12 bits 
    ADCCON1bits.STRGSRC = 0b00001; // Select scan trigger.
    
+   // Set these to 0 since Vdd > 2.5 V
+   ADCCON1bits.AICPMPEN = 0;
+   CFGCONbits.IOANCPEN = 0; 
+   
    /* Configure ADCCON2 */ 
-   ADCCON2bits.SAMC = 5; // ADC7 sampling time = 5 * TAD7 
+   ADCCON2bits.SAMC = 5; // ADC7 sampling time = 7 * TAD7 
    ADCCON2bits.ADCDIV = 1; // ADC7 clock freq is half of control clock = TAD7
+   ADCCON2bits.EOSIEN = 1; // End of scan interrupt enabled
    
    /* Initialize warm up time register */ 
    ADCANCON = 0; 
-   ADCANCONbits.WKUPCLKCNT = 5; // Wakeup exponent
+   ADCANCONbits.WKUPCLKCNT = 0xA; // Wakeup exponent
    
    /* Clock setting */ 
-   ADCCON3 = 0;
-   ADCCON3bits.ADCSEL = 0; // Select input clock source 
-   ADCCON3bits.CONCLKDIV = 1; // Control clock frequency is half of input clock 
+//   ADCCON3 = 0;
+   ADCCON3bits.ADCSEL = 0; // Select Tclk = PBCLK3 (50 MHz)
+   ADCCON3bits.CONCLKDIV = 1; // Control clock frequency is half of input clock (TQ =25 MHz)
    ADCCON3bits.VREFSEL = 0; // Select AVDD and AVSS as reference source
    
-   ADC0TIMEbits.ADCDIV = 1; // ADC0 clock frequency is half of control clock = TAD0 
-   ADC0TIMEbits.SAMC = 5; // ADC0 sampling time = 5 * TAD0 
-   ADC0TIMEbits.SELRES = 3; // ADC0 resolution is 12 bits
+   // ADCxTIME registers
+   ADC4TIMEbits.ADCEIS = 0b000; // Data ready interrupt 1 ADC clock early
+   ADC4TIMEbits.SELRES = 0b11; // 12 bit resolution
+   ADC4TIMEbits.ADCDIV = 1; // ADC4 clock freq is half of control clock
+   ADC4TIMEbits.SAMC = 5; // ADC4 sampling time = 7*TAD4
    
-   /* Select analog input for ADC modules, no presync trigger, not sync sampling */ 
-   ADCTRGMODEbits.SH0ALT = 0; // ADC0 = AN0
+   // ADCTRGMODE
+   ADCTRGMODE = 0; // Use AN4 for ADC4, don't use presynchronized triggers, don't use synchronous sampling
    
    /* Select ADC input mode */ 
    ADCIMCON1bits.SIGN4 = 0; // unsigned data format 
@@ -99,25 +107,66 @@ void InitADC(void) {
    /* Configure ADCCSSx */ 
    ADCCSS1 = 0; // Clear all bits 
    ADCCSS2 = 0; 
-   ADCCSS1bits.CSS4 = 1; // AN6 set for scan 
-   ADCCSS1bits.CSS6 = 1; // AN11 set for scan 
+   ADCCSS1bits.CSS4 = 1; // AN4 set for scan 
+   ADCCSS1bits.CSS6 = 1; // AN6 set for scan 
    ADCCSS2bits.CSS37 = 1; // AN37 set for scan 
+   
+   // Also need to set trigger source for AN4/AN6 since class1/class2
+   ADCTRG2bits.TRGSRC4 = 0b00011; // STRIG
+   ADCTRG2bits.TRGSRC6 = 0b00011; // STRIG
+   
+   // Not using digital comparator, don't worry about ADCCMPENx
+   ADCCMPEN1 = 0;
+   ADCCMPEN2 = 0;
+   ADCCMPEN3 = 0;
+   ADCCMPEN4 = 0;
+   ADCCMPEN5 = 0;
+   ADCCMPEN6 = 0;
    
    /* Configure ADCCMPCONx */ 
    ADCCMPCON1 = 0; // No digital comparators are used. Setting the ADCCMPCONx 
-   ADCCMPCON2 = 0; // register to '0' ensures that the comparator is disabled. 
+   ADCCMPCON2 = 0; // register to '0' ensures that the comparator is disabled.
+   ADCCMPCON3 = 0;
+   ADCCMPCON4 = 0;
+   ADCCMPCON5 = 0;
+   ADCCMPCON6 = 0;
    
    /* Configure ADCFLTRx */ 
    ADCFLTR1 = 0; // No oversampling filters are used. 
    ADCFLTR2 = 0; 
+   ADCFLTR3 = 0; 
+   ADCFLTR4 = 0; 
+   ADCFLTR5 = 0; 
+   ADCFLTR6 = 0; 
+   
+   // ADCFSTAT: not using FIFO so dont worry about it
+   
+   // ADCBASE: Not using interrupts so don't worry about it
+   
+   // ADCTRGSNS: leave at default-use poitive edge of trigger
+   ADCTRGSNS = 0;
    
    /* Early interrupt */ 
    ADCEIEN1 = 0; // No early interrupt 
    ADCEIEN2 = 0;
    
-
+   /* 
+     Enable local/global interrupts
+    */
+   INTCONbits.MVEC = 1; // Use multivector mode
+   PRISSbits.PRI4SS = 0b0100; // Priority 4 interrupt use shadow set 4
+   IPC11bits.ADCIP = 4; // ADC global interrupt priority
+   
+   // Clear interrupt flags
+  IFS1CLR = _IFS1_ADCIF_MASK;
+  
+  // Local disable interrupts
+  IEC1CLR = _IEC1_ADCIE_MASK;
+  
+  __builtin_enable_interrupts(); // Global enable interrupts
+  
    /*
-    Step 4: The user sets the ON bit to ?1?, which enables 
+    Step 4: The user sets the ON bit to 1, which enables 
     * the ADC control clock.
    */
    ADCCON1bits.ON = 1;
@@ -133,22 +182,25 @@ void InitADC(void) {
    while(ADCCON2bits.REFFLT); // Wait if there is a fault with the reference voltage
    
     /*
-    Step 3: The user sets the ANENx bit to ?1? for the ADC 
+    Step 3: The user sets the ANENx bit to 1 for the ADC 
     SAR Cores needed (which internally in the ADC module 
     enables the control clock to generate by division the 
     core clocks for the desired ADC SAR Cores, which in turn 
     enables the bias circuitry for these ADC SAR Cores).
-   */
-      
-   ADCANCONbits.ANEN7 = 1; // Enable, ADC
+   */ 
+   ADCANCONbits.ANEN7 = 1; // Enable, ADC 7
    while(!ADCANCONbits.WKRDY7); // Wait until ADC7 is ready
+   
+   ADCANCONbits.ANEN4 = 1; // Enable ADC 4
+   while (!ADCANCONbits.WKRDY4); // Wait until ADC4 is ready
    
    /*
     Step 6: Set the DIGENx bit (ADCCON3<15,13:8>) to
-    ?1?, which enables the digital circuitry to immediately
+    1, which enables the digital circuitry to immediately
     begin processing incoming triggers to perform data
     conversions. 
    */
+   ADCCON3bits.DIGEN4 = 1 ; // Enable ADC4
    ADCCON3bits.DIGEN7 = 1; // Enable ADC7
 }
 
@@ -170,14 +222,6 @@ void InitADC(void) {
  *************************************************************************/
 void ReadADC(uint16_t *Results){
     
-    ADCCON3bits.GSWTRG = 1; // Trigger a conversion
-    
-    while (ADCDSTAT1bits.ARDY4 == 0);  // Wait the conversions to complete
-    Results[0] = ADCDATA4; // fetch the result
-    
-    while (ADCDSTAT1bits.ARDY6 == 0); 
-    Results[1] = ADCDATA6; // fetch the result
-    
-    while (ADCDSTAT2bits.ARDY37 == 0); 
-    Results[2] = ADCDATA37; // fetch the result
+    IEC1SET = _IEC1_ADCIE_MASK; // Enable local interrupt
+    ADCCON3bits.GSWTRG = 1; // Trigger a conversion    
 }
