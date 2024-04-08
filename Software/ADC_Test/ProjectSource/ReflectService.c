@@ -149,13 +149,13 @@ ES_Event_t RunReflectService(ES_Event_t ThisEvent)
  ***************************************************************************/
 void __ISR(_ADC_VECTOR, IPL4SRS) ADCHandler(void) {
     uint32_t status = ADCCON2;
-    if ((status>>28) & 1) {
+    if ((status>>29) & 1) { 
         IFS1CLR = _IFS1_ADCIF_MASK; // Clear interrupt flag
         IEC1CLR = _IEC1_ADCIE_MASK; // Disable the interrupt
         
-        ReflectiveResults[0] = ADCDATA4; // fetch the result
-        ReflectiveResults[1] = ADCDATA6; // fetch the result
-        ReflectiveResults[2] = ADCDATA37; // fetch the result
+        ReflectiveResults[0] = ADCDATA6; // fetch the result
+        ReflectiveResults[1] = ADCDATA37; // fetch the result
+        ReflectiveResults[2] = ADCDATA4; // fetch the result
     } else {
         DB_printf("Some other ADC interrupt is active!\r\n");
     }

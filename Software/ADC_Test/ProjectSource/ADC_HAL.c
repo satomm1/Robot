@@ -13,6 +13,7 @@
 ****************************************************************************/
 #include "ES_Configure.h"
 #include "ES_Framework.h"
+#include "dbprintf.h"
 
 /**************************************************************************
   Function
@@ -68,7 +69,7 @@ void InitADC(void) {
    CFGCONbits.IOANCPEN = 0; 
    
    /* Configure ADCCON2 */ 
-   ADCCON2bits.SAMC = 5; // ADC7 sampling time = 5 * TAD7 
+   ADCCON2bits.SAMC = 5; // ADC7 sampling time = 7 * TAD7 
    ADCCON2bits.ADCDIV = 1; // ADC7 clock freq is half of control clock = TAD7
    ADCCON2bits.EOSIEN = 1; // End of scan interrupt enabled
    
@@ -77,13 +78,19 @@ void InitADC(void) {
    ADCANCONbits.WKUPCLKCNT = 0xA; // Wakeup exponent
    
    /* Clock setting */ 
-   ADCCON3 = 0;
-   ADCCON3bits.ADCSEL = 0; // Select Tclk = PBCLK3 (50 MHz))
+//   ADCCON3 = 0;
+   ADCCON3bits.ADCSEL = 0; // Select Tclk = PBCLK3 (50 MHz)
    ADCCON3bits.CONCLKDIV = 1; // Control clock frequency is half of input clock (TQ =25 MHz)
    ADCCON3bits.VREFSEL = 0; // Select AVDD and AVSS as reference source
    
-   // ADCxTIME registers: Don't need since not using ADC 0-4
-   // ADCTRGMODE: Don't need since not using ADC 0-4
+   // ADCxTIME registers
+   ADC4TIMEbits.ADCEIS = 0b000; // Data ready interrupt 1 ADC clock early
+   ADC4TIMEbits.SELRES = 0b11; // 12 bit resolution
+   ADC4TIMEbits.ADCDIV = 1; // ADC4 clock freq is half of control clock
+   ADC4TIMEbits.SAMC = 5; // ADC4 sampling time = 7*TAD4
+   
+   // ADCTRGMODE
+   ADCTRGMODE = 0; // Use AN4 for ADC4, don't use presynchronized triggers, don't use synchronous sampling
    
    /* Select ADC input mode */ 
    ADCIMCON1bits.SIGN4 = 0; // unsigned data format 
@@ -139,8 +146,6 @@ void InitADC(void) {
    // ADCTRGSNS: leave at default-use poitive edge of trigger
    ADCTRGSNS = 0;
    
-   // ADCxTIME: Not using ADC0-4 so don't worry about it
-   
    /* Early interrupt */ 
    ADCEIEN1 = 0; // No early interrupt 
    ADCEIEN2 = 0;
@@ -183,8 +188,12 @@ void InitADC(void) {
     core clocks for the desired ADC SAR Cores, which in turn 
     enables the bias circuitry for these ADC SAR Cores).
    */ 
-   ADCANCONbits.ANEN7 = 1; // Enable, ADC
+   ADCANCONbits.ANEN7 = 1; // Enable, ADC 7
    while(!ADCANCONbits.WKRDY7); // Wait until ADC7 is ready
+   
+   ADCANCONbits.ANEN4 = 1; // Enable ADC 4
+   while (!ADCANCONbits.WKRDY4); // Wait until ADC4 is ready
+   DB_printf("ADC4 Ready! \r\n");
    
    /*
     Step 6: Set the DIGENx bit (ADCCON3<15,13:8>) to
@@ -192,6 +201,7 @@ void InitADC(void) {
     begin processing incoming triggers to perform data
     conversions. 
    */
+   ADCCON3bits.DIGEN4 = 1 ; // Enable ADC4
    ADCCON3bits.DIGEN7 = 1; // Enable ADC7
 }
 
@@ -215,15 +225,4 @@ void ReadADC(uint16_t *Results){
     
     IEC1SET = _IEC1_ADCIE_MASK; // Enable local interrupt
     ADCCON3bits.GSWTRG = 1; // Trigger a conversion    
-    
-//    ADCCON3bits.GSWTRG = 1; // Trigger a conversion
-//    
-//    while (ADCDSTAT1bits.ARDY4 == 0);  // Wait the conversions to complete
-//    Results[0] = ADCDATA4; // fetch the result
-//    
-//    while (ADCDSTAT1bits.ARDY6 == 0); 
-//    Results[1] = ADCDATA6; // fetch the result
-//    
-//    while (ADCDSTAT2bits.ARDY37 == 0); 
-//    Results[2] = ADCDATA37; // fetch the result
 }
