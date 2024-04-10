@@ -21,6 +21,7 @@
 #include "IMU_SM.h"
 #include <sys/attribs.h>
 #include "dbprintf.h"
+#include <math.h>
 
 /*----------------------------- Module Defines ----------------------------*/
 #define READ  0b10000000
@@ -366,7 +367,7 @@ void GetIMUData(float *ImuResults)
     } else {
         signed_data = vel_z_unsigned;
     }
-    float z_vel = (float)signed_data / 131.2;
+    float z_vel = (float)signed_data / 131.2 * M_PI / 180;  // Also convert to rad/sec here!
 //    DB_printf("Vel z: %d deg/sec\r\n\r\n", (int16_t)z_vel);
     
     ImuResults[0] = x_accel;
