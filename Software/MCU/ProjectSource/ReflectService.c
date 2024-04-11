@@ -159,30 +159,26 @@ void WriteCliffToSPI(uint8_t *Message2Send)
 {    
   Message2Send[0] = 10; // 9 indicates we are cliff sensor data (byte 1)
     
-  // The x/y accel and z vel data are all floats. The floats can be sent as 4 
+  // The sensor data are all 12 bit integers. The floats can be sent as 2 
   // chunks of 8 bits.
   
-  // Now write the status of cliff sensors (bytes 2-4)
-  if (ReflectiveResults[0] > CLIFF_THRESHOLD) {
-    Message2Send[1] = 0b11111111;
-  } else { 
-    Message2Send[1] = 0;
+  // Now write the sensor1 data (bytes 2-3)
+  for (uint8_t j=0; j<2; j++) { // iterate through the 4, 8-bit chunks of the float
+    Message2Send[j+1] = (ReflectiveResults[0] >> (8-8*j)) & 0xFF;
   }
   
-  if (ReflectiveResults[1] > CLIFF_THRESHOLD) {
-    Message2Send[2] = 0b11111111;
-  } else { 
-    Message2Send[2] = 0;
+  // Now write the sensor1 data (bytes 4-5)
+  for (uint8_t j=0; j<2; j++) { // iterate through the 4, 8-bit chunks of the float
+    Message2Send[j+3] = (ReflectiveResults[1] >> (8-8*j)) & 0xFF;
   }
   
-  if (ReflectiveResults[2] > CLIFF_THRESHOLD) {
-    Message2Send[3] = 0b11111111;
-  } else { 
-    Message2Send[3] = 0;
+  // Now write the sensor1 data (bytes 6-7)
+  for (uint8_t j=0; j<2; j++) { // iterate through the 4, 8-bit chunks of the float
+    Message2Send[j+5] = (ReflectiveResults[2] >> (8-8*j)) & 0xFF;
   }
   
-  for (uint8_t j = 0; j < 12; j++) {
-    Message2Send[j+3] = 0; // Fill rest of buffer with 0's
+  for (uint8_t j = 0; j < 9; j++) {
+    Message2Send[j+7] = 0; // Fill rest of buffer with 0's
   }
 }
 
