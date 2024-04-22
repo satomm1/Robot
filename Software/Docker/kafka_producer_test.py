@@ -1,4 +1,5 @@
 from kafka import KafkaProducer
+from kafka.admin import KafkaAdminClient, NewTopic
 import time, json
 
 def serializer(message):
@@ -7,10 +8,19 @@ def serializer(message):
 if __name__ == "__main__":
     print("Hello Kafka")
 
-    producer = KafkaProducer(
-        bootstrap_servers=["192.168.50.2:29094"],
-        value_serializer=serializer
+    admin_client = KafkaAdminClient(
+        bootstrap_servers="192.168.50.2:29094",
+        client_id='test'
     )
+
+    topic_list = []
+    topic_list.append(NewTopic(name="quickstart-events", num_partitions=1, replication_factor=1))
+    admin_client.create_topics(new_topics=topic_list, validate_only=False )
+
+
+    producer = KafkaProducer(
+    bootstrap_servers=["192.168.50.2:29094"],
+    value_serializer=serializer
 
     x = False
     while True:
