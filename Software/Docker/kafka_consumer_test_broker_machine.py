@@ -3,7 +3,7 @@ import json
 
 if __name__ == "__main__":
     print("Hello Kafka!")
-    consumer = KafkaConsumer("quickstart-events", bootstrap_servers="192.168.50.2:29094")
+    consumer = KafkaConsumer("quickstart-events", bootstrap_servers="broker:29092")    
     print("Consumer established")
 
     for msg in consumer:
