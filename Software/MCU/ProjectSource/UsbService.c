@@ -80,6 +80,9 @@ bool InitUsbService(uint8_t Priority)
   puts("\rSerial Output for MattBot Control Board \r");
   DB_printf( "compiled at %s on %s\n", __TIME__, __DATE__);
   DB_printf( "\n\r\n");
+  DB_printf("Robot ID: %d\r\n", ROBOT_ID);
+  DB_printf("Running on Rev 0.%d\n", PCB_REV);
+  DB_printf( "\n\r\n");
   DB_printf( "Press any key to post key-stroke events\n\r");
   DB_printf( "Press 'xxx' to test xxx \n\r");
 

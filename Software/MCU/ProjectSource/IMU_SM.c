@@ -106,6 +106,7 @@ bool InitImuSM(uint8_t Priority)
     pSPICON2 = (__SPI1CON2bits_t *)&SPI4CON2;
     pSPIBRG = &SPI4BRG;
     pSPIBUF = &SPI4BUF;
+    pSPISTAT = (__SPI1STATbits_t *)&SPI4STAT;
     
     SPI4CON = 0;
     SPI4CON2 = 0;
@@ -129,6 +130,7 @@ bool InitImuSM(uint8_t Priority)
     pSPICON2 = (__SPI1CON2bits_t *)&SPI1CON2;
     pSPIBRG = &SPI1BRG;
     pSPIBUF = &SPI1BUF;
+    pSPISTAT = (__SPI1STATbits_t *)&SPI1STAT;
     
     SPI1CON = 0;
     SPI1CON2 = 0;
@@ -619,7 +621,7 @@ uint8_t ReadIMU8(uint8_t Address)
     while (!pSPISTAT->SPIRBE) {
         uint8_t temp = *pSPIBUF;
     }
-    
+
     __builtin_disable_interrupts();
     *pSPIBUF = READ | Address; // Specify the address of data we want to receive
     *pSPIBUF = 0x00; // This is for the dummy message

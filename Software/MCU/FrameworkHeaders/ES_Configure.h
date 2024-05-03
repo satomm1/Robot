@@ -26,9 +26,9 @@
 
 /****************************************************************************/
 // Define the Robot ID, this should be a unique 8 bit ID for each robot
-#define ROBOT_ID 0xAA
+#define ROBOT_ID 2
 //#define PCB_REV 1
-#define PCB_REV 2
+#define PCB_REV 1
 
 
 /****************************************************************************/
