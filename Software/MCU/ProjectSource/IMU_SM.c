@@ -65,6 +65,12 @@ static bool IntStatusReading = false;
 static bool FifoReading = false;
 static uint8_t rx_data[16];
 
+static volatile __SPI1CONbits_t * pSPICON;
+static volatile __SPI1CON2bits_t * pSPICON2;
+static volatile __SPI1STATbits_t * pSPISTAT;
+static volatile uint32_t * pSPIBRG;
+static volatile uint32_t * pSPIBUF;
+
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
  Function
@@ -84,53 +90,75 @@ bool InitImuSM(uint8_t Priority)
 {
   ES_Event_t ThisEvent;
   
-  // Set interrupt pins to inputs
-  TRISDSET = _TRISD_TRISD12_MASK | _TRISD_TRISD13_MASK;
-  
-  INT2R = 0b1010; // Map RD12 -> External interrupt 2
-  
-  // Set SPI1 Pins to correct input or output setting
-  TRISDCLR = _TRISD_TRISD1_MASK | _TRISD_TRISD3_MASK | _TRISD_TRISD4_MASK; // Set SCK1, SS1, SDO1 to output
-  TRISDSET = _TRISD_TRISD2_MASK; // Set SDI1 to Input
-  
-  
-  TRISHCLR = _TRISH_TRISH5_MASK | _TRISH_TRISH4_MASK | _TRISH_TRISH6_MASK |_TRISH_TRISH7_MASK;
-  ANSELHCLR = _ANSELH_ANSH5_MASK |_ANSELH_ANSH4_MASK|_ANSELH_ANSH6_MASK;
-  LATHbits.LATH5 = 0;
-  
-  // Map SPI1 Pins to correct function
-  // RD1 is mapped to CLK1 by default
-  RPD4R = 0b0101; // Map RD4 -> SS1
-  RPD3R = 0b0101; // Map RD3 -> SDO1
-  SDI1R = 0b0000; // Map SDI1 -> RD2
+  if (PCB_REV == 1) {
+    // Set SPI4 Pins to correct input or output setting
+    TRISACLR = _TRISA_TRISA15_MASK;
+    TRISDCLR = _TRISD_TRISD9_MASK | _TRISD_TRISD10_MASK; // Set SCK4, SS4, SDO4 to output
+    TRISDSET = _TRISD_TRISD11_MASK; // Set SDI4 to input
+      
+    // Map SPI4 Pins to correct function
+    // RD10 is mapped to CLK4 by default
+    RPD9R = 0b1000; // Map RD4 -> SS4
+    RPA15R = 0b1000; // Map RA15 -> SDO4
+    SDI4R = 0b0011; // Map SDI3 -> RD11
+      
+    pSPICON = (__SPI1CONbits_t *)&SPI4CON;
+    pSPICON2 = (__SPI1CON2bits_t *)&SPI4CON2;
+    pSPIBRG = &SPI4BRG;
+    pSPIBUF = &SPI4BUF;
     
-  // Initialize SPI1
-  SPI1CON = 0; // Reset SPI1CON settings
-  SPI1CONbits.FRMEN = 0; // Disable framed SPI support
-  SPI1CONbits.FRMPOL = 0; // SS1 is active low
-  SPI1CONbits.MSSEN = 1; // SS is automatically driven
-  SPI1CONbits.MCLKSEL = 0; // Use PBCLK2 for the Baud Rate Generator (50 MHz)
-  SPI1CONbits.ENHBUF = 1; // Enhance buffer enabled (use FIFOs)
-  SPI1CONbits.DISSDO = 0; // SDO1 is used by the module
-  SPI1CONbits.MODE32 = 0; // 8 bit mode
-  SPI1CONbits.MODE16 = 0; // 8 bit mode
-  SPI1CONbits.SMP = 1; // Data sampled at middle of data output time
-  SPI1CONbits.CKE = 1; // Serial output data changes on transition from active clock state to idle clock state
-  SPI1CONbits.CKP = 1; // Idle state for the clock is high level
-  SPI1CONbits.MSTEN = 1; // Host mode
-  SPI1CONbits.DISSDI = 0; // The SDI pin is controlled by the module
-  SPI1CONbits.STXISEL = 0b00; // Interrupt generated when last transfer shifted out of SPISR and transmit operations are complete
-  SPI1CONbits.SRXISEL = 0b01; // Interrupt is generated when the buffer is not empty
+    SPI4CON = 0;
+    SPI4CON2 = 0;
+  } else if (PCB_REV == 2) {
+    // Set interrupt pins to inputs
+    TRISDSET = _TRISD_TRISD12_MASK | _TRISD_TRISD13_MASK;
 
-  SPI1CON2 = 0; // Reset SPI1CON2 register settings
-  SPI1CON2bits.AUDEN = 0; // Audio protocol is disabled
-  
-  while (!SPI1STATbits.SPIRBE){
-      uint8_t ClearData = SPI1BUF;
+    INT2R = 0b1010; // Map RD12 -> External interrupt 2
+
+    // Set SPI1 Pins to correct input or output setting
+    TRISDCLR = _TRISD_TRISD1_MASK | _TRISD_TRISD3_MASK | _TRISD_TRISD4_MASK; // Set SCK1, SS1, SDO1 to output
+    TRISDSET = _TRISD_TRISD2_MASK; // Set SDI1 to Input
+        
+    // Map SPI1 Pins to correct function
+    // RD1 is mapped to CLK1 by default
+    RPD4R = 0b0101; // Map RD4 -> SS1
+    RPD3R = 0b0101; // Map RD3 -> SDO1
+    SDI1R = 0b0000; // Map SDI1 -> RD2
+    
+    pSPICON = (__SPI1CONbits_t *)&SPI1CON;
+    pSPICON2 = (__SPI1CON2bits_t *)&SPI1CON2;
+    pSPIBRG = &SPI1BRG;
+    pSPIBUF = &SPI1BUF;
+    
+    SPI1CON = 0;
+    SPI1CON2 = 0;
   }
-  SPI1STATbits.SPIROV = 0; // Clear the Receive overflow bit
+     
+  // Initialize SPIxCON
+  pSPICON->FRMEN = 0; // Disable framed SPI support
+  pSPICON->FRMPOL = 0; // SS1 is active low
+  pSPICON->MSSEN = 1; // SS is automatically driven
+  pSPICON->MCLKSEL = 0; // Use PBCLK2 for the Baud Rate Generator (50 MHz)
+  pSPICON->ENHBUF = 1; // Enhance buffer enabled (use FIFOs)
+  pSPICON->DISSDO = 0; // SDO1 is used by the module
+  pSPICON->MODE32 = 0; // 8 bit mode
+  pSPICON->MODE16 = 0; // 8 bit mode
+  pSPICON->SMP = 1; // Data sampled at middle of data output time
+  pSPICON->CKE = 1; // Serial output data changes on transition from active clock state to idle clock state
+  pSPICON->CKP = 1; // Idle state for the clock is high level
+  pSPICON->MSTEN = 1; // Host mode
+  pSPICON->DISSDI = 0; // The SDI pin is controlled by the module
+  pSPICON->STXISEL = 0b00; // Interrupt generated when last transfer shifted out of SPISR and transmit operations are complete
+  pSPICON->SRXISEL = 0b01; // Interrupt is generated when the buffer is not empty
+
+  pSPICON2->AUDEN = 0; // Audio protocol is disabled
   
-  SPI1BRG = 15; //15; // 1.56 MHz clock frequency, IMU Has max frequency of 10 MHz
+  while (!pSPISTAT->SPIRBE){
+      uint8_t ClearData = *pSPIBUF;
+  }
+  pSPISTAT->SPIROV = 0; // Clear the Receive overflow bit
+  
+  *pSPIBRG = 15; //15; // 1.56 MHz clock frequency, IMU Has max frequency of 10 MHz
     
   
   // Setup Timer 6
@@ -145,23 +173,36 @@ bool InitImuSM(uint8_t Priority)
   PRISSbits.PRI7SS = 0b0111; // Priority 7 interrupt use shadow set 7
   
   // Set interrupt priorities
-  IPC27bits.SPI1TXIP = 7; // SPI2TX
-  IPC27bits.SPI1RXIP = 7; // SPI2RX
+  if (PCB_REV == 1) {
+    IPC41bits.SPI4TXIP = 7; // SPI4TX
+    IPC41bits.SPI4RXIP = 7; // SPI4RX
+  } else if (PCB_REV == 2) {
+    IPC27bits.SPI1TXIP = 7; // SPI1TX
+    IPC27bits.SPI1RXIP = 7; // SPI1RX
+  }
   IPC7bits.T6IP = 7; // T6
   
   // Clear interrupt flags
-  IFS3CLR = _IFS3_SPI1RXIF_MASK | _IFS3_SPI1TXIF_MASK;
-  IFS0CLR = _IFS0_T6IF_MASK;
+  if (PCB_REV == 1) {
+    IFS5CLR = _IFS5_SPI4RXIF_MASK | _IFS5_SPI4TXIF_MASK; // SPI4
+  } else if (PCB_REV == 2) {
+    IFS3CLR = _IFS3_SPI1RXIF_MASK | _IFS3_SPI1TXIF_MASK; // SPI1
+  }
+  IFS0CLR = _IFS0_T6IF_MASK; // T6
   
   // Disable the RX/TX interrupt
-  IEC3CLR = _IEC3_SPI1RXIE_MASK | _IEC3_SPI1TXIE_MASK;
-  
+  if (PCB_REV == 1) {
+    IEC5CLR = _IEC5_SPI4RXIE_MASK | _IEC5_SPI4TXIE_MASK; // SPI4
+  } else if (PCB_REV == 2) {
+    IEC3CLR = _IEC3_SPI1RXIE_MASK | _IEC3_SPI1TXIE_MASK; // SPI1
+  }
+   
   // Enable the T6 interrupt
   IEC0SET = _IEC0_T6IE_MASK;
   
   __builtin_enable_interrupts(); // Global enable interrupts
   
-  SPI1CONbits.ON = 1; // Finally turn SPI1 on
+  pSPICON->ON = 1; // Finally turn the SPI module on
     
   MyPriority = Priority;
   // put us into the Initial PseudoState
@@ -256,7 +297,11 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
         case ES_TIMEOUT:
         {
             T6CONbits.ON = 1; // Turn T6 on
-            IEC3SET = _IEC3_SPI1RXIE_MASK; // Enable the RX interrupt
+            if (PCB_REV == 1){
+                IEC5SET = _IEC5_SPI4RXIE_MASK;
+            } else if (PCB_REV == 2){
+                IEC3SET = _IEC3_SPI1RXIE_MASK; // Enable the RX interrupt
+            }
             ES_Timer_InitTimer(IMU_TIMER, 1000); // Init timer
             CurrentState = IMURun;
         }
@@ -272,35 +317,35 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
         case ES_TIMEOUT:
         {
             // Periodically print out gyro values.
-//            DB_printf("Status: %d\r\n", ReadIMU16(0x02));
-//                    
-//            int16_t signed_data;
-//            if (Accel[0].FullData & 0x8000) {
-//                signed_data = -((~Accel[0].FullData & 0xFFFF) + 1);
-//            } else {
-//                signed_data = Accel[0].FullData;
-//            }
-//            float x_accel = (float)signed_data / 8.19 * 9.81 / 1000;
-//            DB_printf("Accel x: %d m/s^2\r\n", (int16_t)x_accel);
-//            
-//            if (Accel[1].FullData & 0x8000) {
-//                signed_data = -((~Accel[1].FullData & 0xFFFF) + 1);
-//            } else {
-//                signed_data = Accel[1].FullData;
-//            }
-//            float y_accel = (float)signed_data / 8.19 * 9.81 / 1000;
-//            DB_printf("Accel y: %d m/s^2\r\n", (int16_t)y_accel);
-//            
-//            
-//            if (Gyro[2].FullData & 0x8000) {
-//                signed_data = -((~Gyro[2].FullData & 0xFFFF) + 1);
-//            } else {
-//                signed_data = Gyro[2].FullData;
-//            }
-//            float z_vel = (float)signed_data / 131.2;
-//            DB_printf("Vel z: %d deg/sec\r\n\r\n", (int16_t)z_vel);
-//            
-//            ES_Timer_InitTimer(IMU_TIMER, 1000);
+            DB_printf("Status: %d\r\n", ReadIMU16(0x02));
+                    
+            int16_t signed_data;
+            if (Accel[0].FullData & 0x8000) {
+                signed_data = -((~Accel[0].FullData & 0xFFFF) + 1);
+            } else {
+                signed_data = Accel[0].FullData;
+            }
+            float x_accel = (float)signed_data / 8.19 * 9.81 / 1000;
+            DB_printf("Accel x: %d m/s^2\r\n", (int16_t)x_accel);
+            
+            if (Accel[1].FullData & 0x8000) {
+                signed_data = -((~Accel[1].FullData & 0xFFFF) + 1);
+            } else {
+                signed_data = Accel[1].FullData;
+            }
+            float y_accel = (float)signed_data / 8.19 * 9.81 / 1000;
+            DB_printf("Accel y: %d m/s^2\r\n", (int16_t)y_accel);
+            
+            
+            if (Gyro[2].FullData & 0x8000) {
+                signed_data = -((~Gyro[2].FullData & 0xFFFF) + 1);
+            } else {
+                signed_data = Gyro[2].FullData;
+            }
+            float z_vel = (float)signed_data / 131.2;
+            DB_printf("Vel z: %d deg/sec\r\n\r\n", (int16_t)z_vel);
+            
+            ES_Timer_InitTimer(IMU_TIMER, 1000);
         }
         break;
 
@@ -505,20 +550,20 @@ void ResetIMU(void) {
 void WriteIMU(uint8_t Address, uint8_t LowerByte, uint8_t UpperByte, uint8_t NumBytes)
 {
     __builtin_disable_interrupts();
-    SPI1BUF = Address;
-    SPI1BUF = LowerByte;
+    *pSPIBUF = Address;
+    *pSPIBUF = LowerByte;
     if (NumBytes == 2) {
-        SPI1BUF = UpperByte;
+        *pSPIBUF = UpperByte;
     }
     __builtin_enable_interrupts();
     
-    while (SPI1STATbits.SPIBUSY) {
+    while (pSPISTAT->SPIBUSY) {
         // Blocking code --- OK Since we are only calling this function during initialization
     }
     
     uint8_t data1;
-    while (!SPI1STATbits.SPIRBE) {
-        data1 = SPI1BUF;
+    while (!pSPISTAT->SPIRBE) {
+        data1 = *pSPIBUF;
     }
     return;
 }
@@ -526,18 +571,18 @@ void WriteIMU(uint8_t Address, uint8_t LowerByte, uint8_t UpperByte, uint8_t Num
 void WriteIMU2(uint8_t Address, AccelGyroData_t data)
 {
     __builtin_disable_interrupts();
-    SPI1BUF = Address;
-    SPI1BUF = data.DataStruct.LowerByte;
-    SPI1BUF = data.DataStruct.UpperByte;
+    *pSPIBUF = Address;
+    *pSPIBUF = data.DataStruct.LowerByte;
+    *pSPIBUF = data.DataStruct.UpperByte;
     __builtin_enable_interrupts();
     
-    while (SPI1STATbits.SPIBUSY) {
+    while (pSPISTAT->SPIBUSY) {
         // Blocking code --- OK Since we are only calling this function during testing
     }
     
     uint8_t data1;
-    while (!SPI1STATbits.SPIRBE) {
-        data1 = SPI1BUF;
+    while (!pSPISTAT->SPIRBE) {
+        data1 = *pSPIBUF;
     }
     return;
 }
@@ -545,20 +590,20 @@ void WriteIMU2(uint8_t Address, AccelGyroData_t data)
 void WriteIMU2Transfer(uint8_t Address, AccelGyroData_t data1, AccelGyroData_t data2)
 {
     __builtin_disable_interrupts();
-    SPI1BUF = Address;
-    SPI1BUF = data1.DataStruct.LowerByte;
-    SPI1BUF = data1.DataStruct.UpperByte;
-    SPI1BUF = data2.DataStruct.LowerByte;
-    SPI1BUF = data2.DataStruct.UpperByte;
+    *pSPIBUF = Address;
+    *pSPIBUF = data1.DataStruct.LowerByte;
+    *pSPIBUF = data1.DataStruct.UpperByte;
+    *pSPIBUF = data2.DataStruct.LowerByte;
+    *pSPIBUF = data2.DataStruct.UpperByte;
     __builtin_enable_interrupts();
     
-    while (SPI1STATbits.SPIBUSY) {
+    while (pSPISTAT->SPIBUSY) {
         // Blocking code --- OK Since we are only calling this function during testing
     }
     
     uint8_t data;
-    while (!SPI1STATbits.SPIRBE) {
-        data = SPI1BUF;
+    while (!pSPISTAT->SPIRBE) {
+        data = *pSPIBUF;
     }
     return;
 }
@@ -571,24 +616,24 @@ void WriteIMU2Transfer(uint8_t Address, AccelGyroData_t data1, AccelGyroData_t d
  */
 uint8_t ReadIMU8(uint8_t Address)
 {
-    while (!SPI1STATbits.SPIRBE) {
-        uint8_t temp = SPI1BUF;
+    while (!pSPISTAT->SPIRBE) {
+        uint8_t temp = *pSPIBUF;
     }
     
     __builtin_disable_interrupts();
-    SPI1BUF = READ | Address; // Specify the address of data we want to receive
-    SPI1BUF = 0x00; // This is for the dummy message
-    SPI1BUF = 0x00;
+    *pSPIBUF = READ | Address; // Specify the address of data we want to receive
+    *pSPIBUF = 0x00; // This is for the dummy message
+    *pSPIBUF = 0x00;
     __builtin_enable_interrupts();
     
-    while (SPI1STATbits.SPIBUSY) {
+    while (pSPISTAT->SPIBUSY) {
         // Blocking code --- OK Since we are only calling this function during testing
     }
 
     
-    uint8_t temp = SPI1BUF;
-    uint8_t dummy_data = SPI1BUF;
-    uint8_t data = SPI1BUF;
+    uint8_t temp = *pSPIBUF;
+    uint8_t dummy_data = *pSPIBUF;
+    uint8_t data = *pSPIBUF;
     return data;
 }
 
@@ -600,36 +645,69 @@ uint8_t ReadIMU8(uint8_t Address)
  */
 uint16_t ReadIMU16(uint8_t Address)
 {
-    while (!SPI1STATbits.SPIRBE) {
-        uint8_t temp = SPI1BUF;
+    while (!pSPISTAT->SPIRBE) {
+        uint8_t temp = *pSPIBUF;
     }
     
     __builtin_disable_interrupts();
-    SPI1BUF = READ | Address; // Specify the address of data we want to receive
-    SPI1BUF = 0x00; // This is for the dummy message
-    SPI1BUF = 0x00;
-    SPI1BUF = 0x00;
+    *pSPIBUF = READ | Address; // Specify the address of data we want to receive
+    *pSPIBUF = 0x00; // This is for the dummy message
+    *pSPIBUF = 0x00;
+    *pSPIBUF = 0x00;
     __builtin_enable_interrupts();
     
-    while (SPI1STATbits.SPIBUSY) {
+    while (pSPISTAT->SPIBUSY) {
         // Blocking code --- OK Since we are only calling this function during testing
     }
     
-    uint8_t temp = SPI1BUF;
-    uint8_t dummy_data = SPI1BUF;
+    uint8_t temp = *pSPIBUF;
+    uint8_t dummy_data = *pSPIBUF;
     
     AccelGyroData_t data;
-    data.DataStruct.LowerByte = SPI1BUF;
-    data.DataStruct.UpperByte = SPI1BUF;
+    data.DataStruct.LowerByte = *pSPIBUF;
+    data.DataStruct.UpperByte = *pSPIBUF;
     return data.FullData;
 }
 
+#if (PCB_REV ==  1)
+void __ISR(_SPI4_RX_VECTOR, IPL7SRS) SPI4RXHandler(void)
+{
+    static uint8_t data_read = 0;
+    
+    while (pSPISTAT->SPIRBE == 0){
+        rx_data[data_read] = *pSPIBUF;
+        data_read += 1;
+        if (data_read == 14) {
+            data_read = 0;
+            Accel[0].DataStruct.LowerByte = rx_data[2];
+            Accel[0].DataStruct.UpperByte = rx_data[3];
+            Accel[1].DataStruct.LowerByte = rx_data[4];
+            Accel[1].DataStruct.UpperByte = rx_data[5];
+            Accel[2].DataStruct.LowerByte = rx_data[6];
+            Accel[2].DataStruct.UpperByte = rx_data[7];
+            Gyro[0].DataStruct.LowerByte = rx_data[8];
+            Gyro[0].DataStruct.UpperByte = rx_data[9];
+            Gyro[1].DataStruct.LowerByte = rx_data[10];
+            Gyro[1].DataStruct.UpperByte = rx_data[11];
+            Gyro[2].DataStruct.LowerByte = rx_data[12];
+            Gyro[2].DataStruct.UpperByte = rx_data[13];
+        }
+    }
+    IFS5CLR = _IFS5_SPI4RXIF_MASK; // clear the interrupt flag 
+}
+
+void __ISR(_SPI4_TX_VECTOR, IPL7SRS) SPI4TXHandler(void)
+{
+    IEC5CLR = _IEC5_SPI4TXIE_MASK; // Disable the interrupt
+    IFS5CLR = _IFS5_SPI4TXIF_MASK; // clear the interrupt flag 
+}
+#elif (PCB_REV == 2)
 void __ISR(_SPI1_RX_VECTOR, IPL7SRS) SPI1RXHandler(void)
 {
     static uint8_t data_read = 0;
     
-    while (SPI1STATbits.SPIRBE == 0){
-        rx_data[data_read] = SPI1BUF;
+    while (pSPISTAT->SPIRBE == 0){
+        rx_data[data_read] = *pSPIBUF;
         data_read += 1;
         if (data_read == 14) {
             data_read = 0;
@@ -655,6 +733,7 @@ void __ISR(_SPI1_TX_VECTOR, IPL7SRS) SPI1TXHandler(void)
     IEC3CLR = _IEC3_SPI1TXIE_MASK; // Disable the interrupt
     IFS3CLR = _IFS3_SPI1TXIF_MASK; // clear the interrupt flag 
 }
+#endif
 
 void __ISR(_TIMER_6_VECTOR, IPL7SRS) T6Handler(void)
 {
@@ -663,10 +742,10 @@ void __ISR(_TIMER_6_VECTOR, IPL7SRS) T6Handler(void)
     
     // Get the current accel/gyroscope readings
     __builtin_disable_interrupts();
-    SPI1BUF = READ | 0x03; // Accel x address
-    SPI1BUF = 0x00; // This is for the dummy message
+    *pSPIBUF = READ | 0x03; // Accel x address
+    *pSPIBUF = 0x00; // This is for the dummy message
     for (uint8_t i=0; i<12; i++) {
-        SPI1BUF = 0x00; // 12 Messages for 12 bytes of accel/gyro data
+        *pSPIBUF = 0x00; // 12 Messages for 12 bytes of accel/gyro data
     }
     __builtin_enable_interrupts();
 }

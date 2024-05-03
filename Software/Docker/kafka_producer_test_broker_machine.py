@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     producer = KafkaProducer(
           bootstrap_servers=["broker:29092"],
-        value_serializer=serializer
+            value_serializer=serializer
     )
     
     x = False
