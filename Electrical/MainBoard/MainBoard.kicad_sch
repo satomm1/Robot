@@ -6,8 +6,8 @@
 
   (title_block
     (title "MCU Controller")
-    (date "2024-03-10")
-    (rev "0.2")
+    (date "2024-05-03")
+    (rev "0.3")
     (company "satomm@stanford.edu")
     (comment 1 "Department of Civil and Environmental Engineering")
     (comment 2 "Engineering Informatics Group")
@@ -3246,6 +3246,11 @@
   (text "Bumper/\nCliff\nSensors" (at 23.495 59.055 0)
     (effects (font (size 5 5)) (justify left bottom))
     (uuid ca28578a-0596-4fea-8c29-b17ef23f534a)
+  )
+  (text "Need to check SPI3 --- The mappings are not correct!"
+    (at 118.11 139.065 0)
+    (effects (font (size 5 5)) (justify left bottom))
+    (uuid d7d21fa6-803a-47a7-b8af-322be0a037ad)
   )
   (text "SPI/\nUART/\nI2C" (at 374.015 119.38 0)
     (effects (font (size 5 5)) (justify left bottom))
