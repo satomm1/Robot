@@ -33,7 +33,12 @@
 #define Ki 0.5 // Integral constant for PID law
 #define Kd 3 // Derivative constant for PID law
 
-#define ENCODER_RESOLUTION 1440 // 374 // Number of pulses per revolution
+#if (PCB_REV==1)
+#define ENCODER_RESOLUTION 374 // Number of pulses per revolution
+#elif (PCB_REV==2)
+#define ENCODER_RESOLUTION 1440 // Number of pulses per revolution
+#endif
+
 #define GEAR_RATIO 34 // Gear reduction ratio
 #define SPEED_CONVERSION_FACTOR (1.6e7*60)/ENCODER_RESOLUTION
 #define WHEEL_BASE 0.258572 // Distance between wheels on the robot (m)

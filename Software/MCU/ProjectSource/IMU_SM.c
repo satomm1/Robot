@@ -319,33 +319,33 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
         case ES_TIMEOUT:
         {
             // Periodically print out gyro values.
-            DB_printf("Status: %d\r\n", ReadIMU16(0x02));
-                    
-            int16_t signed_data;
-            if (Accel[0].FullData & 0x8000) {
-                signed_data = -((~Accel[0].FullData & 0xFFFF) + 1);
-            } else {
-                signed_data = Accel[0].FullData;
-            }
-            float x_accel = (float)signed_data / 8.19 * 9.81 / 1000;
-            DB_printf("Accel x: %d m/s^2\r\n", (int16_t)x_accel);
-            
-            if (Accel[1].FullData & 0x8000) {
-                signed_data = -((~Accel[1].FullData & 0xFFFF) + 1);
-            } else {
-                signed_data = Accel[1].FullData;
-            }
-            float y_accel = (float)signed_data / 8.19 * 9.81 / 1000;
-            DB_printf("Accel y: %d m/s^2\r\n", (int16_t)y_accel);
-            
-            
-            if (Gyro[2].FullData & 0x8000) {
-                signed_data = -((~Gyro[2].FullData & 0xFFFF) + 1);
-            } else {
-                signed_data = Gyro[2].FullData;
-            }
-            float z_vel = (float)signed_data / 131.2;
-            DB_printf("Vel z: %d deg/sec\r\n\r\n", (int16_t)z_vel);
+//            DB_printf("Status: %d\r\n", ReadIMU16(0x02));
+//                    
+//            int16_t signed_data;
+//            if (Accel[0].FullData & 0x8000) {
+//                signed_data = -((~Accel[0].FullData & 0xFFFF) + 1);
+//            } else {
+//                signed_data = Accel[0].FullData;
+//            }
+//            float x_accel = (float)signed_data / 8.19 * 9.81 / 1000;
+//            DB_printf("Accel x: %d m/s^2\r\n", (int16_t)x_accel);
+//            
+//            if (Accel[1].FullData & 0x8000) {
+//                signed_data = -((~Accel[1].FullData & 0xFFFF) + 1);
+//            } else {
+//                signed_data = Accel[1].FullData;
+//            }
+//            float y_accel = (float)signed_data / 8.19 * 9.81 / 1000;
+//            DB_printf("Accel y: %d m/s^2\r\n", (int16_t)y_accel);
+//            
+//            
+//            if (Gyro[2].FullData & 0x8000) {
+//                signed_data = -((~Gyro[2].FullData & 0xFFFF) + 1);
+//            } else {
+//                signed_data = Gyro[2].FullData;
+//            }
+//            float z_vel = (float)signed_data / 131.2;
+//            DB_printf("Vel z: %d deg/sec\r\n\r\n", (int16_t)z_vel);
             
             ES_Timer_InitTimer(IMU_TIMER, 1000);
         }
