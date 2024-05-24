@@ -177,6 +177,14 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
           LATJbits.LATJ3 = 0; 
       }
       
+      if ('q' == ThisEvent.EventParam) {
+          uint8_t fault2_reading = PORTAbits.RA4;
+          uint8_t fault1_reading = PORTJbits.RJ12;
+          
+          DB_printf("Fault1 Status: %d\r\n", fault1_reading);
+          DB_printf("Fault2 Status: %d\r\n", fault2_reading);
+      }
+      
       if ('1' == ThisEvent.EventParam) {
           SetDesiredRPM(45, 45);
       }

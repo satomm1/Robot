@@ -133,6 +133,10 @@ bool InitMotorSM(uint8_t Priority)
   ANSELASET = _ANSELA_ANSA1_MASK;
   TRISJSET = _TRISJ_TRISJ9_MASK;
   TRISASET = _TRISA_TRISA1_MASK;
+  
+  // Set motor driver fault pins to be digital inputs
+  TRISASET = _TRISA_TRISA4_MASK;  // Fault2
+  TRISJSET = _TRISJ_TRISJ12_MASK; // Fault1
       
   // Setup Timers
   // Timer 1 (for control update)
