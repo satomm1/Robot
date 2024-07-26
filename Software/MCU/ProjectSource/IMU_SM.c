@@ -22,6 +22,7 @@
 #include <sys/attribs.h>
 #include "dbprintf.h"
 #include <math.h>
+#include "MadgwickAHRS.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 #define READ  0b10000000
@@ -457,6 +458,46 @@ void WriteImuToSPI(uint8_t *Message2Send)
   }
 }
 
+void WriteImuOrientationXYToSPI(uint8_t *Message2Send)
+{
+    float qx = GetQ(1);
+    float qy = GetQ(2);
+    
+    Message2Send[0] = 15; // 15 indicates we are imu xy data (byte 1)
+    
+    // Now write the x data (bytes 2-5)
+    uint32_t x_as_int = *((uint32_t*)&qx);
+    for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+        Message2Send[j+1] = (x_as_int >> (24-8*j)) & 0xFF;
+    }
+    
+    // Now write the y data (bytes 6-9)
+    uint32_t y_as_int = *((uint32_t*)&qy);
+    for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+        Message2Send[j+5] = (y_as_int >> (24-8*j)) & 0xFF;
+    }
+}
+
+void WriteImuOrientationZWToSPI(uint8_t *Message2Send)
+{
+    float qz = GetQ(3);
+    float qw = GetQ(0);
+    
+    Message2Send[0] = 16; // 16 indicates we are imu zw data (byte 1)
+    
+    // Now write the z data (bytes 2-5)
+    uint32_t z_as_int = *((uint32_t*)&qz);
+    for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+        Message2Send[j+1] = (z_as_int >> (24-8*j)) & 0xFF;
+    }
+    
+    // Now write the w data (bytes 6-9)
+    uint32_t w_as_int = *((uint32_t*)&qw);
+    for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+        Message2Send[j+5] = (w_as_int >> (24-8*j)) & 0xFF;
+    }
+}
+
 /***************************************************************************
  private functions
  ***************************************************************************/
@@ -693,6 +734,8 @@ void __ISR(_SPI4_RX_VECTOR, IPL7SRS) SPI4RXHandler(void)
             Gyro[1].DataStruct.UpperByte = rx_data[11];
             Gyro[2].DataStruct.LowerByte = rx_data[12];
             Gyro[2].DataStruct.UpperByte = rx_data[13];
+            
+            MadgwickAHRSupdateIMU(Gyro[0].FullData, Gyro[1].FullData, Gyro[2].FullData, Accel[0].FullData, Accel[1].FullData, Accel[2].FullData);
         }
     }
     IFS5CLR = _IFS5_SPI4RXIF_MASK; // clear the interrupt flag 
@@ -725,6 +768,8 @@ void __ISR(_SPI1_RX_VECTOR, IPL7SRS) SPI1RXHandler(void)
             Gyro[1].DataStruct.UpperByte = rx_data[11];
             Gyro[2].DataStruct.LowerByte = rx_data[12];
             Gyro[2].DataStruct.UpperByte = rx_data[13];
+            
+            MadgwickAHRSupdateIMU(Gyro[0].FullData, Gyro[1].FullData, Gyro[2].FullData, Accel[0].FullData, Accel[1].FullData, Accel[2].FullData);
         }
     }
     IFS3CLR = _IFS3_SPI1RXIF_MASK; // clear the interrupt flag 

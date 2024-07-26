@@ -316,10 +316,6 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
                 {
                     case 0:
                     {
-                        // Fill buffer with cliff sensor data
-//                        for(uint8_t ii = 0; ii < 16; ii++) {
-//                            MessageToSend[ii] = 1;
-//                        }
                         WriteCliffToSPI(MessageToSend);
                         CurrentMessage = 1;
                     }
@@ -327,30 +323,34 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
 
                     case 1:
                     {
-                        // Fill buffer with imu data
-//                        for(uint8_t ii = 0; ii < 16; ii++) {
-//                            MessageToSend[ii] = 2;
-//                        }
                         WriteImuToSPI(MessageToSend);
                         CurrentMessage = 2;
                     }
                     break;
-
+                    
                     case 2:
                     {
-//                        for(uint8_t ii = 0; ii < 16; ii++) {
-//                            MessageToSend[ii] = 2;
-//                        }
-                        WritePositionToSPI(MessageToSend);
+                        WriteImuOrientationXYToSPI(MessageToSend);
                         CurrentMessage = 3;
                     }
                     break;
-
+                    
                     case 3:
                     {
-//                        for(uint8_t ii = 0; ii < 16; ii++) {
-//                            MessageToSend[ii] = 4;
-//                        }
+                        WriteImuOrientationZWToSPI(MessageToSend);
+                        CurrentMessage = 4;
+                    }
+                    break;
+
+                    case 4:
+                    {
+                        WritePositionToSPI(MessageToSend);
+                        CurrentMessage = 5;
+                    }
+                    break;
+
+                    case 5:
+                    {
                         WriteDeadReckoningVelocityToSPI(MessageToSend);
                         CurrentMessage = 0;
                     }
