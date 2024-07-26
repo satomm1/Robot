@@ -229,6 +229,14 @@ float GetQ(uint8_t num) {
     }
 }
 
+void ResetQuaternion(void)
+{
+    q0 = 1.0f;
+    q1 = 0.0f;
+    q2 = 0.0f;
+    q3 = 0.0f;
+}
+
 //---------------------------------------------------------------------------------------------------
 // Fast inverse square-root
 // See: http://en.wikipedia.org/wiki/Fast_inverse_square_root

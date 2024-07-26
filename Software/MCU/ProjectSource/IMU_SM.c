@@ -498,6 +498,10 @@ void WriteImuOrientationZWToSPI(uint8_t *Message2Send)
     }
 }
 
+void ResetIMUPosition(void)
+{
+    ResetQuaternion();
+}
 /***************************************************************************
  private functions
  ***************************************************************************/

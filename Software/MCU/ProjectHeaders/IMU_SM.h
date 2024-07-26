@@ -49,5 +49,6 @@ void WriteImuOrientationXYToSPI(uint8_t *Message2Send);
 void WriteImuOrientationZWToSPI(uint8_t *Message2Send);
 uint8_t ReadIMU8(uint8_t Address);
 uint16_t ReadIMU16(uint8_t Address);
+void ResetIMUPosition(void);
 #endif /* ImuFSM_H */
 

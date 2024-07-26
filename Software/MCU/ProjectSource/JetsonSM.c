@@ -302,6 +302,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
 
                     CurrentMessage = 0;
                     ResetPosition();
+                    ResetIMUPosition();
                     DB_printf("Received End Message: going to RobotInactive\r\n");
                 }
             }
@@ -393,6 +394,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
           CurrentState = RobotInactive;
           
           ResetPosition();
+          ResetIMUPosition();
           
           DB_printf("Timed out, moving to Robot Inactive\r\n");
           
