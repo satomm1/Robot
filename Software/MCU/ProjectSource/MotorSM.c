@@ -22,6 +22,7 @@
 #include "dbprintf.h"
 #include <sys/attribs.h>
 #include <math.h>
+#include "EEPROMSM.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 #define IC_PERIOD 65535 // Input capture period
@@ -83,6 +84,10 @@ static uint16_t DesiredRightRPM;
 
 static Direction_t LeftDirection = Forward;
 static Direction_t RightDirection = Forward;
+
+static volatile int8_t RL_Data[11];
+static volatile bool RL_writing = false;
+static volatile uint8_t RL_Index = 0;
 
 // with the introduction of Gen2, we need a module level Priority var as well
 static uint8_t MyPriority;
@@ -570,6 +575,10 @@ void ResetPosition(void) {
     theta = 0;
 }
 
+int8_t* GetRLData(void){
+    return RL_Data;
+}
+
 /***************************************************************************
  private functions
  ***************************************************************************/
@@ -730,6 +739,21 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
         RightErrorSum -= RightError;
     }
     
+    if (RL_writing) {
+        RL_Data[RL_Index] = ActualLeftRPM;
+        RL_Data[RL_Index + 1] = LeftDutyCycle;
+        RL_Index += 2;
+        
+        if (RL_Index == 10) {
+            RL_writing = false;
+            RL_Index = 10;
+            RL_Data[10] = 0b11111111;
+            
+            ES_Event_t EEPROMEvent = {EV_EEPROM_WRITE_HISTORY,0};
+//            PostEEPROMSM(EEPROMEvent);
+        }
+    }
+    
     // Lastly, Set the duty cycle of the motors by updating Output Compare
     if (LeftDirection == Backward) {
         LeftDutyCycle = 100 - LeftDutyCycle;
@@ -739,7 +763,7 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     if (RightDirection == Backward) {
         RightDutyCycle = 100 - RightDutyCycle;
     }
-    OC1RS = (OC_PERIOD + 1)/100 * RightDutyCycle;
+    OC1RS = (OC_PERIOD + 1)/100 * RightDutyCycle;    
 }
 
 /****************************************************************************

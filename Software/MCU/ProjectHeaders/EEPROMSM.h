@@ -20,6 +20,19 @@ typedef enum
   EEPROMReading
 }EEPROMState_t;
 
+typedef struct
+{
+    uint8_t Byte1;
+    uint8_t Byte2;
+    uint8_t Byte3;
+} AddressByBytes_t;
+
+typedef union 
+{
+    AddressByBytes_t AddressStruct;
+    uint32_t FullAddress;
+} EEPROM_Address_t;
+
 // Public Function Prototypes
 
 bool InitEEPROMSM(uint8_t Priority);

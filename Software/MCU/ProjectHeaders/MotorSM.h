@@ -48,5 +48,6 @@ void SetDesiredSpeed(float LinearVelocity, float AngularVelocity);
 void WritePositionToSPI(uint8_t *Message2Send);
 void WriteDeadReckoningVelocityToSPI(uint8_t *Message2Send);
 void ResetPosition(void);
+int8_t* GetRLData(void);
 #endif /* MotorFSM_H */
 

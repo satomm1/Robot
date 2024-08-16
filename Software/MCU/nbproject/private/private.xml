@@ -3,17 +3,15 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/UsbService.c</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/EEPROMSM.c</file>
-            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/EventCheckers.c</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/FrameworkHeaders/ES_Configure.h</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/MotorSM.c</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/JetsonSM.c</file>
-            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/FrameworkSource/terminal.c</file>
-            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/ReflectService.c</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/IMU_SM.c</file>
-            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/LEDService.c</file>
-            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/FrameworkSource/dbprintf.c</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectHeaders/MotorSM.h</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/MadgwickAHRS.c</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectHeaders/MadgwickAHRS.h</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectHeaders/IMU_SM.h</file>
         </group>
     </open-files>
 </project-private>

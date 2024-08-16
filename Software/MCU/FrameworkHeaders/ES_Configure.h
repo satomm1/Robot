@@ -287,7 +287,9 @@ typedef enum
   EV_UPDATE_MOTOR_SPEED,
   EV_IMU_DATA_UPDATE,
   EV_LED_ON,
-  EV_LED_OFF
+  EV_LED_OFF,
+  EV_EEPROM_READ_FINISHED,
+  EV_EEPROM_WRITE_HISTORY
 }ES_EventType_t;
 
 /****************************************************************************/
@@ -338,7 +340,7 @@ typedef enum
 #define TIMER4_RESP_FUNC TIMER_UNUSED
 #define TIMER5_RESP_FUNC TIMER_UNUSED
 #define TIMER6_RESP_FUNC TIMER_UNUSED
-#define TIMER7_RESP_FUNC TIMER_UNUSED
+#define TIMER7_RESP_FUNC PostEEPROMSM
 #define TIMER8_RESP_FUNC PostImuSM
 #define TIMER9_RESP_FUNC PostReflectService
 #define TIMER10_RESP_FUNC PostUsbService
@@ -363,5 +365,6 @@ typedef enum
 #define USB_TIMER 10
 #define REFLECT_TIMER 9
 #define IMU_TIMER 8
+#define EEPROM_TIMER 7
 
 #endif /* ES_CONFIGURE_H */

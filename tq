@@ -1,0 +1,421 @@
+[33mcommit 30be944d771a5cb7130200d072d65a5e7048ac2a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mPiDataCollect[m[33m, [m[1;31morigin/PiDataCollect[m[33m)[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Thu Aug 8 15:57:39 2024 -0700
+
+    Add instructions for setting up wifi on the Jetsons
+
+[33mcommit 70b21136388c8c9a98993c6afba59f04f4732047[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Fri Jul 26 13:56:19 2024 -0700
+
+    Give document for docker container setup
+
+[33mcommit 3d91c3ddec6a14a247b4f0a8bfd84c8a9a551a9f[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Fri Jul 26 13:55:20 2024 -0700
+
+    Estimate orienation using Madgwick filter from IMU
+
+[33mcommit ff210268ac9813ad7fb83c65138acbc13d3bf194[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Fri Jul 26 13:54:23 2024 -0700
+
+    Estimate position from orientation using git status
+
+[33mcommit d279d6b42c0b53da8faadaa7251d0d964d150d2e[m[33m ([m[1;31morigin/SoftwareDev[m[33m, [m[1;32mSoftwareDev[m[33m)[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Fri May 24 14:51:14 2024 -0700
+
+    Add ability to query the fault status of the two motor drivers
+
+[33mcommit d6f722e9d025e42503763416d3500908a538182c[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Mon May 6 13:47:30 2024 -0700
+
+    Add functionality to easily switch between the different encoders
+
+[33mcommit aef6e528c730e51bb3b2e9dd837306cf37b2135c[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Fri May 3 16:10:01 2024 -0700
+
+    Finish debugging new IMU setup
+
+[33mcommit 70ea8c9f45e3ce86196e58f6dc28300cf0ed264f[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Fri May 3 15:06:36 2024 -0700
+
+    Add IMU capability for REV 0.1 board
+
+[33mcommit feef7482ad58bd4980722dc5bf201df7e66734f8[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Mon Apr 22 14:16:19 2024 -0700
+
+    Make revisions to some of the files, add updates for running in docker on local machine
+
+[33mcommit 313838655563abe0b71f432898d40130427f94e4[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Mon Apr 22 13:40:54 2024 -0700
+
+    Make some useful comments in a README
+
+[33mcommit 6087dea92f7b873a3fd8abecf7b4e558c5cf344d[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Mon Apr 22 13:20:54 2024 -0700
+
+    Add minimally working docker files for running Kafka/Zookeeper
+
+[33mcommit 71bf6c5c1cfd6987068de79af4d7b60f97f9a3aa[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Thu Apr 11 09:30:58 2024 -0700
+
+    Update reflect service to send appropriate data over spi
+
+[33mcommit f58830db1aff1ca74679e7738c8163da2672a86d[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Apr 10 15:47:42 2024 -0700
+
+    Add new details to the bringup document
+
+[33mcommit df92c79975302465d5ba1b93dc07b3a0dffd3aea[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Apr 10 15:47:25 2024 -0700
+
+    Get IMU and Motor updated, still need to allow easy switch between rev 0.1 and rev 0.2
+
+[33mcommit ff94d4ac19be40e86c75a14ebb977d43a04639c1[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Mon Apr 8 09:18:34 2024 -0700
+
+    Integrate ADC/Reflect service with Jetson messaging
+
+[33mcommit bd76a4e71e99cc6f869158794d67cecb8b8ce7e3[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Mon Apr 8 08:20:09 2024 -0700
+
+    Get ADC test code working
+
+[33mcommit 507d05ccd406250a811138ca16b1c061c81a3634[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Sun Apr 7 15:58:07 2024 -0700
+
+    Add IMU code and code for sending imu data to Jetson
+
+[33mcommit 59617de6b24adf41dfd92f3c8997e6230cbefaaa[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Sun Apr 7 15:40:38 2024 -0700
+
+    Get code for IMU working
+
+[33mcommit 9d453298f13e6a1126ae927bdefb348702d4d595[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Tue Apr 2 13:09:59 2024 -0700
+
+    Finalize code for setting up IMU and verifying soldering is correct
+
+[33mcommit 0c5670381a7d3884c9427402799dbbf99c0090be[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Mon Apr 1 21:11:59 2024 -0700
+
+    Edit imu code
+
+[33mcommit de48775e3dce8bbe67b8fb6bb33d133be96539be[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Fri Mar 22 19:36:22 2024 -0700
+
+    Add code for testing ADC, should be good now just need to debug
+
+[33mcommit dabb47d28c6109ba964c2785011073efdea488ab[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Thu Mar 21 17:23:53 2024 -0700
+
+    Begin work on reflective sensors code
+
+[33mcommit 24ff5f2c809060b50498471527adaa721cf895f9[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Mar 20 23:01:11 2024 -0700
+
+    Begin adding new initialization code for BMI IMU
+
+[33mcommit 89f398f1e9d1ed3d8439fdd14e1a43fc4555305e[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Mar 20 17:03:01 2024 -0700
+
+    Add file for testing IMU
+
+[33mcommit 14ffd4d4de7253747ef1a214bfbba374718c518d[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Mon Mar 11 13:53:51 2024 -0700
+
+    further reduce update time for dead reckoning calcs
+
+[33mcommit f6533ddee5260c8485b2b2f2887e11910f351c81[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Mon Mar 11 13:27:38 2024 -0700
+
+    Dead reckoning use exact formula, increase rate at which dead reckoning is calculated
+
+[33mcommit 93da546068696833b95c9fed594629b9e40ef8b2[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Sun Mar 10 15:35:56 2024 -0700
+
+    Use an exact method for dead reckoning calculations instead of runge-kutta
+
+[33mcommit b4c29a4c1daef440b9e422dccb1853c63a7bf38b[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Thu Mar 7 16:31:24 2024 -0800
+
+    MPLAB xml file
+
+[33mcommit 64df3bf90993eb67750e2680f0860c2ab4e4f551[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Feb 14 14:50:52 2024 -0800
+
+    Change overall SPI framework. Expect 55 before any sort of 16 byte command from teh Jetson
+
+[33mcommit 4599ab701a6d2c048856753a6accbf74bce17260[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Feb 14 13:46:00 2024 -0800
+
+    Allocate 16 bytes for the receiveBuffer-- May have been causing the problem of data getting misaligned with jetson
+
+[33mcommit 2ba8022face0bfe2fa20c2a2570d8ab3a70e244a[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Feb 14 12:25:19 2024 -0800
+
+    Change to PID control
+
+[33mcommit abbb0757d3788cd536eb0d936e648dcabbd7e1b9[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Feb 14 12:23:15 2024 -0800
+
+    Revert "Update motor PID paramters, need to figure out overflow of Jetson SPI"
+    
+    This reverts commit 0b59fb96bbd7ab252bd332ff9b5508b7fe41d7a4.
+    
+    Reverting back to PI control instead of PID
+
+[33mcommit 80238946647936b21fc126d9c11d9ea50d104655[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Feb 14 12:22:47 2024 -0800
+
+    Revert "Change some spi stuff with jetson, probably will need to revert"
+    
+    This reverts commit 06b93681a91bff43f5faf43f78ca409b5d33d08e.
+    
+    Revert back to PI control instead of PID
+
+[33mcommit 06b93681a91bff43f5faf43f78ca409b5d33d08e[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Feb 14 11:33:21 2024 -0800
+
+    Change some spi stuff with jetson, probably will need to revert
+
+[33mcommit 0b59fb96bbd7ab252bd332ff9b5508b7fe41d7a4[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Mon Feb 12 21:40:56 2024 -0800
+
+    Update motor PID paramters, need to figure out overflow of Jetson SPI
+
+[33mcommit 36430121bef12074cbc77be5dacbd6766cdf0121[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Thu Feb 8 13:01:29 2024 -0800
+
+    Update dead reckoning update to occur at 50 Hz rate, also update base width of robot
+
+[33mcommit c9022a692e0d251d2e66976a765dd607b7bc131f[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Feb 7 08:30:39 2024 -0800
+
+    Add jetson bringup details
+
+[33mcommit a75955dec14a4200bd25d04f81602cc56f3c18de[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Tue Feb 6 07:45:01 2024 -0800
+
+    Change limits on maximum velocities
+
+[33mcommit e998e5c45401b7003b9447f0cd6f7d76d1b3ef9c[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Mon Feb 5 14:14:43 2024 -0800
+
+    Directly write to SPI2BUF instead of passing it as an argument
+
+[33mcommit e1e4dec79b8721666d5f894c7e4ce3aa8ead3953[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Mon Feb 5 13:13:44 2024 -0800
+
+    Add code that more gracefully shuts motors off when desired velocity is 0
+
+[33mcommit a00f80b567c96ec716cf243691ad58b33a975eb1[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Fri Feb 2 14:01:52 2024 -0800
+
+    Add updates to jetson bringup
+
+[33mcommit 590d6b211f7afc10895ad35104d9ef50cd86c295[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Thu Feb 1 21:23:40 2024 -0800
+
+    Just making more progress...
+
+[33mcommit a4a9a8235cc5fde404f3b7bc79cd99dac79deaec[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Jan 31 13:30:31 2024 -0800
+
+    Implement Jetson comm functionality for dead reckoning and position
+
+[33mcommit 40b8188c46e87c69ad6b02f74781dbd429483340[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Tue Jan 30 09:27:41 2024 -0800
+
+    Software updates
+
+[33mcommit 73854f9efd207641e8c01c8b3cabe78b8cf5f98b[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Mon Jan 29 15:16:14 2024 -0800
+
+    Get SPI between jetson and mcu figured out
+
+[33mcommit 4156905869bde0872fd6d7313ca9da077574d765[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Mon Jan 29 09:42:08 2024 -0800
+
+    Add changes for Jetson SPI comms
+
+[33mcommit f977c9790cb30934ecffae68af9094d337d4a13a[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Sat Jan 27 16:40:59 2024 -0800
+
+    Get PI control mostly working
+
+[33mcommit 0c268ead351521b3d6d60ca8e40a199e9bbba61b[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Fri Jan 26 15:49:50 2024 -0800
+
+    Add code for basic motor testing
+
+[33mcommit 9313f7b08f1c687bf9a7a29c5a4f03385a7fe7fc[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Fri Jan 26 11:19:04 2024 -0800
+
+    Modify for ros2
+
+[33mcommit b01ad0ab5d8e855f6fff2addbe7344568d339382[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Thu Jan 25 16:24:04 2024 -0800
+
+    Confirm button debouncers/state machines work
+
+[33mcommit 5477a0b5bd0755232350cfd7486eac6c64980019[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Thu Jan 25 16:12:37 2024 -0800
+
+    Get most services at least functioning without crashing
+
+[33mcommit d73fe344c14daa6902b73a7257dc7c4afacbac21[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Thu Jan 25 14:51:31 2024 -0800
+
+    Get basic comm to Jetson Working
+
+[33mcommit 019ea9911ad050560739d9d6a5ed5acdd134afa1[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Tue Jan 23 16:55:14 2024 -0800
+
+    Begin the debugging process. Know LEDs and USB-UART are working here
+
+[33mcommit 45e07fd8cb5544a9b616ff66fb43ebcf15cde1b6[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Thu Jan 11 14:41:40 2024 -0800
+
+    Modify the spi comms file
+
+[33mcommit 386f67e6ed84bab72e185d68c6427e6cdf3d99cd[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Jan 10 16:20:00 2024 -0800
+
+    Add teleop files --- only keyboard teleop
+
+[33mcommit cf8f0ef5f0b80ad5274bb7fd9b553d792bee9a96[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Jan 10 15:56:45 2024 -0800
+
+    Add a service to turn LEDs on or off
+
+[33mcommit c97a126f4b52d7a25785e6937d3d2530d284adb4[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Jan 10 15:10:28 2024 -0800
+
+    Fully align ROS python code with MCU for spi transfer
+
+[33mcommit 1efaed8737b9ac0a1bdc8b9e64eb40c49c5d5e49[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Tue Jan 9 21:59:20 2024 -0800
+
+    Align spi comms between jetson and mcu
+
+[33mcommit 268364a84e6053e4d1e2ac758b0abebf91a0f9b9[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Tue Jan 9 12:30:12 2024 -0800
+
+    Sort out some of the details for jetson-MCU comms and do some more motor code
+
+[33mcommit eec6af9a36283c61b907f0527c8b1e450aa4d5f1[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Mon Jan 8 14:48:08 2024 -0800
+
+    Dead reckoning and IMU
+
+[33mcommit aff6edb03916428ff22c76ba38479ea68ab2bec9[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Thu Dec 28 20:17:36 2023 -0700
+
+    Add button debouncers and add more motor control
+
+[33mcommit f061a5e48976c1871067efa57bcdf9b0eef8bb82[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Dec 27 20:58:24 2023 -0700
+
+    Add some code for communicating between ros and MCU
+
+[33mcommit 496ed91913e949aea75ea23c905923d8b944e991[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Thu Dec 21 13:18:34 2023 -0800
+
+    Begin implementing code for motor control using PI Law
+
+[33mcommit d17ff67965a484bfc2cb9f00cc985764d85e6681[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Dec 20 15:03:28 2023 -0800
+
+    Add starter code for the IMU and Motor Control state machines
+
+[33mcommit d77d52c60f78179e00832e2eb0cdf27347222c71[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Thu Nov 30 22:26:50 2023 -0800
+
+    Delete the gitignore
+
+[33mcommit d7eba1a1f73d24eb4faba556fa63e2192ee62468[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Thu Nov 30 22:22:58 2023 -0800
+
+    Add initial PIC32 Framework Code
+
+[33mcommit ba05f7fbbbfb1fe8d63e9659a5a60a6e6a1d4736[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Nov 8 11:20:18 2023 -0800
+
+    Update KiCAD format
+
+[33mcommit 3cb20d4bf388be0c295aa2d1b1a73ff759e90856[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Nov 8 10:55:20 2023 -0800
+
+    Add initial directories and READMEs
+
+[33mcommit 929706a23c89649724f3bd0580d6388cc437d0a3[m
+Author: Matthew Sato <91570784+satomm1@users.noreply.github.com>
+Date:   Wed Nov 8 10:46:56 2023 -0800
+
+    Initial commit
