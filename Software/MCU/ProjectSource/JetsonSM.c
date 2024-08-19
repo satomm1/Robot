@@ -119,6 +119,8 @@ bool InitJetsonSM(uint8_t Priority)
   // Set interrupt priorities
   IPC36bits.SPI2TXIP = 7; // SPI2TX
   IPC35bits.SPI2RXIP = 7; // SPI2RX
+  IPC36bits.SPI2TXIS = 2;
+  IPC35bits.SPI2RXIS = 2;
   
   // Clear interrupt flags
   IFS4CLR = _IFS4_SPI2TXIF_MASK | _IFS4_SPI2RXIF_MASK;
@@ -490,7 +492,7 @@ void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
             while (!SPI2STATbits.SPIRBE) {
                 TempData = SPI2BUF;
             }
-            
+
             for (uint8_t ii = 0; ii < 16; ii++) {
                 SPI2BUF = MessageToSend[ii];
             }

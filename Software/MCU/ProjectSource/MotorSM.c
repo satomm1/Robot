@@ -26,7 +26,7 @@
 /*----------------------------- Module Defines ----------------------------*/
 #define IC_PERIOD 65535 // Input capture period
 #define OC_PERIOD 312   // Output compare period (10 kHz)
-#define CONTROL_PERIOD 1000 // Control update period --- 6250 Hz
+#define CONTROL_PERIOD 10000 // 1000 // Control update period --- 6250 Hz
 #define NO_SPEED_PERIOD 65535 // Period to indicate motor not spinning
 #define DEAD_RECKONING_PERIOD 1953 // 3906 // 7812 // Chosen so that we update at 50 Hz rate
 #define Kp 3 // Proportional constant for PID law
@@ -36,7 +36,8 @@
 #if (PCB_REV==1)
 #define ENCODER_RESOLUTION 374 // Number of pulses per revolution
 #elif (PCB_REV==2)
-#define ENCODER_RESOLUTION 1440 // Number of pulses per revolution
+//#define ENCODER_RESOLUTION 1440 // Number of pulses per revolution
+#define ENCODER_RESOLUTION 360
 #endif
 
 #define GEAR_RATIO 34 // Gear reduction ratio
@@ -83,6 +84,8 @@ static uint16_t DesiredRightRPM;
 
 static Direction_t LeftDirection = Forward;
 static Direction_t RightDirection = Forward;
+
+static float V_desired = 0.;
 
 // with the introduction of Gen2, we need a module level Priority var as well
 static uint8_t MyPriority;
@@ -211,10 +214,21 @@ bool InitMotorSM(uint8_t Priority)
 //  IC2CONbits.ICI = 0b00; // Interrupt on every capture event
   IC3CONbits.ICI = 0b00; // Interrupt on every capture event
 //  IC4CONbits.ICI = 0b00; // Interrupt on every capture event
-  IC1CONbits.ICM = 0b011; // Every rising edge mode
+//  IC1CONbits.ICM = 0b011; // Every rising edge mode
+//  IC1CONbits.ICM = 0b100; // Every 4th rising edge mode
+  
 //  IC2CONbits.ICM = 0b001; // Every edge mode
-  IC3CONbits.ICM = 0b011; // Every rising edge mode
+//  IC3CONbits.ICM = 0b011; // Every rising edge mode
+//  IC3CONbits.ICM = 0b100; // Every 4th rising edge mode
+  
 //  IC4CONbits.ICM = 0b011; // Every edge mode
+#if (PCB_REV==1)
+  IC1CONbits.ICM = 0b011; // Every rising edge mode
+  IC3CONbits.ICM = 0b011; // Every rising edge mode
+#elif (PCB_REV==2)
+  IC1CONbits.ICM = 0b100; // Every 4th rising edge mode
+  IC3CONbits.ICM = 0b100; // Every 4th rising edge mode
+#endif
   
   // Setup Interrupts
   INTCONbits.MVEC = 1; // Use multivector mode
@@ -227,9 +241,9 @@ bool InitMotorSM(uint8_t Priority)
   IPC4bits.IC3IP = 7; // IC3
   IPC4bits.IC3IS = 3; // IC3 Sub-priority
   IPC1bits.T1IP = 7; // T1
-  IPC1bits.T1IS = 2; // T1 Sub-priority
+  IPC1bits.T1IS = 1; // T1 Sub-priority
   IPC3bits.T3IP = 7; // T3
-  IPC3bits.T3IS = 3; // T3 Sub-priority
+  IPC3bits.T3IS = 2; // T3 Sub-priority
   IPC4bits.T4IP = 6; // T4
   IPC6bits.T5IP = 6; // T5
   IPC8bits.T7IP = 6; // T7
@@ -348,8 +362,9 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
         {
             uint16_t left_rpm = SPEED_CONVERSION_FACTOR / LeftPulseLength;
             uint16_t right_rpm = SPEED_CONVERSION_FACTOR / RightPulseLength;
+//            DB_printf("\r\n \r\n \r\n \r\n");
 //            DB_printf("RPM: %d, %d \r\n", left_rpm, right_rpm);
-//            DB_printf("Vel: %d\r\n", (uint16_t)(V_current*100));
+//            DB_printf("Vel: %d (desired = %d)\r\n", (uint16_t)(V_current*100), (uint16_t)(V_desired*100));
 //            DB_printf("w: %d\r\n", (uint16_t)(w_current*100));
 //            DB_printf("x: %d\r\n", (uint16_t)(x*100));
 //            DB_printf("y: %d\r\n", (uint16_t)(y*100));
@@ -428,6 +443,8 @@ void SetDesiredRPM(uint16_t LeftRPM, uint16_t RightRPM)
 ****************************************************************************/
 void SetDesiredSpeed(float V, float w)
 {
+    V_desired = V;
+    
     // We turn off control for stopped to prevent jittering
     if (V==0 && w == 0) {
         
@@ -647,7 +664,7 @@ void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
         LeftRotations += 1;
     } else {
         LeftRotations -= 1;
-    }
+    }   
     
     // restart Timer5 (timer to indicate if motor is stopped)
     T5CONCLR = _T5CON_ON_MASK;     
