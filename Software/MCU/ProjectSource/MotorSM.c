@@ -28,9 +28,9 @@
 #define OC_PERIOD 312   // Output compare period (10 kHz)
 #define CONTROL_PERIOD 10000 // 1000 // Control update period --- 6250 Hz
 #define NO_SPEED_PERIOD 65535 // Period to indicate motor not spinning
-#define DEAD_RECKONING_PERIOD 1953 // 3906 // 7812 // Chosen so that we update at 50 Hz rate
-#define Kp 3 // Proportional constant for PID law
-#define Ki 0.5 // Integral constant for PID law
+#define DEAD_RECKONING_PERIOD 3906// 1953 // 3906 // 7812 // Chosen so that we update at 50 Hz rate
+#define Kp 5 // Proportional constant for PID law
+#define Ki 0.8 // Integral constant for PID law
 #define Kd 3 // Derivative constant for PID law
 
 #if (PCB_REV==1)
@@ -44,7 +44,7 @@
 #define SPEED_CONVERSION_FACTOR (1.6e7*60)/ENCODER_RESOLUTION
 #define WHEEL_BASE 0.258572 // Distance between wheels on the robot (m)
 #define WHEEL_RADIUS 0.04 // Radius of wheels (m))
-#define DEAD_RECKONING_TIME 0.00499968 //0.00999936 //0.01999872 // Time between dead reckoning updates in seconds (depends on DEAD_RECKONING_PERIOD)
+#define DEAD_RECKONING_TIME 0.00999936 //0.00499968 //0.00999936 //0.01999872 // Time between dead reckoning updates in seconds (depends on DEAD_RECKONING_PERIOD)
 #define DEAD_RECKONING_RATIO 2*3.14159 / ENCODER_RESOLUTION / DEAD_RECKONING_TIME * WHEEL_RADIUS // This number times change in encoder clicks is linear velocity in m/second
 
 #define V_MAX 1 // max 1 m/sec
@@ -360,10 +360,10 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
         
         case ES_TIMEOUT:
         {
-            uint16_t left_rpm = SPEED_CONVERSION_FACTOR / LeftPulseLength;
-            uint16_t right_rpm = SPEED_CONVERSION_FACTOR / RightPulseLength;
+//            uint16_t left_rpm = SPEED_CONVERSION_FACTOR / LeftPulseLength;
+//            uint16_t right_rpm = SPEED_CONVERSION_FACTOR / RightPulseLength;
 //            DB_printf("\r\n \r\n \r\n \r\n");
-//            DB_printf("RPM: %d, %d \r\n", left_rpm, right_rpm);
+//            DB_printf("RPM: %d, %d (%d, %d) \r\n", left_rpm, right_rpm, DesiredLeftRPM, DesiredRightRPM);
 //            DB_printf("Vel: %d (desired = %d)\r\n", (uint16_t)(V_current*100), (uint16_t)(V_desired*100));
 //            DB_printf("w: %d\r\n", (uint16_t)(w_current*100));
 //            DB_printf("x: %d\r\n", (uint16_t)(x*100));
@@ -429,7 +429,7 @@ void SetDesiredRPM(uint16_t LeftRPM, uint16_t RightRPM)
 
 /****************************************************************************
  Function
-     SetDesiredRPM
+     SetDesiredSpeed
 
  Parameters
      float V: the desired linear velocity
@@ -623,7 +623,7 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
     } else {
         RightRotations += 1;
     }
-    
+
     // restart Timer4 (timer to indicate if motor is stopped)
     T4CONCLR = _T4CON_ON_MASK;     
     TMR4 = 0;     
@@ -930,7 +930,7 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
         theta += 2*M_PI;
     }
     
-    if (omega < 0.01) {
+    if (omega < 0.01 && omega > -0.01) {
         x = x + V * cosf(prev_theta) * DEAD_RECKONING_TIME;
         y = y + V * sinf(prev_theta) * DEAD_RECKONING_TIME;
     } else {
