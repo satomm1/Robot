@@ -21,6 +21,7 @@
 #include "Button1DebouncerSM.h"
 #include "EventCheckers.h"
 #include "dbprintf.h"
+#include "ReflectService.h"
 /*----------------------------- Module Defines ----------------------------*/
 #define DEBOUNCE_TIME 50
 //#define DEBUG
@@ -169,6 +170,8 @@ ES_Event_t RunButton1DebouncerSM(ES_Event_t ThisEvent)
                 CurrentState = Button1DebouncingWait; 
                 // U1MODEbits.ON = 1; // turn peripheral on
                 
+                UpdateButtonStatus(1, true);
+                
                 #ifdef DEBUG
                 DB_printf("Button 1 Pressed\r\n");
                 #endif
@@ -193,6 +196,8 @@ ES_Event_t RunButton1DebouncerSM(ES_Event_t ThisEvent)
                 ES_Event_t NewEvent = {EV_BUTTON1_RELEASED, 0};           
                 // TODO: Post to proper SM         
                 CurrentState = Button1DebouncingWait; 
+                
+                UpdateButtonStatus(1, false);
                 
                 #ifdef DEBUG
                 DB_printf("Button 1 Released\r\n");

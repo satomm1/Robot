@@ -39,6 +39,7 @@
 // with the introduction of Gen2, we need a module level Priority variable
 static uint8_t MyPriority;
 static uint16_t ReflectiveResults[3];
+static uint8_t ButtonState = 0;
 
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
@@ -177,9 +178,22 @@ void WriteCliffToSPI(uint8_t *Message2Send)
     Message2Send[j+5] = (ReflectiveResults[2] >> (8-8*j)) & 0xFF;
   }
   
-  for (uint8_t j = 0; j < 9; j++) {
-    Message2Send[j+7] = 0; // Fill rest of buffer with 0's
+  // Write button status (byte 8)
+  Message2Send[7] = ButtonState;
+  
+  for (uint8_t j = 0; j < 8; j++) {
+    Message2Send[j+8] = 0; // Fill rest of buffer with 0's
   }
+}
+
+void UpdateButtonStatus(uint8_t ButtonNum, bool Status){
+    if (Status) {
+        // Set the bit corresponding to ButtonNum
+        ButtonState |= (1 << (ButtonNum-1));
+    } else {
+        // Clear the bit corresponding to ButtonNum
+        ButtonState &= ~(1 << (ButtonNum-1));
+    }
 }
 
 /***************************************************************************
