@@ -16,8 +16,7 @@
 // State definitions for use with the query function
 typedef enum
 {
-  InitPState_EEPROM, EEPROMWaiting, EEPROMWriting,
-  EEPROMReading
+  InitPState_EEPROM, EEPROMWaiting, EEPROMWriteEnabled, EEPROMWriting
 }EEPROMState_t;
 
 // Public Function Prototypes
@@ -27,6 +26,7 @@ bool PostEEPROMSM(ES_Event_t ThisEvent);
 ES_Event_t RunEEPROMSM(ES_Event_t ThisEvent);
 EEPROMState_t QueryEEPROMSM(void);
 
+void WriteEnable(void);
 void WriteByteEEPROM(uint8_t data);
 void WriteMultiBytesEEPROM(uint8_t *data, uint16_t N);
 void ReadByteEEPROM(uint32_t address);

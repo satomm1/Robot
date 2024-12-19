@@ -51,9 +51,10 @@ static uint32_t SamplesOnCurrentPage = 0;
 static uint32_t CurrentPage = 0;
 
 // Variable to assist in TX of SPI data
-static bool transferring = false;
+static bool transferring = false;  // Transferring data
+static bool transfer_wait = false; // Waiting for transfer to finish
 static bool sent_wren = false;
-static bool write_one = false;
+static bool sent_instr_address = false;
 static uint8_t tx_index = 0;
 static uint8_t bytes_to_write[32];
 static uint16_t num_bytes_to_write = 0;
@@ -234,11 +235,6 @@ ES_Event_t RunEEPROMSM(ES_Event_t ThisEvent)
     {
       switch (ThisEvent.EventType)
       {
-        case ES_LOCK: 
-        { 
-          CurrentState = EEPROMWriting;  
-        }
-        break;
         
         case EV_EEPROM_RX_COMPLETE:
         {
@@ -249,6 +245,36 @@ ES_Event_t RunEEPROMSM(ES_Event_t ThisEvent)
         }
         break;
         
+        case EV_WRITE_ENABLED:
+        {            
+            if (ThisEvent.EventParam) {
+                CurrentState = EEPROMWriting;
+                SPI5CONbits.STXISEL = 0b11; // Interrupt is generated when the buffer is not full (has one or more empty elements)
+                IEC5SET = _IEC5_SPI5TXIE_MASK; // Enable interrupt
+            } else {
+                CurrentState = EEPROMWriteEnabled;
+            }
+        }
+        break;
+            
+        default:
+          ;
+      }  
+    }
+    break;
+    
+    case EEPROMWriteEnabled: 
+    {
+      switch (ThisEvent.EventType)
+      {
+        case EV_BEGIN_WRITE: 
+        { 
+          CurrentState = EEPROMWriting;
+          SPI5CONbits.STXISEL = 0b11; // Interrupt is generated when the buffer is not full (has one or more empty elements)
+          IEC5SET = _IEC5_SPI5TXIE_MASK; // Enable interrupt
+        }
+        break;
+
         default:
           ;
       }  
@@ -259,30 +285,13 @@ ES_Event_t RunEEPROMSM(ES_Event_t ThisEvent)
     {
       switch (ThisEvent.EventType)
       {
-        case ES_LOCK: 
+        case ES_TIMEOUT: 
         { 
-          CurrentState = EEPROMWriting;  
+          // 5 ms wait timer elapsed, write complete
+          CurrentState = EEPROMWaiting;  
         }
         break;
 
-        
-        default:
-          ;
-      }  
-    }
-    break;
-    
-    case EEPROMReading: 
-    {
-      switch (ThisEvent.EventType)
-      {
-        case ES_LOCK: 
-        { 
-          CurrentState = EEPROMWriting;  
-        }
-        break;
-
-        
         default:
           ;
       }  
@@ -317,33 +326,46 @@ EEPROMState_t QueryEEPROMFSM(void)
   return CurrentState;
 }
 
-//void WriteEnable(void) {
-//    sent_wren = true;  // Waiting for SS go inactive after sending WREN
-//    SPI5BUF = WREN;
-//    
-//    // Enable the transmit interrupt
-//    SPI5CONbits.STXISEL = 0b00; // Interrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
-//    IEC5SET = _IEC5_SPI5TXIE_MASK;
-//}
-
 // Note: To facilitate clean pages, we only accept data in sequences of 32 x 8 bytes
 //       Each page is 256 bytes, so this allows 8 samples per page, even if each
 //       sample is less than 32 bytes.
-void WriteByteEEPROM(uint8_t data) {
+
+void WriteEnable(void) {
     
-    tx_index = 0;
-    bytes_to_write[0] = data;
-    num_bytes_to_write = 1;
-        
-    // Write Enable
+    if (CurrentState != EEPROMWaiting) {
+        // Not in valid state to perform write enable
+        transferring = false;
+        return;
+    }
+    
     sent_wren = true;  // Waiting for SS go inactive after sending WREN
-    transferring = true;  // In writing mode
-    write_one = true; // Only writing one byte
+    sent_instr_address; // Have not yet send address/instruction bytes
     SPI5BUF = WREN;
     
     // Enable the transmit interrupt
     SPI5CONbits.STXISEL = 0b00; // Interrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
     IEC5SET = _IEC5_SPI5TXIE_MASK;
+}
+
+void WriteByteEEPROM(uint8_t data) {
+    
+    if (CurrentState == EEPROMWriting) {
+        return; // Write in progress, don't do anything
+    }
+    
+    tx_index = 0;
+    bytes_to_write[0] = data;
+    num_bytes_to_write = 1;
+        
+    transferring = true;  // In writing mode
+    
+    if (CurrentState == EEPROMWaiting) {
+        WriteEnable();  // Write Enable First
+    } else if (CurrentState == EEPROMWriteEnabled) {
+        // Already WriteEnabled, can begin write of data
+        ES_Event_t new_event = {EV_BEGIN_WRITE, 0};
+        PostEEPROMSM(new_event);
+    }
 }
 
 void WriteMultiBytesEEPROM(uint8_t *data, uint16_t N) {
@@ -353,21 +375,25 @@ void WriteMultiBytesEEPROM(uint8_t *data, uint16_t N) {
         return;
     }
     
-    // Write Enable
-    sent_wren = true;
-    transferring = true; 
-    write_one = false;
+    if (CurrentState == EEPROMWriting) {
+        return; // Write in progress, don't do anything
+    }
+    
     tx_index = 0;
     num_bytes_to_write = N;
-    
     for (uint8_t i = 0; i < N; i++){
         bytes_to_write[i] = data[i];
     }
-    SPI5BUF = WREN;
     
-    // Enable the transmit interrupt
-    SPI5CONbits.STXISEL = 0b00; // Interrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
-    IEC5SET = _IEC5_SPI5TXIE_MASK;
+    transferring = true; // In writing mode
+
+    if (CurrentState == EEPROMWaiting) {
+        WriteEnable();  // Write Enable First
+    } else if (CurrentState == EEPROMWriteEnabled) {
+        // Already WriteEnabled, can begin write of data
+        ES_Event_t new_event = {EV_BEGIN_WRITE, 0};
+        PostEEPROMSM(new_event);
+    }
 }
 
 void ReadByteEEPROM(uint32_t address) {
@@ -386,7 +412,7 @@ void ReadByteEEPROM(uint32_t address) {
     SPI5BUF = address_byte1;
     SPI5BUF = address_byte2;
     SPI5BUF = address_byte3;
-    SPI5BUF = 0xFF; // For retrieving data
+    SPI5BUF = 0x0F; // For retrieving data
 }
 
 void ReadMultiBytesEEPROM(uint32_t address, uint16_t N) {
@@ -436,49 +462,32 @@ void __ISR(_SPI5_TX_VECTOR, IPL7SRS) SPI5TXHandler(void)
         
         DB_printf("Sent WREN, SS Status = %d\r\n", PORTFbits.RF12);
         
-        // Get relevant address bytes
-        uint8_t address_byte3 = (CurrentAddress >> 0) & 0xFF;
-        uint8_t address_byte2 = (CurrentAddress >> 8) & 0xFF;
-        uint8_t address_byte1 = (CurrentAddress >> 16) & 0xFF;
+        // Post Event to say we have write enabled complete
+        ES_Event_t new_event = {EV_WRITE_ENABLED, 0};
         
-        DB_printf("Writing to address: %d\r\n", address_byte3);
-        
-        // Send Write Sequence
-        SPI5BUF = WRITE; // Write Instruction
-        SPI5BUF = address_byte1; // Write Address
-        SPI5BUF = address_byte2;
-        SPI5BUF = address_byte3;
-            
-        // Immediately start writing bytes
-        if (write_one) {    
-            // Only One byte to write
-            SPI5BUF = bytes_to_write[0];
-            
-            transferring = false; // Done with TX
-        } else {
-            // Send bytes as long as we still have bytes to send and TX buffer not full
-            while ((tx_index < num_bytes_to_write) && !SPI5STATbits.SPITBF) {
-                SPI5BUF = bytes_to_write[tx_index];
-                tx_index += 1;
-            }
-            
-            // Check if still have bytes to send
-            if (tx_index < num_bytes_to_write) {
-                SPI5CONbits.STXISEL = 0b11; // Interrupt is generated when the buffer is not full (has one or more empty elements)
-                IEC5SET = _IEC5_SPI5TXIE_MASK; // Enable interrupt
-            } else {
-                transferring = false;  // Done with TX
-            }
+        if (transferring) {
+            new_event.EventParam = 1; // Indicate we have data to transfer
         }
         
-        // Update the current address/page
-        CurrentAddress += 32;
-        SamplesOnCurrentPage += 1;
-        if (SamplesOnCurrentPage == 8) {
-            CurrentPage += 1;
-            SamplesOnCurrentPage = 0;
-        }
+        PostEEPROMSM(new_event);
     } else if (transferring) {  // Here we finish sending outstanding bytes
+        
+        if (!sent_instr_address) {
+           // Get relevant address bytes
+           uint8_t address_byte3 = (CurrentAddress >> 0) & 0xFF;
+           uint8_t address_byte2 = (CurrentAddress >> 8) & 0xFF;
+           uint8_t address_byte1 = (CurrentAddress >> 16) & 0xFF;
+
+           DB_printf("Writing to address: %x\r\n", CurrentAddress);
+
+           // Send Write Sequence
+           SPI5BUF = WRITE; // Write Instruction
+           SPI5BUF = address_byte1; // Write Address
+           SPI5BUF = address_byte2;
+           SPI5BUF = address_byte3;
+           
+           sent_instr_address = true; // We have now sent address and instruction bits
+        }
         
         // Send bytes as long as we still have bytes to send and TX buffer not full
         while ((tx_index < num_bytes_to_write) && SPI5STATbits.SPITBF) {
@@ -487,12 +496,24 @@ void __ISR(_SPI5_TX_VECTOR, IPL7SRS) SPI5TXHandler(void)
         }
         
         // Check if still have bytes to send
-        if (tx_index < num_bytes_to_write) {
-            SPI5CONbits.STXISEL = 0b11; // Interrupt is generated when the buffer is not full (has one or more empty elements)
-            IEC5SET = _IEC5_SPI5TXIE_MASK; // Enable interrupt
-        } else {
+        if (tx_index == num_bytes_to_write) {
             transferring = false;  // Done with TX
+            transfer_wait = true; // Now just wait for TX to finish
+            SPI5CONbits.STXISEL = 0b00; // Interrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
         }
+        IEC5SET = _IEC5_SPI5TXIE_MASK; // Enable interrupt
+    } else if (transfer_wait) {  // Here we know we have finished the TX
+        transfer_wait = false; // transfer has finished
+        
+        // Update the current address/page
+        CurrentAddress += 32;
+        SamplesOnCurrentPage += 1;
+        if (SamplesOnCurrentPage == 8) {
+            CurrentPage += 1;
+            SamplesOnCurrentPage = 0;
+        }
+        
+        ES_Timer_InitTimer(EEPROM_TIMER, 5); // Set 5 ms wait timer
     }
 }
 
@@ -541,7 +562,7 @@ void __ISR(_SPI5_RX_VECTOR, IPL7SRS) SPI5RXHandler(void) {
         // For now, we just discard all values since we aren't reading any values
         while (!SPI5STATbits.SPIRBE) {
             rx_data = SPI5BUF;
-            DB_printf("Received rx\r\n");
+//            DB_printf("Received rx\r\n");
         }
     }
     
