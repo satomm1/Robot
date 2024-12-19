@@ -39,7 +39,7 @@
 /* prototypes for private functions for this machine.They should be functions
    relevant to the behavior of this state machine
 */
-void InitEEPROM(void);
+
 /*---------------------------- Module Variables ---------------------------*/
 // everybody needs a state variable, you may need others as well.
 // type of state variable should match htat of enum in header file
@@ -53,7 +53,8 @@ static uint32_t CurrentPage = 0;
 // Variable to assist in TX of SPI data
 static bool transferring = false;  // Transferring data
 static bool transfer_wait = false; // Waiting for transfer to finish
-static bool sent_wren = false;
+static bool sent_wren = false;  // waiting for write enable to finish
+static bool sent_wrdi = false;  // Waiting for write disable to finish
 static bool sent_instr_address = false;
 static uint8_t tx_index = 0;
 static uint8_t bytes_to_write[32];
@@ -223,8 +224,6 @@ ES_Event_t RunEEPROMSM(ES_Event_t ThisEvent)
     {
       if (ThisEvent.EventType == ES_INIT)    // only respond to ES_Init
       {
-          InitEEPROM();
-
         // now put the machine into the actual initial state
         CurrentState = EEPROMWaiting;
       }
@@ -272,6 +271,12 @@ ES_Event_t RunEEPROMSM(ES_Event_t ThisEvent)
           CurrentState = EEPROMWriting;
           SPI5CONbits.STXISEL = 0b11; // Interrupt is generated when the buffer is not full (has one or more empty elements)
           IEC5SET = _IEC5_SPI5TXIE_MASK; // Enable interrupt
+        }
+        break;
+        
+        case EV_WRITE_DISABLED:
+        {
+          CurrentState == EEPROMWaiting;
         }
         break;
 
@@ -339,8 +344,23 @@ void WriteEnable(void) {
     }
     
     sent_wren = true;  // Waiting for SS go inactive after sending WREN
-    sent_instr_address; // Have not yet send address/instruction bytes
+    sent_instr_address = false; // Have not yet send address/instruction bytes
     SPI5BUF = WREN;
+    
+    // Enable the transmit interrupt
+    SPI5CONbits.STXISEL = 0b00; // Interrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
+    IEC5SET = _IEC5_SPI5TXIE_MASK;
+}
+
+void WriteDisable(void) {
+    
+    if (CurrentState != EEPROMWriteEnabled) {
+        // Not in valid state to perform write disable
+        return;
+    }
+    
+    sent_wrdi = true;
+    SPI5BUF = WRDI;
     
     // Enable the transmit interrupt
     SPI5CONbits.STXISEL = 0b00; // Interrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
@@ -447,11 +467,6 @@ void ReadStatusEEPROM(void) {
  private functions
  ***************************************************************************/
 
-// Performs SPI actions needed to set up EEPROM for writing/reading
-void InitEEPROM(void) {
-    // Nothing to do here
-}
-
 void __ISR(_SPI5_TX_VECTOR, IPL7SRS) SPI5TXHandler(void)
 {
     IEC5CLR = _IEC5_SPI5TXIE_MASK; // Disable the interrupt
@@ -469,6 +484,14 @@ void __ISR(_SPI5_TX_VECTOR, IPL7SRS) SPI5TXHandler(void)
             new_event.EventParam = 1; // Indicate we have data to transfer
         }
         
+        PostEEPROMSM(new_event);
+    } else if (sent_wrdi) {
+        sent_wrdi = false;
+        
+        DB_printf("Sent WRDI, SS Status = %d\r\n", PORTFbits.RF12);
+        
+        // Post Event to say we have write disabled complete
+        ES_Event_t new_event = {EV_WRITE_DISABLED, 0};        
         PostEEPROMSM(new_event);
     } else if (transferring) {  // Here we finish sending outstanding bytes
         

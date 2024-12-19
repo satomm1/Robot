@@ -27,6 +27,7 @@ ES_Event_t RunEEPROMSM(ES_Event_t ThisEvent);
 EEPROMState_t QueryEEPROMSM(void);
 
 void WriteEnable(void);
+void WriteDisable(void);
 void WriteByteEEPROM(uint8_t data);
 void WriteMultiBytesEEPROM(uint8_t *data, uint16_t N);
 void ReadByteEEPROM(uint32_t address);
