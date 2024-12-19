@@ -27,5 +27,11 @@ bool PostEEPROMSM(ES_Event_t ThisEvent);
 ES_Event_t RunEEPROMSM(ES_Event_t ThisEvent);
 EEPROMState_t QueryEEPROMSM(void);
 
+void WriteByteEEPROM(uint8_t data);
+void WriteMultiBytesEEPROM(uint8_t *data, uint16_t N);
+void ReadByteEEPROM(uint32_t address);
+void ReadMultiBytesEEPROM(uint32_t address, uint16_t N);
+void ReadStatusEEPROM(void);
+
 #endif /* FSMEEPROM_H */
 
