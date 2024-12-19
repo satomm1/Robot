@@ -245,13 +245,18 @@ ES_Event_t RunEEPROMSM(ES_Event_t ThisEvent)
         break;
         
         case EV_WRITE_ENABLED:
-        {            
+        {    
+            DB_printf("Sent WREN, SS Status = %d\r\n", PORTFbits.RF12);
+            
             if (ThisEvent.EventParam) {
                 CurrentState = EEPROMWriting;
                 SPI5CONbits.STXISEL = 0b11; // Interrupt is generated when the buffer is not full (has one or more empty elements)
                 IEC5SET = _IEC5_SPI5TXIE_MASK; // Enable interrupt
+                
+                DB_printf("Entered EEPROMWriting\r\n");
             } else {
                 CurrentState = EEPROMWriteEnabled;
+                DB_printf("Entered EEPROMWriteEnabled\r\n");
             }
         }
         break;
@@ -271,12 +276,18 @@ ES_Event_t RunEEPROMSM(ES_Event_t ThisEvent)
           CurrentState = EEPROMWriting;
           SPI5CONbits.STXISEL = 0b11; // Interrupt is generated when the buffer is not full (has one or more empty elements)
           IEC5SET = _IEC5_SPI5TXIE_MASK; // Enable interrupt
+          
+          DB_printf("Entered EEPROMWriting\r\n");
         }
         break;
         
         case EV_WRITE_DISABLED:
         {
-          CurrentState == EEPROMWaiting;
+          DB_printf("Sent WRDI, SS Status = %d\r\n", PORTFbits.RF12);
+            
+          CurrentState = EEPROMWaiting;
+          
+          DB_printf("Entered EEPROMWaiting\r\n");
         }
         break;
 
@@ -294,6 +305,8 @@ ES_Event_t RunEEPROMSM(ES_Event_t ThisEvent)
         { 
           // 5 ms wait timer elapsed, write complete
           CurrentState = EEPROMWaiting;  
+          
+          DB_printf("Entered EEPROMWaiting\r\n");
         }
         break;
 
@@ -340,15 +353,19 @@ void WriteEnable(void) {
     if (CurrentState != EEPROMWaiting) {
         // Not in valid state to perform write enable
         transferring = false;
+        DB_printf("Not in valid state to write enable!\r\n");
         return;
     }
+    
+    // Change interrupt trigger and clear interrupt flag
+    SPI5CONbits.STXISEL = 0b00; // Interrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
+    IFS5CLR = _IFS5_SPI5TXIF_MASK;
     
     sent_wren = true;  // Waiting for SS go inactive after sending WREN
     sent_instr_address = false; // Have not yet send address/instruction bytes
     SPI5BUF = WREN;
     
-    // Enable the transmit interrupt
-    SPI5CONbits.STXISEL = 0b00; // Interrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
+    // Enable interrupt
     IEC5SET = _IEC5_SPI5TXIE_MASK;
 }
 
@@ -356,14 +373,18 @@ void WriteDisable(void) {
     
     if (CurrentState != EEPROMWriteEnabled) {
         // Not in valid state to perform write disable
+        DB_printf("Not write enabled! No need to write disable...\r\n");
         return;
     }
+    
+    // Change interrupt trigger and clear interrupt flag
+    SPI5CONbits.STXISEL = 0b00; // Interrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
+    IFS5CLR = _IFS5_SPI5TXIF_MASK;
     
     sent_wrdi = true;
     SPI5BUF = WRDI;
     
     // Enable the transmit interrupt
-    SPI5CONbits.STXISEL = 0b00; // Interrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
     IEC5SET = _IEC5_SPI5TXIE_MASK;
 }
 
@@ -474,9 +495,7 @@ void __ISR(_SPI5_TX_VECTOR, IPL7SRS) SPI5TXHandler(void)
     
     if (sent_wren) {
         sent_wren = false;
-        
-        DB_printf("Sent WREN, SS Status = %d\r\n", PORTFbits.RF12);
-        
+                
         // Post Event to say we have write enabled complete
         ES_Event_t new_event = {EV_WRITE_ENABLED, 0};
         
@@ -487,8 +506,6 @@ void __ISR(_SPI5_TX_VECTOR, IPL7SRS) SPI5TXHandler(void)
         PostEEPROMSM(new_event);
     } else if (sent_wrdi) {
         sent_wrdi = false;
-        
-        DB_printf("Sent WRDI, SS Status = %d\r\n", PORTFbits.RF12);
         
         // Post Event to say we have write disabled complete
         ES_Event_t new_event = {EV_WRITE_DISABLED, 0};        
@@ -574,8 +591,8 @@ void __ISR(_SPI5_RX_VECTOR, IPL7SRS) SPI5RXHandler(void) {
             rx_data = SPI5BUF;
             
             rx_indx += 1;
-            if (rx_indx == 1) {
-                DB_printf("Status is: %d", rx_data);
+            if (rx_indx == 2) {
+                DB_printf("Status is: %d\r\n", rx_data);
                 rx_indx = 0;
                 
                 status_reading = false;
