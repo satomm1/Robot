@@ -19,9 +19,11 @@
 #include "ES_Configure.h"
 #include "ES_Framework.h"
 #include "MotorSM.h"
+#include "LEDService.h"
 #include "dbprintf.h"
 #include <sys/attribs.h>
 #include <math.h>
+#include "matt_circular_buffer.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 #define IC_PERIOD 65535 // Input capture period
@@ -49,10 +51,13 @@
 
 #define V_MAX 1 // max 1 m/sec
 #define w_MAX 2 // max 2 rad/sec
+
+#define BUFF_SIZE 65
 /*---------------------------- Module Functions ---------------------------*/
 /* prototypes for private functions for this machine.They should be functions
    relevant to the behavior of this state machine
 */
+static void Store_RL_Data(void);
 
 /*---------------------------- Module Variables ---------------------------*/
 // everybody needs a state variable, you may need others as well.
@@ -87,6 +92,17 @@ static Direction_t RightDirection = Forward;
 
 static float V_desired = 0.;
 
+static uint16_t RL_Data_Index = 0;
+static int16_t RL_Data[1000][32];
+static uint16_t RL_Data_Printing_Index = 0;
+
+static uint16_t circ_buff_size = BUFF_SIZE;
+static int16_t circ_buff_array[BUFF_SIZE];
+static circular_buffer_t cb;  // Buffer for keeping State data
+
+static int16_t recording_array[200];
+static circular_buffer_t cb_record;  // Buffer for keeping track of when to move data into RL_Data
+
 // with the introduction of Gen2, we need a module level Priority var as well
 static uint8_t MyPriority;
 
@@ -108,6 +124,10 @@ static uint8_t MyPriority;
 bool InitMotorSM(uint8_t Priority)
 {
   ES_Event_t ThisEvent;
+  
+  // Initialize the circular buffer
+  circular_buffer_init(&cb, circ_buff_array, circ_buff_size);
+  circular_buffer_init(&cb_record, recording_array, 200);
   
   // Set Motor Driving/Direction pins to outputs
   TRISFCLR = _TRISF_TRISF2_MASK | _TRISF_TRISF8_MASK;
@@ -360,6 +380,7 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
         
         case ES_TIMEOUT:
         {
+            if (ThisEvent.EventParam == MOTOR_TIMER) {
 //            uint16_t left_rpm = SPEED_CONVERSION_FACTOR / LeftPulseLength;
 //            uint16_t right_rpm = SPEED_CONVERSION_FACTOR / RightPulseLength;
 //            DB_printf("\r\n \r\n \r\n \r\n");
@@ -372,7 +393,37 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
 //            DB_printf("LR: %d\r\n", LeftRotations);
 //            DB_printf("RR: %d\r\n", RightRotations);
             
-            ES_Timer_InitTimer(MOTOR_TIMER, 500);
+                ES_Timer_InitTimer(MOTOR_TIMER, 500);
+            } else if (ThisEvent.EventParam == RL_TIMER) {
+                // Print 2-1000 entries of RL DATA...
+                DB_printf("%d.......\r\n", RL_Data_Printing_Index+1);
+                for (uint8_t i=0; i<31; i++) {
+                    DB_printf("%d,", RL_Data[RL_Data_Printing_Index][i]);
+                }
+                DB_printf("%d\r\n", RL_Data[RL_Data_Printing_Index][31]);
+
+                RL_Data_Printing_Index += 1;
+                
+                if (RL_Data_Printing_Index != RL_Data_Index) {
+                    ES_Timer_InitTimer(RL_TIMER, 10);
+                } else {
+                    RL_Data_Index = 0;
+                }
+            }
+        }
+        break;
+        
+        case EV_PRINT_RL_DATA:
+        {
+            // Print first entry of RL Data
+            DB_printf("1.......\r\n");
+            for (uint8_t i=0; i<31; i++) {
+                DB_printf("%d,", RL_Data[0][i]);
+            }
+            DB_printf("%d\r\n", RL_Data[0][31]);
+            
+            RL_Data_Printing_Index = 1;
+            ES_Timer_InitTimer(RL_TIMER, 10);
         }
         break;
         
@@ -422,7 +473,8 @@ MotorState_t QueryMotorSM(void)
      already correctly set to have wheels moving in correct direction
 ****************************************************************************/
 void SetDesiredRPM(uint16_t LeftRPM, uint16_t RightRPM)
-{
+{    
+  DB_printf("Desired RPM: %d, %d\r\n", LeftRPM, RightRPM);
   DesiredLeftRPM = LeftRPM;
   DesiredRightRPM = RightRPM;
 }
@@ -443,8 +495,25 @@ void SetDesiredRPM(uint16_t LeftRPM, uint16_t RightRPM)
 ****************************************************************************/
 void SetDesiredSpeed(float V, float w)
 {
-    V_desired = V;
+    if (V != V_desired && (V != 0 || w != 0)) {
+      DB_printf("Recording...\r\n");
+      circular_buffer_reset(&cb_record);
+      for (uint8_t i=9; i<=100; i++) { // First 0.16 sec
+          circular_buffer_put(&cb_record, i);
+      }
+      for (uint16_t i=125; i<625; i+=25) {
+          circular_buffer_put(&cb_record, i);
+      }
+      circular_buffer_put(&cb_record, 625); // 1 s
+      circular_buffer_put(&cb_record, 688); // 1.1 s
+      circular_buffer_put(&cb_record, 750); // 1.2 s
+      circular_buffer_put(&cb_record, 812); // 1.3 s
+      circular_buffer_put(&cb_record, 875); // 1.4 s
+      circular_buffer_put(&cb_record, 937); // 1.5 s
+  }
     
+    V_desired = V;
+        
     // We turn off control for stopped to prevent jittering
     if (V==0 && w == 0) {
         
@@ -461,6 +530,7 @@ void SetDesiredSpeed(float V, float w)
         OC1RS = 0;
         OC2RS = 0;
         
+        SetDesiredRPM(0,0);
         return;
     } else {
         T1CONbits.ON = 1; // Turn timer 1 back on
@@ -587,6 +657,10 @@ void ResetPosition(void) {
     theta = 0;
 }
 
+void PrintBufferSize(void) {
+    DB_printf("Buffer Size: %d\r\n", circular_buffer_size(&cb));
+}
+
 /***************************************************************************
  private functions
  ***************************************************************************/
@@ -697,12 +771,19 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     static float RightErrorDiff;
     static int16_t LeftDutyCycle; // Only static here for speed
     static int16_t RightDutyCycle; // Only static here for speed
+    static int16_t PrevLeftDutyCycle; // Only static here for speed
+    static int16_t PrevRightDutyCycle; // Only static here for speed
+    static int16_t LeftDelta=0; // Only static here for speed
+    static int16_t RightDelta=0; // Only static here for speed
+    static int16_t LeftReward; // Only static here for speed
     
     // Initialize variables used throughout the ISR (Static for speed)
-    static uint16_t ActualLeftRPM;
-    static uint16_t ActualRightRPM;
+    static uint16_t ActualLeftRPM = 0;
+    static uint16_t ActualRightRPM = 0;
     
     IFS0CLR = _IFS0_T1IF_MASK; // Clear the timer interrupt
+    
+//    LATHbits.LATH4 = 1;
     
     // Calculate Current RPM based on Pulse Lengths from encoders
     ActualLeftRPM = SPEED_CONVERSION_FACTOR / LeftPulseLength;
@@ -711,6 +792,13 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     // Calculate error from desired RPM
     LeftError = DesiredLeftRPM - ActualLeftRPM;
     RightError = DesiredRightRPM - ActualRightRPM;
+    
+    LeftReward = -3*LeftError*LeftError - LeftDelta*LeftDelta;
+    
+    circular_buffer_put(&cb, (int16_t)(LeftReward));
+    circular_buffer_put(&cb, ActualLeftRPM);
+    circular_buffer_put(&cb, DesiredLeftRPM);
+    circular_buffer_put(&cb, PrevLeftDutyCycle);
     
 //    DB_printf("%d, %d", (int16_t)LeftError, (int16_t)LeftErrorSum);
     
@@ -757,6 +845,36 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
         RightDutyCycle = 100 - RightDutyCycle;
     }
     OC1RS = (OC_PERIOD + 1)/100 * RightDutyCycle;
+    
+    LeftDelta = LeftDutyCycle - PrevLeftDutyCycle;
+    circular_buffer_put(&cb, LeftDelta);
+    
+    PrevLeftDutyCycle = LeftDutyCycle;
+    PrevRightDutyCycle = RightDutyCycle;
+    
+    int16_t peek_data;
+    uint8_t peek_count = circular_buffer_peek(&cb_record, &peek_data, 1);
+    if (peek_count && (peek_data==0)) {
+        
+        // Remove the entry since it is now 0
+        circular_buffer_get(&cb_record, &peek_data);
+        
+        // Save the RL Data
+        if (RL_Data_Index < 1000) {
+            Store_RL_Data();
+        }
+        
+        if (RL_Data_Index == 1000) {
+            ES_Event_t NewEvent = {EV_LED_ON, 4};
+            PostLEDService(NewEvent);
+            RL_Data_Index = 1001;
+        }
+    }
+    
+    // Decrement the record counts
+    circular_buffer_decrement_all(&cb_record);
+    
+//    LATHbits.LATH4 = 0;
 }
 
 /****************************************************************************
@@ -937,4 +1055,53 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
         x = x + V/omega * (sinf(theta) - sinf(prev_theta));
         y = y - V/omega * (cosf(theta) - cosf(prev_theta));
     }
+}
+
+static void Store_RL_Data(void) {
+    
+    // Now store the set of data in RL_Data
+    int16_t peek_rl_data[BUFF_SIZE];
+    uint16_t peek_count = circular_buffer_peek(&cb, peek_rl_data, BUFF_SIZE);
+    
+    // States (2 prior, current, and 1 after)
+    RL_Data[RL_Data_Index][0] = peek_rl_data[1];
+    RL_Data[RL_Data_Index][1] = peek_rl_data[2];
+    RL_Data[RL_Data_Index][2] = peek_rl_data[3];
+    RL_Data[RL_Data_Index][3] = peek_rl_data[6];
+    RL_Data[RL_Data_Index][4] = peek_rl_data[7];
+    RL_Data[RL_Data_Index][5] = peek_rl_data[8];
+    RL_Data[RL_Data_Index][6] = peek_rl_data[11];
+    RL_Data[RL_Data_Index][7] = peek_rl_data[12];
+    RL_Data[RL_Data_Index][8] = peek_rl_data[13];
+    RL_Data[RL_Data_Index][9] = peek_rl_data[16];
+    RL_Data[RL_Data_Index][10] = peek_rl_data[17];
+    RL_Data[RL_Data_Index][11] = peek_rl_data[18];
+
+    // 3 States ending at t+10
+    RL_Data[RL_Data_Index][12] = peek_rl_data[51];
+    RL_Data[RL_Data_Index][13] = peek_rl_data[52];
+    RL_Data[RL_Data_Index][14] = peek_rl_data[53];
+    RL_Data[RL_Data_Index][15] = peek_rl_data[56];
+    RL_Data[RL_Data_Index][16] = peek_rl_data[57];
+    RL_Data[RL_Data_Index][17] = peek_rl_data[58];
+    RL_Data[RL_Data_Index][18] = peek_rl_data[61];
+    RL_Data[RL_Data_Index][19] = peek_rl_data[62];
+    RL_Data[RL_Data_Index][20] = peek_rl_data[63];
+
+    // Action taken
+    RL_Data[RL_Data_Index][21] =  peek_rl_data[14];
+
+    // Rewards Received 
+    RL_Data[RL_Data_Index][22] = peek_rl_data[15];
+    RL_Data[RL_Data_Index][23] = peek_rl_data[20];
+    RL_Data[RL_Data_Index][24] = peek_rl_data[25];
+    RL_Data[RL_Data_Index][25] = peek_rl_data[30];
+    RL_Data[RL_Data_Index][26] = peek_rl_data[35];
+    RL_Data[RL_Data_Index][27] = peek_rl_data[40];
+    RL_Data[RL_Data_Index][28] = peek_rl_data[45];
+    RL_Data[RL_Data_Index][29] = peek_rl_data[50];
+    RL_Data[RL_Data_Index][30] = peek_rl_data[55];
+    RL_Data[RL_Data_Index][31] = peek_rl_data[60];
+
+    RL_Data_Index += 1;
 }

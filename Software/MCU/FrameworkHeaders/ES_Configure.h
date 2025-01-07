@@ -292,7 +292,8 @@ typedef enum
   EV_WRITE_ENABLED,
   EV_WRITE_DISABLED,
   EV_WRITE_COMPLETE,
-  EV_BEGIN_WRITE
+  EV_BEGIN_WRITE,
+  EV_PRINT_RL_DATA
 }ES_EventType_t;
 
 /****************************************************************************/
@@ -342,7 +343,7 @@ typedef enum
 #define TIMER3_RESP_FUNC TIMER_UNUSED
 #define TIMER4_RESP_FUNC TIMER_UNUSED
 #define TIMER5_RESP_FUNC TIMER_UNUSED
-#define TIMER6_RESP_FUNC TIMER_UNUSED
+#define TIMER6_RESP_FUNC PostMotorSM
 #define TIMER7_RESP_FUNC PostEEPROMSM
 #define TIMER8_RESP_FUNC PostImuSM
 #define TIMER9_RESP_FUNC PostReflectService
@@ -369,5 +370,6 @@ typedef enum
 #define REFLECT_TIMER 9
 #define IMU_TIMER 8
 #define EEPROM_TIMER 7
+#define RL_TIMER 6
 
 #endif /* ES_CONFIGURE_H */
