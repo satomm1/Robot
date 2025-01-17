@@ -30,6 +30,9 @@
 //#define PCB_REV 1
 #define PCB_REV 2
 
+// Define if we want to log data for RL Motor control
+#define RL_MOTOR_LOGGING
+
 
 /****************************************************************************/
 // The maximum number of services sets an upper bound on the number of

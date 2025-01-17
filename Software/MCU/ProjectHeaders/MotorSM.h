@@ -45,6 +45,7 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent);
 MotorState_t QueryMotorSM(void);
 void SetDesiredRPM(uint16_t LeftRPM, uint16_t RightRPM);
 void SetDesiredSpeed(float LinearVelocity, float AngularVelocity);
+void MultiplyDesiredSpeed(float Factor);
 void WritePositionToSPI(uint8_t *Message2Send);
 void WriteDeadReckoningVelocityToSPI(uint8_t *Message2Send);
 void ResetPosition(void);

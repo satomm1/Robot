@@ -91,6 +91,7 @@ static Direction_t LeftDirection = Forward;
 static Direction_t RightDirection = Forward;
 
 static float V_desired = 0.;
+static float w_desired = 0.;
 
 static uint16_t RL_Data_Index = 0;
 static int16_t RL_Data[1000][32];
@@ -396,18 +397,24 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
                 ES_Timer_InitTimer(MOTOR_TIMER, 500);
             } else if (ThisEvent.EventParam == RL_TIMER) {
                 // Print 2-1000 entries of RL DATA...
-                DB_printf("%d.......\r\n", RL_Data_Printing_Index+1);
+//                DB_printf("%d.......\r\n", RL_Data_Printing_Index+1);
                 for (uint8_t i=0; i<31; i++) {
                     DB_printf("%d,", RL_Data[RL_Data_Printing_Index][i]);
+                    while (!U1STAbits.TRMT) {
+                        // Block while writing...
+                    }
                 }
                 DB_printf("%d\r\n", RL_Data[RL_Data_Printing_Index][31]);
 
                 RL_Data_Printing_Index += 1;
                 
                 if (RL_Data_Printing_Index != RL_Data_Index) {
-                    ES_Timer_InitTimer(RL_TIMER, 10);
+                    ES_Timer_InitTimer(RL_TIMER, 15);
                 } else {
                     RL_Data_Index = 0;
+                    
+                    ES_Event_t NewEvent = {EV_LED_OFF, 4};
+                    PostLEDService(NewEvent);
                 }
             }
         }
@@ -416,7 +423,7 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
         case EV_PRINT_RL_DATA:
         {
             // Print first entry of RL Data
-            DB_printf("1.......\r\n");
+//            DB_printf("1.......\r\n");
             for (uint8_t i=0; i<31; i++) {
                 DB_printf("%d,", RL_Data[0][i]);
             }
@@ -474,7 +481,7 @@ MotorState_t QueryMotorSM(void)
 ****************************************************************************/
 void SetDesiredRPM(uint16_t LeftRPM, uint16_t RightRPM)
 {    
-  DB_printf("Desired RPM: %d, %d\r\n", LeftRPM, RightRPM);
+//  DB_printf("Desired RPM: %d, %d\r\n", LeftRPM, RightRPM);
   DesiredLeftRPM = LeftRPM;
   DesiredRightRPM = RightRPM;
 }
@@ -495,8 +502,8 @@ void SetDesiredRPM(uint16_t LeftRPM, uint16_t RightRPM)
 ****************************************************************************/
 void SetDesiredSpeed(float V, float w)
 {
+#ifdef RL_MOTOR_LOGGING
     if (V != V_desired && (V != 0 || w != 0)) {
-      DB_printf("Recording...\r\n");
       circular_buffer_reset(&cb_record);
       for (uint8_t i=9; i<=100; i++) { // First 0.16 sec
           circular_buffer_put(&cb_record, i);
@@ -510,9 +517,11 @@ void SetDesiredSpeed(float V, float w)
       circular_buffer_put(&cb_record, 812); // 1.3 s
       circular_buffer_put(&cb_record, 875); // 1.4 s
       circular_buffer_put(&cb_record, 937); // 1.5 s
-  }
+    }
+#endif
     
     V_desired = V;
+    w_desired = w;
         
     // We turn off control for stopped to prevent jittering
     if (V==0 && w == 0) {
@@ -583,6 +592,10 @@ void SetDesiredSpeed(float V, float w)
     
     // Last set the desired RPM variables
     SetDesiredRPM(left_w, right_w);
+}
+
+void MultiplyDesiredSpeed(float Factor) {
+    SetDesiredSpeed(Factor*V_desired, Factor*w_desired);    
 }
 
 /****************************************************************************
@@ -776,6 +789,8 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     static int16_t LeftDelta=0; // Only static here for speed
     static int16_t RightDelta=0; // Only static here for speed
     static int16_t LeftReward; // Only static here for speed
+    static int16_t peek_data; // Only static here for speed
+    static uint8_t peek_count; // Only static here for speed
     
     // Initialize variables used throughout the ISR (Static for speed)
     static uint16_t ActualLeftRPM = 0;
@@ -793,12 +808,20 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     LeftError = DesiredLeftRPM - ActualLeftRPM;
     RightError = DesiredRightRPM - ActualRightRPM;
     
-    LeftReward = -3*LeftError*LeftError - LeftDelta*LeftDelta;
-    
+#ifdef RL_MOTOR_LOGGING
+//    LeftReward = -3*LeftError*LeftError - LeftDelta*LeftDelta;
+    LeftReward = -LeftError*LeftError;
+            
     circular_buffer_put(&cb, (int16_t)(LeftReward));
-    circular_buffer_put(&cb, ActualLeftRPM);
-    circular_buffer_put(&cb, DesiredLeftRPM);
+    if (LeftDirection == Backward) {
+        circular_buffer_put(&cb, -ActualLeftRPM);
+        circular_buffer_put(&cb, -DesiredLeftRPM);
+    } else {
+        circular_buffer_put(&cb, ActualLeftRPM);
+        circular_buffer_put(&cb, DesiredLeftRPM);
+    }
     circular_buffer_put(&cb, PrevLeftDutyCycle);
+#endif
     
 //    DB_printf("%d, %d", (int16_t)LeftError, (int16_t)LeftErrorSum);
     
@@ -846,14 +869,16 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     }
     OC1RS = (OC_PERIOD + 1)/100 * RightDutyCycle;
     
+#ifdef RL_MOTOR_LOGGING
     LeftDelta = LeftDutyCycle - PrevLeftDutyCycle;
     circular_buffer_put(&cb, LeftDelta);
+#endif
     
     PrevLeftDutyCycle = LeftDutyCycle;
     PrevRightDutyCycle = RightDutyCycle;
     
-    int16_t peek_data;
-    uint8_t peek_count = circular_buffer_peek(&cb_record, &peek_data, 1);
+#ifdef RL_MOTOR_LOGGING
+    peek_count = circular_buffer_peek(&cb_record, &peek_data, 1);
     if (peek_count && (peek_data==0)) {
         
         // Remove the entry since it is now 0
@@ -873,6 +898,7 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     
     // Decrement the record counts
     circular_buffer_decrement_all(&cb_record);
+#endif
     
 //    LATHbits.LATH4 = 0;
 }
