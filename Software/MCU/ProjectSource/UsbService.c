@@ -91,9 +91,8 @@ bool InitUsbService(uint8_t Priority)
   DB_printf( "\n\r\n");
   DB_printf("Robot ID: %d\r\n", ROBOT_ID);
   DB_printf("Running on Rev 0.%d\n", PCB_REV);
+  DB_printf("Using motor type %d\n", MOTOR_TYPE);
   DB_printf( "\n\r\n");
-  DB_printf( "Press any key to post key-stroke events\n\r");
-  DB_printf( "Press 'xxx' to test xxx \n\r");
 
   // post the initial transition event
   ThisEvent.EventType = ES_INIT;
@@ -269,6 +268,18 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
       
       if ('6' == ThisEvent.EventParam) {
           SetDesiredSpeed(-0.1, 0);
+      }
+           
+      if ('7' == ThisEvent.EventParam) {
+          MultiplyDesiredSpeed(1.1);
+      }
+      
+      if ('8' == ThisEvent.EventParam) {
+          MultiplyDesiredSpeed(0.9);
+      }
+      
+      if ('9' == ThisEvent.EventParam) {
+          MultiplyDesiredSpeed(-1);
       }
       
 //      if ('8' == ThisEvent.EventParam) {

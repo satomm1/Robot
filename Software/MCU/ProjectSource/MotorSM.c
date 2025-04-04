@@ -35,9 +35,9 @@
 #define Ki 0.8 // Integral constant for PID law
 #define Kd 3 // Derivative constant for PID law
 
-#if (PCB_REV==1)
+#if (MOTOR_TYPE==1)
 #define ENCODER_RESOLUTION 374 // Number of pulses per revolution
-#elif (PCB_REV==2)
+#elif (MOTOR_TYPE==2)
 //#define ENCODER_RESOLUTION 1440 // Number of pulses per revolution
 #define ENCODER_RESOLUTION 360
 #endif
@@ -243,10 +243,10 @@ bool InitMotorSM(uint8_t Priority)
 //  IC3CONbits.ICM = 0b100; // Every 4th rising edge mode
   
 //  IC4CONbits.ICM = 0b011; // Every edge mode
-#if (PCB_REV==1)
+#if (MOTOR_TYPE==1)
   IC1CONbits.ICM = 0b011; // Every rising edge mode
   IC3CONbits.ICM = 0b011; // Every rising edge mode
-#elif (PCB_REV==2)
+#elif (MOTOR_TYPE==2)
   IC1CONbits.ICM = 0b100; // Every 4th rising edge mode
   IC3CONbits.ICM = 0b100; // Every 4th rising edge mode
 #endif
