@@ -50,20 +50,24 @@ static uint32_t CurrentAddress = 0;
 static uint32_t SamplesOnCurrentPage = 0;
 static uint32_t CurrentPage = 0;
 
+static uint32_t ReadAddress = 0;
+
 // Variable to assist in TX of SPI data
 static bool transferring = false;  // Transferring data
 static bool transfer_wait = false; // Waiting for transfer to finish
 static bool sent_wren = false;  // waiting for write enable to finish
 static bool sent_wrdi = false;  // Waiting for write disable to finish
 static bool sent_instr_address = false;
-static uint8_t tx_index = 0;
-static uint8_t bytes_to_write[32];
+static uint16_t tx_index = 0;
+static uint8_t bytes_to_write[256];
 static uint16_t num_bytes_to_write = 0;
 
 // Variables to assist in RX of SPI data
 static bool receiving = false;
-static uint8_t bytes_read[32];
-static uint16_t num_bytes_to_read = 0;
+static bool receiving_tx = false;
+static bool receiving_tx_multi = false;
+static uint8_t bytes_read[256];
+static volatile uint16_t num_bytes_to_read = 0;
 
 // Variable to assist in reading status
 static bool status_reading = false;
@@ -117,6 +121,8 @@ bool InitEEPROMSM(uint8_t Priority)
   RPG0R = 0b1001; // RG0 -> SDO5
   RPF12R = 0b1001; // RF12 -> SS5
   
+//  LATFbits.LATF12 = 1;
+  
   SPI5CON = 0;
   SPI5CON2 = 0;
   SPI5CONbits.MSSEN = 1; // SS automatically driven
@@ -125,7 +131,7 @@ bool InitEEPROMSM(uint8_t Priority)
   SPI5CONbits.DISSDO = 0; // SDO5 controlled by the module
   SPI5CONbits.MODE32 = 0;
   SPI5CONbits.MODE16 = 0; // 8 bit mode
-  SPI5CONbits.SMP = 0; // Data sampled at middle
+  SPI5CONbits.SMP = 1; // Data sampled at middle
   SPI5CONbits.CKE = 0; // Output data changes on transition from idle clock to active clock
   SPI5CONbits.CKP = 1; // Idle clock state is high
   SPI5CONbits.MSTEN = 1; // Host mode
@@ -133,7 +139,7 @@ bool InitEEPROMSM(uint8_t Priority)
   SPI5CONbits.STXISEL = 0b00; // Interrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
   SPI5CONbits.SRXISEL = 0b01; // Interrupt is generated when the buffer is not empty
   
-  SPI5BRG = 9; // F_pb = 50 MHz --> F_sck = 2.5 MHz,  (EEPROM max 10 MHz)
+  SPI5BRG = 39; // F_pb = 50 MHz --> F_sck = 2.5 MHz,  (EEPROM max 10 MHz)
   
   SPI5STATbits.SPIROV = 0; // Clear overflow bit
   
@@ -238,7 +244,7 @@ ES_Event_t RunEEPROMSM(ES_Event_t ThisEvent)
         case EV_EEPROM_RX_COMPLETE:
         {
             DB_printf("Received Data is: \r\n");
-            for (uint8_t i = 0; i<num_bytes_to_read; i++) {
+            for (uint16_t i = 0; i<num_bytes_to_read; i++) {
                 DB_printf("%d\r\n", bytes_read[i]);
             }
         }
@@ -250,6 +256,9 @@ ES_Event_t RunEEPROMSM(ES_Event_t ThisEvent)
             
             if (ThisEvent.EventParam) {
                 CurrentState = EEPROMWriting;
+                
+                SPI5CONbits.MSSEN = 0;
+                LATFbits.LATF12 = 0;
                 SPI5CONbits.STXISEL = 0b11; // Interrupt is generated when the buffer is not full (has one or more empty elements)
                 IEC5SET = _IEC5_SPI5TXIE_MASK; // Enable interrupt
                 
@@ -274,6 +283,8 @@ ES_Event_t RunEEPROMSM(ES_Event_t ThisEvent)
         case EV_BEGIN_WRITE: 
         { 
           CurrentState = EEPROMWriting;
+          SPI5CONbits.MSSEN = 0;
+          LATFbits.LATF12 = 0;
           SPI5CONbits.STXISEL = 0b11; // Interrupt is generated when the buffer is not full (has one or more empty elements)
           IEC5SET = _IEC5_SPI5TXIE_MASK; // Enable interrupt
           
@@ -363,6 +374,7 @@ void WriteEnable(void) {
     
     sent_wren = true;  // Waiting for SS go inactive after sending WREN
     sent_instr_address = false; // Have not yet send address/instruction bytes
+    // LATFbits.LATF12 = 0;
     SPI5BUF = WREN;
     
     // Enable interrupt
@@ -382,6 +394,7 @@ void WriteDisable(void) {
     IFS5CLR = _IFS5_SPI5TXIF_MASK;
     
     sent_wrdi = true;
+    // LATFbits.LATF12 = 0;
     SPI5BUF = WRDI;
     
     // Enable the transmit interrupt
@@ -411,8 +424,8 @@ void WriteByteEEPROM(uint8_t data) {
 
 void WriteMultiBytesEEPROM(uint8_t *data, uint16_t N) {
     
-    if (N > 32) {
-        // We don't allow writes of more than 32 bytes at a time
+    if (N > 256) {
+        // We don't allow writes of more than 256 bytes at a time
         return;
     }
     
@@ -422,7 +435,7 @@ void WriteMultiBytesEEPROM(uint8_t *data, uint16_t N) {
     
     tx_index = 0;
     num_bytes_to_write = N;
-    for (uint8_t i = 0; i < N; i++){
+    for (uint16_t i = 0; i < N; i++){
         bytes_to_write[i] = data[i];
     }
     
@@ -440,7 +453,12 @@ void WriteMultiBytesEEPROM(uint8_t *data, uint16_t N) {
 void ReadByteEEPROM(uint32_t address) {
     
     receiving = true; // We are now interested in data we receive
+    receiving_tx = true;
     num_bytes_to_read = 1;
+    
+    // Change interrupt trigger and clear interrupt flag
+    SPI5CONbits.STXISEL = 0b00; // Interrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
+    IFS5CLR = _IFS5_SPI5TXIF_MASK;
     
     // Get relevant address bytes
     uint8_t address_byte1 = (address >> 16) & 0xFF;
@@ -449,37 +467,41 @@ void ReadByteEEPROM(uint32_t address) {
     
     DB_printf("Reading Address: %d\r\n", address);
     
+    // LATFbits.LATF12 = 0;
     SPI5BUF = READ;
     SPI5BUF = address_byte1;
     SPI5BUF = address_byte2;
     SPI5BUF = address_byte3;
     SPI5BUF = 0x0F; // For retrieving data
+    
+    IEC5SET = _IEC5_SPI5TXIE_MASK; // Enable interrupt
 }
 
 void ReadMultiBytesEEPROM(uint32_t address, uint16_t N) {
-    if (N>32) {
-        // Only allowed to read up to 32 bytes at a time
+    if (N>256) {
+        // Only allowed to read up to 256 bytes at a time
         return;
     }
     
-    receiving = true; // We are now interested in data we receive
+    receiving = true;
+    receiving_tx_multi = true;
+    sent_instr_address = false;
     num_bytes_to_read = N;
     
-    // Get relevant address bytes
-    uint8_t address_byte1 = (address >> 16) & 0xFF;
-    uint8_t address_byte2 = (address >> 8) & 0xFF;
-    uint8_t address_byte3 = (address >> 0) & 0xFF;
+    ReadAddress = address;
     
-    SPI5BUF = READ;
-    SPI5BUF = address_byte1;
-    SPI5BUF = address_byte2;
-    SPI5BUF = address_byte3;
-    
-    // TODO: Send correct number of 0b00000000 bytes, will need TX interrupt as well
+    SPI5CONbits.MSSEN = 0;
+    SPI5CONbits.STXISEL = 0b11; // Interrupt is generated when the buffer is not full (has one or more empty elements)
+    LATFbits.LATF12 = 0;
+    IEC5SET = _IEC5_SPI5TXIE_MASK; // Enable interrupt
 }
 
-void ReadStatusEEPROM(void) {
+void ReadStatusEEPROM(void)
+{
+    receiving_tx = true;
     status_reading = true;
+    
+    // LATFbits.LATF12 = 0;
     SPI5BUF = RDSR;
     SPI5BUF = 0xFF;
 }
@@ -495,6 +517,7 @@ void __ISR(_SPI5_TX_VECTOR, IPL7SRS) SPI5TXHandler(void)
     
     if (sent_wren) {
         sent_wren = false;
+        // LATFbits.LATF12 = 1;
                 
         // Post Event to say we have write enabled complete
         ES_Event_t new_event = {EV_WRITE_ENABLED, 0};
@@ -506,6 +529,7 @@ void __ISR(_SPI5_TX_VECTOR, IPL7SRS) SPI5TXHandler(void)
         PostEEPROMSM(new_event);
     } else if (sent_wrdi) {
         sent_wrdi = false;
+        // LATFbits.LATF12 = 1;
         
         // Post Event to say we have write disabled complete
         ES_Event_t new_event = {EV_WRITE_DISABLED, 0};        
@@ -518,10 +542,11 @@ void __ISR(_SPI5_TX_VECTOR, IPL7SRS) SPI5TXHandler(void)
            uint8_t address_byte2 = (CurrentAddress >> 8) & 0xFF;
            uint8_t address_byte1 = (CurrentAddress >> 16) & 0xFF;
 
-           DB_printf("Writing to address: %x\r\n", CurrentAddress);
+           DB_printf("Writing to address: %d\r\n", CurrentAddress);
 
+           // LATFbits.LATF12 = 0;
            // Send Write Sequence
-           SPI5BUF = WRITE; // Write Instruction
+           SPI5BUF = 2; // Write Instruction
            SPI5BUF = address_byte1; // Write Address
            SPI5BUF = address_byte2;
            SPI5BUF = address_byte3;
@@ -530,39 +555,86 @@ void __ISR(_SPI5_TX_VECTOR, IPL7SRS) SPI5TXHandler(void)
         }
         
         // Send bytes as long as we still have bytes to send and TX buffer not full
-        while ((tx_index < num_bytes_to_write) && SPI5STATbits.SPITBF) {
-                SPI5BUF = bytes_to_write[tx_index];
-                tx_index += 1;
+        while ((tx_index < num_bytes_to_write) && !SPI5STATbits.SPITBF) {
+            SPI5BUF = bytes_to_write[tx_index];
+            tx_index += 1;
         }
         
         // Check if still have bytes to send
         if (tx_index == num_bytes_to_write) {
+            DB_printf("tx_index: %d\r\n", tx_index);
             transferring = false;  // Done with TX
             transfer_wait = true; // Now just wait for TX to finish
             SPI5CONbits.STXISEL = 0b00; // Interrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
         }
+        IFS5CLR = _IFS5_SPI5TXIF_MASK;
         IEC5SET = _IEC5_SPI5TXIE_MASK; // Enable interrupt
     } else if (transfer_wait) {  // Here we know we have finished the TX
         transfer_wait = false; // transfer has finished
+         LATFbits.LATF12 = 1;
+         SPI5CONbits.MSSEN = 1;
         
         // Update the current address/page
-        CurrentAddress += 32;
-        SamplesOnCurrentPage += 1;
-        if (SamplesOnCurrentPage == 8) {
-            CurrentPage += 1;
-            SamplesOnCurrentPage = 0;
+        CurrentAddress += 256;
+        CurrentPage += 1;
+        
+        if (CurrentPage == 512) {
+            // Reached max so start at beginning
+            CurrentAddress = 0;
+            CurrentPage = 0;
         }
         
         ES_Timer_InitTimer(EEPROM_TIMER, 5); // Set 5 ms wait timer
+    } else if (receiving_tx) {
+        receiving_tx = false; // Finished transit of data for reading
+        // LATFbits.LATF12 = 1;
+    } else if (receiving_tx_multi) {
+        
+        
+        if (!sent_instr_address) {
+            sent_instr_address = true;
+            tx_index = 0;
+            
+            // Send instruction and address
+            uint8_t address_byte3 = (ReadAddress >> 0) & 0xFF;
+            uint8_t address_byte2 = (ReadAddress >> 8) & 0xFF;
+            uint8_t address_byte1 = (ReadAddress >> 16) & 0xFF;
+            
+            DB_printf("Reading starting at address: %d\r\n", ReadAddress);
+            
+            SPI5BUF = READ;
+            SPI5BUF = address_byte3;
+            SPI5BUF = address_byte2;
+            SPI5BUF = address_byte1;
+        }
+        
+        
+        
+        while ((tx_index < num_bytes_to_read) && !SPI5STATbits.SPITBF) {
+            SPI5BUF = 0x0F; // Write a byte for each byte we want to read.
+            tx_index += 1;
+        }
+        
+        // Check if still have bytes to send
+        if (tx_index == num_bytes_to_read) {
+            receiving_tx_multi = false;  // Done with TX
+            transfer_wait = true; // Now just wait for TX to finish
+            SPI5CONbits.STXISEL = 0b00; // Interrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
+            IFS5CLR = _IFS5_SPI5TXIF_MASK; // clear the interrupt flag 
+            IEC5SET = _IEC5_SPI5TXIE_MASK; // Enable interrupt
+        } else {
+            IFS5CLR = _IFS5_SPI5TXIF_MASK; // clear the interrupt flag 
+            IEC5SET = _IEC5_SPI5TXIE_MASK; // Enable interrupt
+        }
     }
 }
 
 void __ISR(_SPI5_RX_VECTOR, IPL7SRS) SPI5RXHandler(void) {
     
     static uint8_t rx_data;
-    static uint8_t rx_indx = 0;
+    static uint16_t rx_indx = 0;
     
-    if (receiving && SPI5STATbits.RXBUFELM >= 5) {
+    if (receiving) {
         while (!SPI5STATbits.SPIRBE) {
             rx_data = SPI5BUF;
             
@@ -575,6 +647,9 @@ void __ISR(_SPI5_RX_VECTOR, IPL7SRS) SPI5RXHandler(void) {
             rx_indx += 1;
             
             if (rx_indx-4 >= num_bytes_to_read) {
+                
+                DB_printf("rx_indx: %d\r\n", rx_indx);
+                
                 // We read all the bytes we expected to
                 rx_indx = 0;
                 receiving = false;
@@ -584,8 +659,6 @@ void __ISR(_SPI5_RX_VECTOR, IPL7SRS) SPI5RXHandler(void) {
                 PostEEPROMSM(new_event);
             }
         }
-    } else if (receiving) {
-        
     } else if (status_reading) {
         while (!SPI5STATbits.SPIRBE && status_reading) {
             rx_data = SPI5BUF;
