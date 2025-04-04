@@ -112,99 +112,99 @@ bool InitImuSM(uint8_t Priority)
     SPI4CON2 = 0;
   } else if (PCB_REV == 2) {
     // Set interrupt pins to inputs
-    TRISDSET = _TRISD_TRISD12_MASK | _TRISD_TRISD13_MASK;
-
-    INT2R = 0b1010; // Map RD12 -> External interrupt 2
-
-    // Set SPI1 Pins to correct input or output setting
-    TRISDCLR = _TRISD_TRISD1_MASK | _TRISD_TRISD3_MASK | _TRISD_TRISD4_MASK; // Set SCK1, SS1, SDO1 to output
-    TRISDSET = _TRISD_TRISD2_MASK; // Set SDI1 to Input
-        
-    // Map SPI1 Pins to correct function
-    // RD1 is mapped to CLK1 by default
-    RPD4R = 0b0101; // Map RD4 -> SS1
-    RPD3R = 0b0101; // Map RD3 -> SDO1
-    SDI1R = 0b0000; // Map SDI1 -> RD2
-    
-    pSPICON = (__SPI1CONbits_t *)&SPI1CON;
-    pSPICON2 = (__SPI1CON2bits_t *)&SPI1CON2;
-    pSPIBRG = &SPI1BRG;
-    pSPIBUF = &SPI1BUF;
-    pSPISTAT = (__SPI1STATbits_t *)&SPI1STAT;
-    
-    SPI1CON = 0;
-    SPI1CON2 = 0;
+//    TRISDSET = _TRISD_TRISD12_MASK | _TRISD_TRISD13_MASK;
+//
+//    INT2R = 0b1010; // Map RD12 -> External interrupt 2
+//
+//    // Set SPI1 Pins to correct input or output setting
+//    TRISDCLR = _TRISD_TRISD1_MASK | _TRISD_TRISD3_MASK | _TRISD_TRISD4_MASK; // Set SCK1, SS1, SDO1 to output
+//    TRISDSET = _TRISD_TRISD2_MASK; // Set SDI1 to Input
+//        
+//    // Map SPI1 Pins to correct function
+//    // RD1 is mapped to CLK1 by default
+//    RPD4R = 0b0101; // Map RD4 -> SS1
+//    RPD3R = 0b0101; // Map RD3 -> SDO1
+//    SDI1R = 0b0000; // Map SDI1 -> RD2
+//    
+//    pSPICON = (__SPI1CONbits_t *)&SPI1CON;
+//    pSPICON2 = (__SPI1CON2bits_t *)&SPI1CON2;
+//    pSPIBRG = &SPI1BRG;
+//    pSPIBUF = &SPI1BUF;
+//    pSPISTAT = (__SPI1STATbits_t *)&SPI1STAT;
+//    
+//    SPI1CON = 0;
+//    SPI1CON2 = 0;
   }
      
   // Initialize SPIxCON
-  pSPICON->FRMEN = 0; // Disable framed SPI support
-  pSPICON->FRMPOL = 0; // SS1 is active low
-  pSPICON->MSSEN = 1; // SS is automatically driven
-  pSPICON->MCLKSEL = 0; // Use PBCLK2 for the Baud Rate Generator (50 MHz)
-  pSPICON->ENHBUF = 1; // Enhance buffer enabled (use FIFOs)
-  pSPICON->DISSDO = 0; // SDO1 is used by the module
-  pSPICON->MODE32 = 0; // 8 bit mode
-  pSPICON->MODE16 = 0; // 8 bit mode
-  pSPICON->SMP = 1; // Data sampled at middle of data output time
-  pSPICON->CKE = 1; // Serial output data changes on transition from active clock state to idle clock state
-  pSPICON->CKP = 1; // Idle state for the clock is high level
-  pSPICON->MSTEN = 1; // Host mode
-  pSPICON->DISSDI = 0; // The SDI pin is controlled by the module
-  pSPICON->STXISEL = 0b00; // Interrupt generated when last transfer shifted out of SPISR and transmit operations are complete
-  pSPICON->SRXISEL = 0b01; // Interrupt is generated when the buffer is not empty
-
-  pSPICON2->AUDEN = 0; // Audio protocol is disabled
-  
-  while (!pSPISTAT->SPIRBE){
-      uint8_t ClearData = *pSPIBUF;
-  }
-  pSPISTAT->SPIROV = 0; // Clear the Receive overflow bit
-  
-  *pSPIBRG = 15; //15; // 1.56 MHz clock frequency, IMU Has max frequency of 10 MHz
+//  pSPICON->FRMEN = 0; // Disable framed SPI support
+//  pSPICON->FRMPOL = 0; // SS1 is active low
+//  pSPICON->MSSEN = 1; // SS is automatically driven
+//  pSPICON->MCLKSEL = 0; // Use PBCLK2 for the Baud Rate Generator (50 MHz)
+//  pSPICON->ENHBUF = 1; // Enhance buffer enabled (use FIFOs)
+//  pSPICON->DISSDO = 0; // SDO1 is used by the module
+//  pSPICON->MODE32 = 0; // 8 bit mode
+//  pSPICON->MODE16 = 0; // 8 bit mode
+//  pSPICON->SMP = 1; // Data sampled at middle of data output time
+//  pSPICON->CKE = 1; // Serial output data changes on transition from active clock state to idle clock state
+//  pSPICON->CKP = 1; // Idle state for the clock is high level
+//  pSPICON->MSTEN = 1; // Host mode
+//  pSPICON->DISSDI = 0; // The SDI pin is controlled by the module
+//  pSPICON->STXISEL = 0b00; // Interrupt generated when last transfer shifted out of SPISR and transmit operations are complete
+//  pSPICON->SRXISEL = 0b01; // Interrupt is generated when the buffer is not empty
+//
+//  pSPICON2->AUDEN = 0; // Audio protocol is disabled
+//  
+//  while (!pSPISTAT->SPIRBE){
+//      uint8_t ClearData = *pSPIBUF;
+//  }
+//  pSPISTAT->SPIROV = 0; // Clear the Receive overflow bit
+//  
+//  *pSPIBRG = 15; //15; // 1.56 MHz clock frequency, IMU Has max frequency of 10 MHz
     
   
   // Setup Timer 6
-  T6CON = 0;
-  T6CONbits.TCKPS = 0b111; // 1:256 prescale value, 195.3125  kHz
-  T6CONbits.TCS = 0; // Use internal peripheral clock (PBCLK3, 50 MHz)
-  PR6 = 3906; // ~50 Hz
-  TMR6 = 0; // Set TMR5 to 0
-  
-  // Setup Interrupts
-  INTCONbits.MVEC = 1; // Use multivector mode
-  PRISSbits.PRI7SS = 0b0111; // Priority 7 interrupt use shadow set 7
-  
-  // Set interrupt priorities
-  if (PCB_REV == 1) {
-    IPC41bits.SPI4TXIP = 7; // SPI4TX
-    IPC41bits.SPI4RXIP = 7; // SPI4RX
-  } else if (PCB_REV == 2) {
-    IPC27bits.SPI1TXIP = 7; // SPI1TX
-    IPC27bits.SPI1RXIP = 7; // SPI1RX
-  }
-  IPC7bits.T6IP = 7; // T6
-  
-  // Clear interrupt flags
-  if (PCB_REV == 1) {
-    IFS5CLR = _IFS5_SPI4RXIF_MASK | _IFS5_SPI4TXIF_MASK; // SPI4
-  } else if (PCB_REV == 2) {
-    IFS3CLR = _IFS3_SPI1RXIF_MASK | _IFS3_SPI1TXIF_MASK; // SPI1
-  }
-  IFS0CLR = _IFS0_T6IF_MASK; // T6
-  
-  // Disable the RX/TX interrupt
-  if (PCB_REV == 1) {
-    IEC5CLR = _IEC5_SPI4RXIE_MASK | _IEC5_SPI4TXIE_MASK; // SPI4
-  } else if (PCB_REV == 2) {
-    IEC3CLR = _IEC3_SPI1RXIE_MASK | _IEC3_SPI1TXIE_MASK; // SPI1
-  }
-   
+//  T6CON = 0;
+//  T6CONbits.TCKPS = 0b111; // 1:256 prescale value, 195.3125  kHz
+//  T6CONbits.TCS = 0; // Use internal peripheral clock (PBCLK3, 50 MHz)
+//  PR6 = 3906; // ~50 Hz
+//  TMR6 = 0; // Set TMR5 to 0
+//  
+//  // Setup Interrupts
+//  INTCONbits.MVEC = 1; // Use multivector mode
+//  PRISSbits.PRI7SS = 0b0111; // Priority 7 interrupt use shadow set 7
+//  
+//  // Set interrupt priorities
+//  if (PCB_REV == 1) {
+//    IPC41bits.SPI4TXIP = 7; // SPI4TX
+//    IPC41bits.SPI4RXIP = 7; // SPI4RX
+//  } else if (PCB_REV == 2) {
+//    IPC27bits.SPI1TXIP = 7; // SPI1TX
+//    IPC27bits.SPI1RXIP = 7; // SPI1RX
+//  }
+//  IPC7bits.T6IP = 7; // T6
+//  
+//  // Clear interrupt flags
+//  if (PCB_REV == 1) {
+//    IFS5CLR = _IFS5_SPI4RXIF_MASK | _IFS5_SPI4TXIF_MASK; // SPI4
+//  } else if (PCB_REV == 2) {
+//    IFS3CLR = _IFS3_SPI1RXIF_MASK | _IFS3_SPI1TXIF_MASK; // SPI1
+//  }
+//  IFS0CLR = _IFS0_T6IF_MASK; // T6
+//  
+//  // Disable the RX/TX interrupt
+//  if (PCB_REV == 1) {
+//    IEC5CLR = _IEC5_SPI4RXIE_MASK | _IEC5_SPI4TXIE_MASK; // SPI4
+//  } else if (PCB_REV == 2) {
+//    IEC3CLR = _IEC3_SPI1RXIE_MASK | _IEC3_SPI1TXIE_MASK; // SPI1
+//  }
+//   
   // Enable the T6 interrupt
-  IEC0SET = _IEC0_T6IE_MASK;
+  // IEC0SET = _IEC0_T6IE_MASK;
+//  
+//  __builtin_enable_interrupts(); // Global enable interrupts
   
-  __builtin_enable_interrupts(); // Global enable interrupts
-  
-  pSPICON->ON = 1; // Finally turn the SPI module on
+  // pSPICON->ON = 1; // Finally turn the SPI module on
     
   MyPriority = Priority;
   // put us into the Initial PseudoState
@@ -263,11 +263,11 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
     {
       if (ThisEvent.EventType == ES_INIT) 
       {
-        ResetIMU(); // Perform a soft reset of the IMU
-        
-        // now put the machine into the actual initial state
-        CurrentState = IMUReset;
-        ES_Timer_InitTimer(IMU_TIMER, 500);
+//        ResetIMU(); // Perform a soft reset of the IMU
+//        
+//        // now put the machine into the actual initial state
+//        CurrentState = IMUReset;
+//        ES_Timer_InitTimer(IMU_TIMER, 500);
       }
     }
     break;
