@@ -150,8 +150,8 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
   {
     case ES_NEW_KEY:   // announce
     {
-//      DB_printf("ES_NEW_KEY received with -> %c <- in Service 0\r\n",
-//          (char)ThisEvent.EventParam);
+      DB_printf("ES_NEW_KEY received with -> %c <- in Service 0\r\n",
+          (char)ThisEvent.EventParam);
 //      if ('p' == ThisEvent.EventParam)
 //      {
 //          PrintBufferSize();
@@ -194,8 +194,8 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
           uint8_t fault2_reading = PORTAbits.RA4;
           uint8_t fault1_reading = PORTJbits.RJ12;
           
-          DB_printf("Fault1 Status: %d\r\n", fault1_reading);
-          DB_printf("Fault2 Status: %d\r\n", fault2_reading);
+          DB_printf("Fault1 Status (0=error): %d\r\n", fault1_reading);
+          DB_printf("Fault2 Status (0=error): %d\r\n", fault2_reading);
       }
       
       if ('c' == ThisEvent.EventParam) {
