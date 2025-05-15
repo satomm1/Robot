@@ -48,14 +48,26 @@ At this point, I recommend preparing the Jetson and inserting the Jetson into it
 
 12) **Add Levels 4, 5, and 6.** Add these levels one by one by connecting to the 3 pronged standoffs. This is the most tedious part of the whole process as you will need to attach three M3 screws per standoff. 
 
-13) **Attach the LiDAR to the platform and to the top level.** Screw the LiDAR sensor into the platform. **Important**: do not use too long of screws. Next, attach the LiDAR platform to the top level with the 3.5 inch standoffs.
+13) **Attach the LiDAR to the platform and to the top level.** Screw the LiDAR sensor into the platform. **Important**: do not use too long of screws. Next, attach the LiDAR platform to the top level with the 3.5 inch standoffs. The LiDAR cable should be facing the front of the robot.
+
+![LiDAR](./images/LiDAR.jpg)
 
 14) **Attach the Astra Camera.** Insert the Astra camera into its mount using an M6 screw. Then, attach the mount to the top level using M3 screws.
 
+![Astra Camera](./images/astra.jpg)
+
 15) **Attach the touch screen.** Attach the touch screen to its legs. The long legs use a screw (provided with the screen) to attach, while the screen just rests in the short legs. Secure the legs to the top platform using M3 screws.
+
+![Touch Screen](./images/touch_screen.jpg)
 
 16) **Attach the USB camera.** Use two M3 screws to attach the camera to the top level. 
 
-17) **Attach the microphones.**
+![USB Camera](./images/usb_cam.jpg)
 
-18) **Attach the foam bumpers.** 
+17) **Attach the microphones.** First, the microphones neede to be inserted into the housings. For best performance, use a gasket and acoustically transparent membrane. I use a piece of foam-like double sided tape for the gasket and muslin fabric for the acoustically transparent membrane. With these layers, use a M3 screw to secure the microphone/PCB to the housing. Then, glue the housing to it's back. Last, connect the entire housing to one of the three pronged standoffs using a M3 screw.
+
+![Microphone](./images/microphone.jpg)
+
+18) **Attach the foam bumpers.** Use the zipties to secure the foam bumpers to each level. You may need to cut small sections out of the foam to accomodate the three pronged standoffs. To connect the ends of the foam together, use some masking tape.
+
+![Foam Bumper](./images/bumper.jpg)
