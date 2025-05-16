@@ -9,8 +9,8 @@ The remainder of this README provides instructions for creating the mechanical f
 
 A comprehensive parts list is located in `BOM.xlsx` that will be needed for constructing this mobile robot.
 
-1) **Laser cut the platforms out of a thin, stiff wood.** I use tempered hardwood (Duron) of 1/8"-1/4" thickness. Every file that should be laser cut is listed in the `lasercut.xlsx` file. The corresponding `.dxf` files are located in the `mechanical` directory.
-2) **Prepare the 3D printed parts.** 3D Print the required parts using PLA plastic. Every file that should be 3D printed is listed in the `3d_print.xlsx` file. The corresponding `.stl` files are located in the `mechanical` directory.
+1) **Laser cut the platforms out of a thin, stiff wood.** I use tempered hardwood (Duron) of 1/8"-1/4" thickness. Every file that should be laser cut is listed in the `lasercut.xlsx` file. The corresponding `.dxf` files are located in this directory.
+2) **Prepare the 3D printed parts.** 3D Print the required parts using PLA plastic. Every file that should be 3D printed is listed in the `3d_print.xlsx` file. The corresponding `.stl` files are located in this directory.
 
 **Note**: If you use different components (motor, wheels, etc), the laser cut or 3D printed files may need to be modified first.
 
@@ -36,9 +36,15 @@ A comprehensive parts list is located in `BOM.xlsx` that will be needed for cons
 
 8) **Install battery holders and Jetson holder onto the second level platform.** Use M3 screws to attach the 2 battery holders and Nvidia Jetson Holder onto the second level platform.
 
+![Second Level](./images/second_level.png)
+
 9) **Install standoffs on the first layer** Install the 3 inch standoffs to connect the first and second layer platform. Below they are shown as metal standoffs, but 3D printed versions can be used as well.
 
+![First Layer Standoffs](./images/first_layer_standoff.jpg)
+
 10) **Secure 3 Pronged standoffs to each platform** Connect the 3 pronged standoff to the top of levels 3, 4, and 5. This means you will insert 3 M3 screws through the bottom of the platform. Make sure the prongs are aligned so that when you connect the other side they are lined up with the empty holes!
+
+![Three Prong Standoffs](./images/three_prong.png)
 
 ***
 At this point, I recommend preparing the Jetson and inserting the Jetson into it's platform. Read more instructions here in the `Electrical` directory.
