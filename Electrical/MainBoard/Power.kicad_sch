@@ -3199,6 +3199,12 @@
 		(uuid "900bc344-22d0-4ef0-b66a-8ad49cfd2a49")
 	)
 	(junction
+		(at 269.24 254)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "971a0628-e4dc-4501-8a4c-a39a7bd08179")
+	)
+	(junction
 		(at 285.115 260.985)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3514,7 +3520,7 @@
 	)
 	(wire
 		(pts
-			(xy 34.29 144.78) (xy 24.765 144.78)
+			(xy 34.29 144.78) (xy 25.4 144.78)
 		)
 		(stroke
 			(width 0)
@@ -3784,7 +3790,7 @@
 	)
 	(wire
 		(pts
-			(xy 84.455 177.8) (xy 84.455 179.705)
+			(xy 83.82 177.8) (xy 83.82 180.34)
 		)
 		(stroke
 			(width 0)
@@ -3914,23 +3920,13 @@
 	)
 	(wire
 		(pts
-			(xy 73.66 177.8) (xy 84.455 177.8)
+			(xy 73.66 177.8) (xy 83.82 177.8)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "f46101d2-33f6-4f3e-96ea-adbf6aead279")
-	)
-	(wire
-		(pts
-			(xy 24.765 142.24) (xy 24.765 144.78)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f6086fd9-56d0-45b7-8dfd-21ddc5c115bb")
 	)
 	(hierarchical_label "Vdrive"
 		(shape output)
@@ -4356,71 +4352,6 @@
 			(project "MainBoard"
 				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/cf2778d1-0cc7-4750-89d4-9f2327b2ee05"
 					(reference "#PWR0200")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 41.91 147.32 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "0b0f5a05-b0f8-4d3c-a5e6-ddc8c7416e03")
-		(property "Reference" "#PWR0191"
-			(at 41.91 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 41.91 151.765 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 41.91 147.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 41.91 147.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 41.91 147.32 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "f1bb7a03-8877-48b7-8135-e57704317dfb")
-		)
-		(instances
-			(project "MainBoard"
-				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/cf2778d1-0cc7-4750-89d4-9f2327b2ee05"
-					(reference "#PWR0191")
 					(unit 1)
 				)
 			)
@@ -5064,7 +4995,7 @@
 	)
 	(symbol
 		(lib_id "power:+5V")
-		(at 24.765 142.24 0)
+		(at 25.4 144.78 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5073,7 +5004,7 @@
 		(fields_autoplaced yes)
 		(uuid "59e43ac3-7fcc-44ab-953f-36c6a278705d")
 		(property "Reference" "#PWR0189"
-			(at 24.765 146.05 0)
+			(at 25.4 148.59 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5082,7 +5013,7 @@
 			)
 		)
 		(property "Value" "+5V"
-			(at 24.765 137.16 0)
+			(at 25.4 139.7 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5090,7 +5021,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 24.765 142.24 0)
+			(at 25.4 144.78 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5099,7 +5030,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 24.765 142.24 0)
+			(at 25.4 144.78 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5108,7 +5039,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 24.765 142.24 0)
+			(at 25.4 144.78 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6214,7 +6145,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 84.455 179.705 0)
+		(at 83.82 180.34 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -6223,7 +6154,7 @@
 		(fields_autoplaced yes)
 		(uuid "a45af877-a2b9-44a7-924b-cf650d4050bf")
 		(property "Reference" "#PWR0210"
-			(at 84.455 186.055 0)
+			(at 83.82 186.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6232,7 +6163,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 84.455 184.15 0)
+			(at 83.82 184.785 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6240,7 +6171,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 84.455 179.705 0)
+			(at 83.82 180.34 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6249,7 +6180,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 84.455 179.705 0)
+			(at 83.82 180.34 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6258,7 +6189,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 84.455 179.705 0)
+			(at 83.82 180.34 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6652,6 +6583,71 @@
 			(project "MainBoard"
 				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/cf2778d1-0cc7-4750-89d4-9f2327b2ee05"
 					(reference "SW3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 41.91 147.32 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "ba155111-ae5e-48cc-9cd8-0450346e32a5")
+		(property "Reference" "#PWR046"
+			(at 41.91 153.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 41.91 151.765 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 41.91 147.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 41.91 147.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 41.91 147.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "2644ac5b-b07a-4d33-929a-4b3792c09bfd")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/cf2778d1-0cc7-4750-89d4-9f2327b2ee05"
+					(reference "#PWR046")
 					(unit 1)
 				)
 			)
@@ -7632,6 +7628,72 @@
 			(project "MainBoard"
 				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/cf2778d1-0cc7-4750-89d4-9f2327b2ee05"
 					(reference "#PWR0190")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:PWR_FLAG")
+		(at 269.24 254 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "f22a06f1-7cae-4c42-a692-d9285f7c2ee7")
+		(property "Reference" "#FLG01"
+			(at 269.24 252.095 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "PWR_FLAG"
+			(at 269.24 248.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 269.24 254 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 269.24 254 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Special symbol for telling ERC where power comes from"
+			(at 269.24 254 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "4da639e0-9c54-4ef8-b14f-7ff5fef728d8")
+		)
+		(instances
+			(project ""
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/cf2778d1-0cc7-4750-89d4-9f2327b2ee05"
+					(reference "#FLG01")
 					(unit 1)
 				)
 			)
