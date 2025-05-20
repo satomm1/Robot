@@ -3,15 +3,15 @@
     "GenerationSoftware": {
       "Vendor": "KiCad",
       "Application": "Pcbnew",
-      "Version": "7.0.6"
+      "Version": "9.0.2"
     },
-    "CreationDate": "2023-11-30T13:58:43-08:00"
+    "CreationDate": "2025-05-19T09:33:39-07:00"
   },
   "GeneralSpecs": {
     "ProjectId": {
       "Name": "MainBoard",
       "GUID": "4d61696e-426f-4617-9264-2e6b69636164",
-      "Revision": "0.1"
+      "Revision": "0.3"
     },
     "Size": {
       "X": 100.1,
@@ -24,15 +24,15 @@
   "DesignRules": [
     {
       "Layers": "Outer",
-      "PadToPad": 0.135,
-      "PadToTrack": 0.135,
+      "PadToPad": 0.15,
+      "PadToTrack": 0.15,
       "TrackToTrack": 0.15,
       "MinLineWidth": 0.25
     },
     {
       "Layers": "Inner",
-      "PadToPad": 0.135,
-      "PadToTrack": 0.135,
+      "PadToPad": 0.15,
+      "PadToTrack": 0.15,
       "TrackToTrack": 0.15,
       "TrackToRegion": 0.508,
       "RegionToRegion": 0.508
@@ -46,12 +46,12 @@
     },
     {
       "Path": "MainBoard-In1_Cu.gbr",
-      "FileFunction": "Copper,L2,Inr",
+      "FileFunction": "Copper,L5,Inr",
       "FilePolarity": "Positive"
     },
     {
       "Path": "MainBoard-In2_Cu.gbr",
-      "FileFunction": "Copper,L3,Inr",
+      "FileFunction": "Copper,L7,Inr",
       "FilePolarity": "Positive"
     },
     {
