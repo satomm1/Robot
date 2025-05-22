@@ -9,7 +9,7 @@ Contains the electrical schematics and PCB gerber files for the Robot electronic
 The Main Board is the only required electronics, so start here. The others (IMU, reflective, microphone) provide additional functionality should you wish to include them.
 
 ## Ordering a Manufactured PCB Board
-
+You can use a variety of vendors to order a PCB. I have used JLPCB in the past. To order, all you need to do is submit the zipped `gerber_files` folder to the vendor.
 
 ## Main Board
 The [main board](./MainBoard/) contains the PIC32 MCU, motor drivers, power supply, button sensors, Jetson communications, etc. In this directory, you will find a comprehensive schematic and PCB layout, as well as ready to use Gerber files for PCB manufacturing.
