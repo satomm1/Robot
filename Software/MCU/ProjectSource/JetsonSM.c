@@ -245,6 +245,34 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
           if (ReceiveBuffer[ThisEvent.EventParam][0] == 90 && ReceiveBuffer[ThisEvent.EventParam][1] == 0b10101010) {
             // We received confirmation that the message was received
             
+            // Get starting position(s)
+            float x_pos;
+            uint32_t combined_bytes = ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][2] << 24) | 
+                        ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][3] << 16) |
+                        ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][4] << 8) |
+                        ReceiveBuffer[ThisEvent.EventParam][5];
+            *((uint32_t*)&x_pos) = combined_bytes;
+            
+            float y_pos;
+            combined_bytes = ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][6] << 24) | 
+                        ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][7] << 16) |
+                        ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][8] << 8) |
+                        ReceiveBuffer[ThisEvent.EventParam][9];
+            *((uint32_t*)&y_pos) = combined_bytes;
+            
+            float theta_pos;
+            combined_bytes = ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][10] << 24) | 
+                        ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][11] << 16) |
+                        ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][12] << 8) |
+                        ReceiveBuffer[ThisEvent.EventParam][13];
+            *((uint32_t*)&theta_pos) = combined_bytes;
+            
+            DB_printf("x: %d\n", (uint32_t)(x_pos*100));
+            DB_printf("y: %d\n", (uint32_t)(y_pos*100));
+            DB_printf("th: %d\n", (uint32_t)(theta_pos*100));
+            
+            SetPosition(x_pos, y_pos, theta_pos);
+            
             YELLOW_LATCH = 0; // Turn yellow LED off
             GREEN_LATCH = 1; // Turn green LED on
             ES_Timer_InitTimer(JETSON_TIMER, JETSON_TIMEOUT); // Start timeout timer
@@ -360,7 +388,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
                 }
 
 
-                // Convert Data to 
+                // Convert Data to float
                 uint32_t combined_bytes = ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][1] << 24) | 
                         ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][2] << 16) |
                         ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][3] << 8) |
