@@ -670,6 +670,12 @@ void ResetPosition(void) {
     theta = 0;
 }
 
+void SetPosition(float x_set, float y_set, float theta_set) {
+    x = x_set;
+    y = y_set;
+    theta = theta_set;
+}
+
 void PrintBufferSize(void) {
     DB_printf("Buffer Size: %d\r\n", circular_buffer_size(&cb));
 }
