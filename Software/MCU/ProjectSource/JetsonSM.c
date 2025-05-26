@@ -3,7 +3,16 @@
    Jetson_SM.c
 
  Description
-   This is a file for implementing the Jetson
+   This is a file for implementing the Jetson state machine. This code 
+   facilitates communications between the MCU and the Jetson via SPI.
+   This code provides a state machine. When receiving the correct 
+   initialization message, the state machine moves to a pending state.
+   When receiving a confirmation message, the state machine moves to the 
+   active state. In the active state the MCU receives desired velocities,
+   while the MCU sends dead reckoning information and other sensor info.
+   If the MCU does not receive a valid message in a set period of time, or
+   the Jetson sends a shutdown message, the state machine moves to the inactive
+   state.
 
  Notes
 
@@ -271,6 +280,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
             DB_printf("y: %d\n", (uint32_t)(y_pos*100));
             DB_printf("th: %d\n", (uint32_t)(theta_pos*100));
             
+            // Use provided position to set the initial dead reckoning positions
             SetPosition(x_pos, y_pos, theta_pos);
             
             YELLOW_LATCH = 0; // Turn yellow LED off
@@ -289,18 +299,9 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
         
         case ES_TIMEOUT:
         {
+            // Didn't receive confirmation in time
             CurrentState = RobotInactive;
             DB_printf("Moving to RobotInactive");
-            
-//            SPI2CONbits.ON = 0;
-//            while (!SPI2STATbits.SPIRBE) {
-//                uint8_t temp = SPI2BUF; 
-//            }
-//            
-//            while (!SPI2STATbits.SPITBF) {
-//                SPI2BUF = 0;
-//            }
-//            SPI2CONbits.ON = 1;
         }
         break;
             
@@ -347,10 +348,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
                 {
                     case 0:
                     {
-                        // Fill buffer with cliff sensor data
-//                        for(uint8_t ii = 0; ii < 16; ii++) {
-//                            MessageToSend[ii] = 1;
-//                        }
+                        // Write the cliff sensor/button data
                         WriteCliffToSPI(MessageToSend);
                         CurrentMessage = 1;
                     }
@@ -358,10 +356,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
 
                     case 1:
                     {
-                        // Fill buffer with imu data
-//                        for(uint8_t ii = 0; ii < 16; ii++) {
-//                            MessageToSend[ii] = 2;
-//                        }
+                        // Write the IMU data
                         WriteImuToSPI(MessageToSend);
                         CurrentMessage = 2;
                     }
@@ -369,9 +364,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
 
                     case 2:
                     {
-//                        for(uint8_t ii = 0; ii < 16; ii++) {
-//                            MessageToSend[ii] = 2;
-//                        }
+                        // Write the position as determined by dead reckoning
                         WritePositionToSPI(MessageToSend);
                         CurrentMessage = 3;
                     }
@@ -379,9 +372,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
 
                     case 3:
                     {
-//                        for(uint8_t ii = 0; ii < 16; ii++) {
-//                            MessageToSend[ii] = 4;
-//                        }
+                        // Write the velocity as determined by dead reckoning
                         WriteDeadReckoningVelocityToSPI(MessageToSend);
                         CurrentMessage = 0;
                     }
@@ -389,7 +380,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
                 }
 
 
-                // Convert Data to float
+                // Convert Received Data to float
                 uint32_t combined_bytes = ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][1] << 24) | 
                         ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][2] << 16) |
                         ((uint32_t)ReceiveBuffer[ThisEvent.EventParam][3] << 8) |
@@ -422,9 +413,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
           YELLOW_LATCH = 1; // Turn yellow LED on
           GREEN_LATCH = 0;  // Turn green LED off
           CurrentState = RobotInactive;
-          
-//          ResetPosition();
-          
+                    
           DB_printf("Timed out, moving to Robot Inactive\r\n");
           
           CurrentMessage = 0;
@@ -481,9 +470,6 @@ void __ISR(_SPI2_TX_VECTOR, IPL7SRS) SPI2TXHandler(void)
     IEC4CLR = _IEC4_SPI2TXIE_MASK;
     // Clear the interrupt 
     IFS4CLR = _IFS4_SPI2TXIF_MASK;
-    
-    // Load Data into buffer
-//    SPI2BUF = 0x00;
 }
 
 
@@ -525,18 +511,11 @@ void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
             for (uint8_t ii = 0; ii < 16; ii++) {
                 SPI2BUF = MessageToSend[ii];
             }
-//            IEC4SET = _IEC4_SPI2TXIE_MASK;  // Turn TX interrupt on to add extra 0x00 once buffer not full
             InMessage = true; // Now we are accepting message bytes
         }
-//        } else if (TempData == 66) {
-//            
-//        } else {
-//            SPI2BUF = 0x00;
-//        }
     }
     
     IFS4CLR = _IFS4_SPI2RXIF_MASK; // Clear the interrupt
-//    ES_Timer_InitTimer(JETSON_TIMER, JETSON_TIMEOUT); // Restart timeout timer
     
     if (MessageIndex == 16) {
         MessageIndex = 0; // Reset Message index once full
@@ -554,6 +533,7 @@ void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
         PostJetsonSM(ReceiveEvent);
     }
     
+    // For debugging:
 //    DB_printf("Received 16 Messages!\r\n");
     // Read the data from the buffer
 //    for (uint8_t i=0; i < 16; i++) {

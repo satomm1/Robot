@@ -3,7 +3,7 @@
    MotorSM.c
 
  Description
-   This is a file for implementing the Motors
+   This is a file for implementing control of the Motors.
 
  Notes
 
@@ -224,25 +224,12 @@ bool InitMotorSM(uint8_t Priority)
   
   // Setup Input capture
   IC1CON = 0; // Reset IC1CON register settings 
-//  IC2CON = 0; // Reset IC2CON register settings 
   IC3CON = 0; // Reset IC3CON register settings 
-//  IC4CON = 0; // Reset IC4CON register settings 
   IC1CONbits.ICTMR = 0; // User timery (timer3)
-//  IC2CONbits.ICTMR = 0; // User timery (timer3)
   IC3CONbits.ICTMR = 0; // User timery (timer3)
-//  IC4CONbits.ICTMR = 0; // User timery (timer3)
   IC1CONbits.ICI = 0b00; // Interrupt on every capture event
-//  IC2CONbits.ICI = 0b00; // Interrupt on every capture event
   IC3CONbits.ICI = 0b00; // Interrupt on every capture event
-//  IC4CONbits.ICI = 0b00; // Interrupt on every capture event
-//  IC1CONbits.ICM = 0b011; // Every rising edge mode
-//  IC1CONbits.ICM = 0b100; // Every 4th rising edge mode
-  
-//  IC2CONbits.ICM = 0b001; // Every edge mode
-//  IC3CONbits.ICM = 0b011; // Every rising edge mode
-//  IC3CONbits.ICM = 0b100; // Every 4th rising edge mode
-  
-//  IC4CONbits.ICM = 0b011; // Every edge mode
+    
 #if (MOTOR_TYPE==1)
   IC1CONbits.ICM = 0b011; // Every rising edge mode
   IC3CONbits.ICM = 0b011; // Every rising edge mode
@@ -271,13 +258,13 @@ bool InitMotorSM(uint8_t Priority)
   
   // Clear interrupt flags
   IFS0CLR = _IFS0_IC1IF_MASK | _IFS0_IC3IF_MASK | _IFS0_T1IF_MASK | 
-          _IFS0_T3IF_MASK | _IFS0_T4IF_MASK | _IFS0_T5IF_MASK; // | _IFS0_IC2IF_MASK | _IFS0_IC4IF_MASK
+          _IFS0_T3IF_MASK | _IFS0_T4IF_MASK | _IFS0_T5IF_MASK; 
   
   IFS1CLR = _IFS1_T7IF_MASK;
   
   // Local enable interrupts
   IEC0SET = _IEC0_IC1IE_MASK | _IEC0_IC3IE_MASK | _IEC0_T1IE_MASK | 
-          _IEC0_T3IE_MASK | _IEC0_T4IE_MASK | _IEC0_T5IE_MASK; //_IEC0_IC2IE_MASK | _IEC0_IC4IE_MASK 
+          _IEC0_T3IE_MASK | _IEC0_T4IE_MASK | _IEC0_T5IE_MASK; 
   
   IEC1SET = _IEC1_T7IE_MASK;
   
@@ -285,9 +272,7 @@ bool InitMotorSM(uint8_t Priority)
   
   // Turn Everything On
   IC1CONbits.ON = 1; // Turn input capture on
-//  IC2CONbits.ON = 1; // Turn input capture on
   IC3CONbits.ON = 1; // Turn input capture on
-//  IC4CONbits.ON = 1; // Turn input capture on
   OC1CONbits.ON = 1; // Turn OC1 on
   OC2CONbits.ON = 1; // Turn OC2 on
   T1CONbits.ON = 1; // Turn timer 1 on
@@ -569,7 +554,7 @@ void SetDesiredSpeed(float V, float w)
     left_w = left_w * 60 / 2 / 3.14159; // (rev/min)
     right_w = right_w * 60 / 2 / 3.14159; // (rev/min)
     
-    // Set the direction pins to the H-Bridge to get correct forward or 
+    // Set the direction pins to the motor driver to get correct forward or 
     // backward motion
     if (left_w  >= 0) {
         LATJbits.LATJ3 = 0; // Set direction pin forward
@@ -581,7 +566,6 @@ void SetDesiredSpeed(float V, float w)
     }
     
     if (right_w >= 0) {
-        
         LATFbits.LATF8 = 0; // Set direction pin forward
         RightDirection = Forward;
     } else {
@@ -955,86 +939,6 @@ void __ISR(_TIMER_5_VECTOR, IPL6SRS) T5Handler(void)
     T5CONCLR = _T5CON_ON_MASK; // stop the timer 
     RightPulseLength = 4294967295; // set RightPulseLength to max    
 }
-
-/****************************************************************************
- Function
-    T7Handler
-
- Description
-    Performs dead reckoning calculations
-****************************************************************************/
-// Dead reckoning via Runge Kutta to solve differential equations
-//void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
-//{
-//    static float V_l; // Left wheel linear velocity (m/s)
-//    static float V_r; // Right wheel linear velocity (m/s)
-//    static float V;   // Robot linear velocity (m/s)
-//    static float omega; // Robot angular velocity (rad/second)
-//    
-//    // Initialize Runge-Kutta Variables (static for speed)
-//    static float k00, k01, k02;
-//    static float k10, k11, k12;
-//    static float k20, k21, k22;
-//    static float k30, k31, k32;
-//    
-//    static int32_t CurLeftRotations;
-//    static int32_t CurRightRotations;
-//    
-//    static bool status = false;
-//    
-//    IFS1CLR = _IFS1_T7IF_MASK; // clear the interrupt flag 
-//    
-//    // First thing we do is grab current number of rotations so this doesn't change mid function
-//    CurLeftRotations = LeftRotations;
-//    CurRightRotations = RightRotations;
-//    
-//    // Calculate linear velocity of both wheels    
-////    DB_printf("L: %d\r\n", CurLeftRotations- LeftPrevRotations);
-////    DB_printf("R: %d\r\n", CurRightRotations- RightPrevRotations);
-//    
-//    V_l = (CurLeftRotations - LeftPrevRotations) * DEAD_RECKONING_RATIO; 
-//    V_r = (CurRightRotations - RightPrevRotations) * DEAD_RECKONING_RATIO;
-//    
-//    // Store for next time
-//    LeftPrevRotations = CurLeftRotations;
-//    RightPrevRotations = CurRightRotations;
-//    
-//    // Calculate linear/angular velocity of robot
-//    V = (V_l + V_r) / 2; 
-//    omega = (V_r - V_l) / WHEEL_BASE;
-//    
-//    V_current = V; // used to store current velocity
-//    w_current = omega; // used to store current angular velocity
-//    
-//    // Now calculate the position of the robot using 4th order Runge Kutta
-//    k00 = V * cosf(theta);
-//    k01 = V * sinf(theta);
-//    k02 = omega;
-//    
-//    k10 = V * cosf(theta + DEAD_RECKONING_TIME / 2 * k02);
-//    k11 = V * sinf(theta + DEAD_RECKONING_TIME / 2 * k02);
-//    k12 = omega;
-//    
-//    k20 = V * cosf(theta + DEAD_RECKONING_TIME / 2 * k12);
-//    k21 = V * sinf(theta + DEAD_RECKONING_TIME / 2 * k12);
-//    k22 = omega;
-//    
-//    k30 = V * cosf(theta + DEAD_RECKONING_TIME * k22);
-//    k31 = V * sinf(theta + DEAD_RECKONING_TIME * k22);
-//    k32 = omega;
-//    
-//    x = x + DEAD_RECKONING_TIME / 6 * (k00 + 2*(k10 + k20) + k30);
-//    y = y + DEAD_RECKONING_TIME / 6 * (k01 + 2*(k11 + k21) + k31);
-//    theta = theta + DEAD_RECKONING_TIME / 6 * (k02 + 2*(k12 + k22) + k32);
-//    
-//    // Ensure theta stays within [-pi, pi]
-//    if (theta > 3.14159265359) {
-//        theta -= 6.28318530718;
-//    } else if (theta < -3.14159265359) {
-//        theta += 6.28318530718;
-//    }
-//    
-//}
 
 // Using an exact method to solve the differential equations
 void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
