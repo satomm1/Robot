@@ -342,6 +342,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
                 float desired_lin_v;
                 float desired_ang_v;
 
+                ES_Timer_InitTimer(JETSON_TIMER, JETSON_TIMEOUT); // Restart timeout timer
                 switch (CurrentMessage)
                 {
                     case 0:
@@ -422,7 +423,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
           GREEN_LATCH = 0;  // Turn green LED off
           CurrentState = RobotInactive;
           
-          ResetPosition();
+//          ResetPosition();
           
           DB_printf("Timed out, moving to Robot Inactive\r\n");
           
@@ -535,7 +536,7 @@ void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
     }
     
     IFS4CLR = _IFS4_SPI2RXIF_MASK; // Clear the interrupt
-    ES_Timer_InitTimer(JETSON_TIMER, JETSON_TIMEOUT); // Restart timeout timer
+//    ES_Timer_InitTimer(JETSON_TIMER, JETSON_TIMEOUT); // Restart timeout timer
     
     if (MessageIndex == 16) {
         MessageIndex = 0; // Reset Message index once full
