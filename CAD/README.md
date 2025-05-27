@@ -18,7 +18,7 @@ A comprehensive parts list is located in `BOM.xlsx` that will be needed for cons
 
 ![Heat set inserts](./images/heat_set.jpg)
 
-4) **Install the motors.** Inser the motors into the motor blocks and secure with screws. **Important**: select the proper length screw (not too long!!!) so that the screw does not go too far and break the motor.
+4) **Install the motors.** Insert the motors into the motor blocks and secure with screws. **Important**: select the proper length screw (not too long!!!) so that the screw does not go too far and break the motor.
 
 ![Motor Blocks](./images/motors.jpg)
 
