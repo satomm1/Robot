@@ -32,9 +32,9 @@ We will be using the 6-pin connector for this microphone (ignore the 5 pin heade
 
 | PIC32 Pin | Jetson I2S Pin | Jetson I2S Pin Number |
 |-----------|----------------|-----------------------|
-| CS        | I2S2_FS        | __ |
-| SDI       | I2S2_DOUT      | __ |
-| SDO       | I2S2_DIN       | __ |
-| SCK       | I2S2_SCLK      | __ |
-| GND       | GND            | __ |
-| 3V3       | 3.3V           | __ |
+| CS        | I2S2_FS        | 35 |
+| SDI       | I2S2_DOUT      | 40 |
+| SDO       | I2S2_DIN       | 38 |
+| SCK       | I2S2_SCLK      | 12 |
+| GND       | GND            | 14 |
+| 3V3       | 3.3V           | 17 |
