@@ -45,7 +45,6 @@ void ResetIMU(void);
 void WriteIMU(uint8_t Address, uint8_t LowerByte, uint8_t UpperByte, uint8_t NumBytes);
 void WriteIMU2(uint8_t Address, AccelGyroData_t data);
 void WriteIMU2Transfer(uint8_t Address, AccelGyroData_t data1, AccelGyroData_t data2);
-void ReadFIFO(void);
 void PrintImuData(void);
 void MahonyUpdate(float ax, float ay, float az, float gx, float gy, float gz, float dt);
 

@@ -28,6 +28,7 @@
 #include "MotorSM.h"
 #include "EEPROMSM.h"
 #include "matt_circular_buffer.h"
+#include "IMU_SM.h"
 /*----------------------------- Module Defines ----------------------------*/
 // these times assume a 10.000mS/tick timing
 #define ONE_SEC 1000
@@ -304,6 +305,14 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
       if ('0' == ThisEvent.EventParam) {
           ES_Event_t NewEvent = {EV_PRINT_RL_DATA,0};
           PostMotorSM(NewEvent);
+      }
+      
+      if ('y' == ThisEvent.EventParam)
+      {
+          float roll;
+          float pitch;
+        GetAngles(&roll, &pitch);
+        DB_printf("Roll, Pitch = %d, %d\r\n", (int16_t)roll, (int16_t)pitch);
       }
       
     }
