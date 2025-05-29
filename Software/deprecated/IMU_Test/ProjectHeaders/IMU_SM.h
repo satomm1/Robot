@@ -46,5 +46,6 @@ ImuState_t QueryImuSM(void);
 void GetIMUData(float *ImuResults);
 uint8_t ReadIMU8(uint8_t Address);
 uint16_t ReadIMU16(uint8_t Address);
+void GetAngles(float* roll, float* pitch);
 #endif /* ImuFSM_H */
 

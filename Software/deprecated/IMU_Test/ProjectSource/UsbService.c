@@ -172,6 +172,14 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
         DB_printf("Settings : %d\r\n", data);
       }
       
+      if ('y' == ThisEvent.EventParam)
+      {
+          float roll;
+          float pitch;
+        GetAngles(&roll, &pitch);
+        DB_printf("Roll, Pitch = %d, %d\r\n", (int16_t)roll, (int16_t)pitch);
+      }
+      
     }
     break;
      
