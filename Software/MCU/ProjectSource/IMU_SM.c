@@ -423,33 +423,28 @@ void GetIMUData(float *ImuResults)
 
 void WriteImuToSPI(uint8_t *Message2Send)
 {
-    float imu_data[3];
-    GetIMUData(imu_data);
+  float roll;
+  float pitch;
+  GetAngles(&roll, &pitch);
     
-    Message2Send[0] = 9; // 9 indicates we are imu data (byte 1)
+  Message2Send[0] = 9; // 9 indicates we are imu data (byte 1)
     
-  // The x/y accel and z vel data are all floats. The floats can be sent as 4 
+  // The roll and pitch data are all floats. The floats can be sent as 4 
   // chunks of 8 bits.
   
-  // Now write the x accel data (bytes 2-5)
-  uint32_t x_as_int = *((uint32_t*)&imu_data[0]);
+  // Now write the roll (bytes 2-5)
+  uint32_t roll_as_int = *((uint32_t*)&roll);
   for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
-    Message2Send[j+1] = (x_as_int >> (24-8*j)) & 0xFF;
+    Message2Send[j+1] = (roll_as_int >> (24-8*j)) & 0xFF;
   }
   
-  // Now write the y accel data (bytes 6-9)
-  uint32_t y_as_int = *((uint32_t*)&imu_data[1]);
+  // Now write the pitch (bytes 6-9)
+  uint32_t pitch_as_int = *((uint32_t*)&pitch);
   for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
-    Message2Send[j+5] = (y_as_int >> (24-8*j)) & 0xFF;
+    Message2Send[j+5] = (pitch_as_int >> (24-8*j)) & 0xFF;
   }
   
-  // Now write the z angular velocity data (bytes 10-13)
-  uint32_t z_as_int = *((uint32_t*)&imu_data[2]);
-  for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
-    Message2Send[j+9] = (z_as_int >> (24-8*j)) & 0xFF;
-  }
-  
-  for (uint8_t j = 0; j < 3; j++) {
+  for (uint8_t j = 0; j < 7; j++) {
     Message2Send[j+13] = 0; // Fill rest of buffer with 0's
   }
 }
