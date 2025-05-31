@@ -7340,7 +7340,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.samsungsem.com/kr/support/product-search/mlcc/CL21B103KBANNNC.jsp"
+		(property "Datasheet" "https://search.kemet.com/download/datasheet/C0805C103K5RAC7800"
 			(at 314.96 93.98 0)
 			(effects
 				(font
@@ -7358,7 +7358,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr" "Samsung Electro-Mechanics"
+		(property "Mfr" "KEMET"
 			(at 314.96 93.98 0)
 			(effects
 				(font
@@ -7367,7 +7367,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr P/N" "CL21B103KBANNNC"
+		(property "Mfr P/N" "C0805C103K5RACTU"
 			(at 314.96 93.98 0)
 			(effects
 				(font
@@ -7385,7 +7385,7 @@
 				(hide yes)
 			)
 		)
-		(property "Supplier 1 P/N" "1276-1015-1-ND"
+		(property "Supplier 1 P/N" "399-C0805C103K5RACTUCT-ND"
 			(at 314.96 93.98 0)
 			(effects
 				(font
@@ -9050,7 +9050,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.samsungsem.com/kr/support/product-search/mlcc/CL21B103KBANNNC.jsp"
+		(property "Datasheet" "https://search.kemet.com/download/datasheet/C0805C103K5RAC7800"
 			(at 113.03 95.25 0)
 			(effects
 				(font
@@ -9068,7 +9068,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr" "Samsung Electro-Mechanics"
+		(property "Mfr" "KEMET"
 			(at 113.03 95.25 0)
 			(effects
 				(font
@@ -9077,7 +9077,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr P/N" "CL21B103KBANNNC"
+		(property "Mfr P/N" "C0805C103K5RACTU"
 			(at 113.03 95.25 0)
 			(effects
 				(font
@@ -9095,7 +9095,7 @@
 				(hide yes)
 			)
 		)
-		(property "Supplier 1 P/N" "1276-1015-1-ND"
+		(property "Supplier 1 P/N" "399-C0805C103K5RACTUCT-ND"
 			(at 113.03 95.25 0)
 			(effects
 				(font

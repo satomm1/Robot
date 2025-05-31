@@ -1994,7 +1994,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.we-online.com/katalog/datasheet/150080RS75000.pdf"
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3739/B1701URO-20D000114U1930.pdf"
 			(at 102.87 82.55 0)
 			(effects
 				(font
@@ -2003,7 +2003,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "LED RED CLEAR 0805 SMD"
+		(property "Description" "LED RED DIFFUSED 0805 SMD"
 			(at 102.87 82.55 0)
 			(effects
 				(font
@@ -2012,7 +2012,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr" "Würth Elektronik"
+		(property "Mfr" "Harvatek Corporation"
 			(at 102.87 82.55 0)
 			(effects
 				(font
@@ -2021,7 +2021,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr P/N" "150080RS75000"
+		(property "Mfr P/N" "B1701URO-20D000114U1930"
 			(at 102.87 82.55 0)
 			(effects
 				(font
@@ -2039,7 +2039,7 @@
 				(hide yes)
 			)
 		)
-		(property "Supplier 1 P/N" "732-4984-1-ND"
+		(property "Supplier 1 P/N" "3147-B1701URO-20D000114U1930CT-ND"
 			(at 102.87 82.55 0)
 			(effects
 				(font
@@ -2363,7 +2363,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.we-online.com/katalog/datasheet/150080RS75000.pdf"
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3739/B1701URO-20D000114U1930.pdf"
 			(at 185.42 82.55 0)
 			(effects
 				(font
@@ -2372,7 +2372,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "LED RED CLEAR 0805 SMD"
+		(property "Description" "LED RED DIFFUSED 0805 SMD"
 			(at 185.42 82.55 0)
 			(effects
 				(font
@@ -2381,7 +2381,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr" "Würth Elektronik"
+		(property "Mfr" "Harvatek Corporation"
 			(at 185.42 82.55 0)
 			(effects
 				(font
@@ -2390,7 +2390,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr P/N" "150080RS75000"
+		(property "Mfr P/N" "B1701URO-20D000114U1930"
 			(at 185.42 82.55 0)
 			(effects
 				(font
@@ -2408,7 +2408,7 @@
 				(hide yes)
 			)
 		)
-		(property "Supplier 1 P/N" "732-4984-1-ND"
+		(property "Supplier 1 P/N" "3147-B1701URO-20D000114U1930CT-ND"
 			(at 185.42 82.55 0)
 			(effects
 				(font
@@ -2486,7 +2486,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.we-online.com/katalog/datasheet/150080RS75000.pdf"
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3739/B1701URO-20D000114U1930.pdf"
 			(at 144.145 82.55 0)
 			(effects
 				(font
@@ -2495,7 +2495,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "LED RED CLEAR 0805 SMD"
+		(property "Description" "LED RED DIFFUSED 0805 SMD"
 			(at 144.145 82.55 0)
 			(effects
 				(font
@@ -2504,7 +2504,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr" "Würth Elektronik"
+		(property "Mfr" "Harvatek Corporation"
 			(at 144.145 82.55 0)
 			(effects
 				(font
@@ -2513,7 +2513,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr P/N" "150080RS75000"
+		(property "Mfr P/N" "B1701URO-20D000114U1930"
 			(at 144.145 82.55 0)
 			(effects
 				(font
@@ -2531,7 +2531,7 @@
 				(hide yes)
 			)
 		)
-		(property "Supplier 1 P/N" "732-4984-1-ND"
+		(property "Supplier 1 P/N" "3147-B1701URO-20D000114U1930CT-ND"
 			(at 144.145 82.55 0)
 			(effects
 				(font
@@ -3401,7 +3401,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.we-online.com/katalog/datasheet/150080RS75000.pdf"
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3656/B1701UD--20D000414U1930.pdf"
 			(at 208.915 82.55 0)
 			(effects
 				(font
@@ -3410,7 +3410,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "LED GREEN CLEAR 0805 SMD"
+		(property "Description" "LED ORANGE DIFFUSED 0805 SMD"
 			(at 208.915 82.55 0)
 			(effects
 				(font
@@ -3419,7 +3419,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr" "Würth Elektronik"
+		(property "Mfr" "Harvatek Corporation"
 			(at 208.915 82.55 0)
 			(effects
 				(font
@@ -3428,7 +3428,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr P/N" "150080VS75000"
+		(property "Mfr P/N" "B1701UD--20D000414U1930"
 			(at 208.915 82.55 0)
 			(effects
 				(font
@@ -3446,7 +3446,7 @@
 				(hide yes)
 			)
 		)
-		(property "Supplier 1 P/N" "732-4986-1-ND"
+		(property "Supplier 1 P/N" "3147-B1701UD--20D000414U1930CT-ND"
 			(at 208.915 82.55 0)
 			(effects
 				(font
@@ -3780,7 +3780,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.we-online.com/katalog/datasheet/150080RS75000.pdf"
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3656/B1701UD--20D000414U1930.pdf"
 			(at 126.365 82.55 0)
 			(effects
 				(font
@@ -3789,7 +3789,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "LED GREEN CLEAR 0805 SMD"
+		(property "Description" "LED ORANGE DIFFUSED 0805 SMD"
 			(at 126.365 82.55 0)
 			(effects
 				(font
@@ -3798,7 +3798,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr" "Würth Elektronik"
+		(property "Mfr" "Harvatek Corporation"
 			(at 126.365 82.55 0)
 			(effects
 				(font
@@ -3807,7 +3807,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr P/N" "150080VS75000"
+		(property "Mfr P/N" "B1701UD--20D000414U1930"
 			(at 126.365 82.55 0)
 			(effects
 				(font
@@ -3825,7 +3825,7 @@
 				(hide yes)
 			)
 		)
-		(property "Supplier 1 P/N" "732-4986-1-ND"
+		(property "Supplier 1 P/N" "3147-B1701UD--20D000414U1930CT-ND"
 			(at 126.365 82.55 0)
 			(effects
 				(font
@@ -3903,7 +3903,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.we-online.com/katalog/datasheet/150080RS75000.pdf"
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3656/B1701UD--20D000414U1930.pdf"
 			(at 167.64 82.55 0)
 			(effects
 				(font
@@ -3912,7 +3912,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "LED GREEN CLEAR 0805 SMD"
+		(property "Description" "LED ORANGE DIFFUSED 0805 SMD"
 			(at 167.64 82.55 0)
 			(effects
 				(font
@@ -3921,7 +3921,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr" "Würth Elektronik"
+		(property "Mfr" "Harvatek Corporation"
 			(at 167.64 82.55 0)
 			(effects
 				(font
@@ -3930,7 +3930,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr P/N" "150080VS75000"
+		(property "Mfr P/N" "B1701UD--20D000414U1930"
 			(at 167.64 82.55 0)
 			(effects
 				(font
@@ -3948,7 +3948,7 @@
 				(hide yes)
 			)
 		)
-		(property "Supplier 1 P/N" "732-4986-1-ND"
+		(property "Supplier 1 P/N" "3147-B1701UD--20D000414U1930CT-ND"
 			(at 167.64 82.55 0)
 			(effects
 				(font

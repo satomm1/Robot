@@ -756,7 +756,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "CONN HEADER VERT 8POS 2.54MM"
 			(at 187.325 142.24 0)
 			(effects
 				(font
@@ -765,7 +765,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr" ""
+		(property "Mfr" "METZ CONNECT USA Inc."
 			(at 187.325 142.24 0)
 			(effects
 				(font
@@ -774,7 +774,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr P/N" ""
+		(property "Mfr P/N" "PR20204VBDN"
 			(at 187.325 142.24 0)
 			(effects
 				(font
@@ -792,7 +792,7 @@
 				(hide yes)
 			)
 		)
-		(property "Supplier 1 P/N" "10129381-908001BLF-ND"
+		(property "Supplier 1 P/N" "1849-PR20204VBDN-ND"
 			(at 187.325 142.24 0)
 			(effects
 				(font

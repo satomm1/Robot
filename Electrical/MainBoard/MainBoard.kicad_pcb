@@ -399,7 +399,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.we-online.com/katalog/datasheet/150080RS75000.pdf"
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3656/B1701UD--20D000414U1930.pdf"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -411,7 +411,7 @@
 				)
 			)
 		)
-		(property "Description" "LED GREEN CLEAR 0805 SMD"
+		(property "Description" "LED ORANGE DIFFUSED 0805 SMD"
 			(at 379.775 -51.025 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -423,7 +423,7 @@
 				)
 			)
 		)
-		(property "Mfr" "Würth Elektronik"
+		(property "Mfr" "Harvatek Corporation"
 			(at 379.775 -51.025 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -435,7 +435,7 @@
 				)
 			)
 		)
-		(property "Mfr P/N" "150080VS75000"
+		(property "Mfr P/N" "B1701UD--20D000414U1930"
 			(at 379.775 -51.025 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -459,7 +459,7 @@
 				)
 			)
 		)
-		(property "Supplier 1 P/N" "732-4986-1-ND"
+		(property "Supplier 1 P/N" "3147-B1701UD--20D000414U1930CT-ND"
 			(at 379.775 -51.025 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -793,7 +793,7 @@
 		(path "/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b/40cb7248-dda3-43c2-89f4-533c7dd2230e")
 		(sheetname "/OtherSensors/")
 		(sheetfile "OtherSensors.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start -1.3208 -3.2258)
 			(end -1.3208 3.3782)
@@ -4202,7 +4202,7 @@
 		(path "/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b/94401af2-3536-444d-9bcb-06bc97b30c14")
 		(sheetname "/OtherSensors/")
 		(sheetfile "OtherSensors.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start 6.4008 -3.2258)
 			(end -1.3208 -3.2258)
@@ -5744,15 +5744,15 @@
 			(uuid "12353a2c-225d-4da2-b055-6f650e1ff691")
 		)
 		(embedded_fonts no)
-		(model "${KICAD6_3DMODEL_DIR}/Connector_PinSocket_2.54mm.3dshapes/PinSocket_1x06_P2.54mm_Horizontal.wrl"
+		(model "${KICAD9_3DMODEL_DIR}/Connector_PinHeader_2.54mm.3dshapes/PinHeader_1x06_P2.54mm_Horizontal.wrl"
 			(offset
-				(xyz 0 0 0)
+				(xyz 0 -12.5 0)
 			)
 			(scale
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 0)
+				(xyz -0 -0 180)
 			)
 		)
 	)
@@ -6158,7 +6158,7 @@
 		(path "/d895d168-5c3b-4f65-b0f2-4d47b39f1a08/ccba71c1-1b8f-46b3-a5d2-9cc3a0af6685")
 		(sheetname "/SPI_UART/")
 		(sheetfile "SPI_UART.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start -1.33 -1.33)
 			(end 0 -1.33)
@@ -7116,7 +7116,7 @@
 		(path "/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b/fa68a8f0-64b7-446c-afb9-528042e04feb")
 		(sheetname "/OtherSensors/")
 		(sheetfile "OtherSensors.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start 6.4008 -3.2258)
 			(end -1.3208 -3.2258)
@@ -9346,7 +9346,7 @@
 		(path "/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b/dd4c3d5d-4084-44a4-b894-272166e9d549")
 		(sheetname "/OtherSensors/")
 		(sheetfile "OtherSensors.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.227064 0.735)
 			(end 0.227064 0.735)
@@ -14011,7 +14011,7 @@
 		(path "/7681952e-9ac4-4545-8f8a-d83e518f0640/39dad8fd-d974-443c-b49a-d034b1f07d98")
 		(sheetname "/GPIO/")
 		(sheetfile "GPIO.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start 3.87 -1.33)
 			(end 3.87 6.41)
@@ -14301,7 +14301,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.we-online.com/katalog/datasheet/150080RS75000.pdf"
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3739/B1701URO-20D000114U1930.pdf"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -14313,7 +14313,7 @@
 				)
 			)
 		)
-		(property "Description" "LED RED CLEAR 0805 SMD"
+		(property "Description" "LED RED DIFFUSED 0805 SMD"
 			(at 376.275 -47.525 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -14325,7 +14325,7 @@
 				)
 			)
 		)
-		(property "Mfr" "Würth Elektronik"
+		(property "Mfr" "Harvatek Corporation"
 			(at 376.275 -47.525 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -14337,7 +14337,7 @@
 				)
 			)
 		)
-		(property "Mfr P/N" "150080RS75000"
+		(property "Mfr P/N" "B1701URO-20D000114U1930"
 			(at 376.275 -47.525 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -14361,7 +14361,7 @@
 				)
 			)
 		)
-		(property "Supplier 1 P/N" "732-4984-1-ND"
+		(property "Supplier 1 P/N" "3147-B1701URO-20D000114U1930CT-ND"
 			(at 376.275 -47.525 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -15917,7 +15917,7 @@
 		(path "/d895d168-5c3b-4f65-b0f2-4d47b39f1a08/1b65b799-2b7f-43f9-9340-ae5526ea988f")
 		(sheetname "/SPI_UART/")
 		(sheetfile "SPI_UART.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start -1.33 -1.33)
 			(end 0 -1.33)
@@ -16638,7 +16638,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.we-online.com/katalog/datasheet/150080RS75000.pdf"
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3656/B1701UD--20D000414U1930.pdf"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -16650,7 +16650,7 @@
 				)
 			)
 		)
-		(property "Description" "LED GREEN CLEAR 0805 SMD"
+		(property "Description" "LED ORANGE DIFFUSED 0805 SMD"
 			(at 372.775 -44.025 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -16662,7 +16662,7 @@
 				)
 			)
 		)
-		(property "Mfr" "Würth Elektronik"
+		(property "Mfr" "Harvatek Corporation"
 			(at 372.775 -44.025 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -16674,7 +16674,7 @@
 				)
 			)
 		)
-		(property "Mfr P/N" "150080VS75000"
+		(property "Mfr P/N" "B1701UD--20D000414U1930"
 			(at 372.775 -44.025 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -16698,7 +16698,7 @@
 				)
 			)
 		)
-		(property "Supplier 1 P/N" "732-4986-1-ND"
+		(property "Supplier 1 P/N" "3147-B1701UD--20D000414U1930CT-ND"
 			(at 372.775 -44.025 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -21324,7 +21324,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.we-online.com/katalog/datasheet/150080RS75000.pdf"
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3739/B1701URO-20D000114U1930.pdf"
 			(at 0 0 270)
 			(layer "F.Fab")
 			(hide yes)
@@ -21336,7 +21336,7 @@
 				)
 			)
 		)
-		(property "Description" "LED RED CLEAR 0805 SMD"
+		(property "Description" "LED RED DIFFUSED 0805 SMD"
 			(at 120.7 289.7 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -21348,7 +21348,7 @@
 				)
 			)
 		)
-		(property "Mfr" "Würth Elektronik"
+		(property "Mfr" "Harvatek Corporation"
 			(at 120.7 289.7 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -21360,7 +21360,7 @@
 				)
 			)
 		)
-		(property "Mfr P/N" "150080RS75000"
+		(property "Mfr P/N" "B1701URO-20D000114U1930"
 			(at 120.7 289.7 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -21384,7 +21384,7 @@
 				)
 			)
 		)
-		(property "Supplier 1 P/N" "732-4984-1-ND"
+		(property "Supplier 1 P/N" "3147-B1701URO-20D000114U1930CT-ND"
 			(at 120.7 289.7 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -21618,7 +21618,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.samsungsem.com/kr/support/product-search/mlcc/CL21B103KBANNNC.jsp"
+		(property "Datasheet" "https://search.kemet.com/download/datasheet/C0805C103K5RAC7800"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -21642,7 +21642,7 @@
 				)
 			)
 		)
-		(property "Mfr" "Samsung Electro-Mechanics"
+		(property "Mfr" "KEMET"
 			(at 405.1 -121.3 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -21654,7 +21654,7 @@
 				)
 			)
 		)
-		(property "Mfr P/N" "CL21B103KBANNNC"
+		(property "Mfr P/N" "C0805C103K5RACTU"
 			(at 405.1 -121.3 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -21678,7 +21678,7 @@
 				)
 			)
 		)
-		(property "Supplier 1 P/N" "1276-1015-1-ND"
+		(property "Supplier 1 P/N" "399-C0805C103K5RACTUCT-ND"
 			(at 405.1 -121.3 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -23755,7 +23755,7 @@
 		(path "/d895d168-5c3b-4f65-b0f2-4d47b39f1a08/fbf968cd-fe6f-4d89-b5c3-368c247f9d2e")
 		(sheetname "/SPI_UART/")
 		(sheetfile "SPI_UART.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start -1.33 -1.33)
 			(end 0 -1.33)
@@ -25419,7 +25419,7 @@
 		(path "/d895d168-5c3b-4f65-b0f2-4d47b39f1a08/00687705-29e4-4e52-89ab-ad10305dd5c0")
 		(sheetname "/SPI_UART/")
 		(sheetfile "SPI_UART.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start -1.33 -1.33)
 			(end 0 -1.33)
@@ -25709,7 +25709,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.we-online.com/katalog/datasheet/150080RS75000.pdf"
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3739/B1701URO-20D000114U1930.pdf"
 			(at 0 0 270)
 			(layer "F.Fab")
 			(hide yes)
@@ -25721,7 +25721,7 @@
 				)
 			)
 		)
-		(property "Description" "LED RED CLEAR 0805 SMD"
+		(property "Description" "LED RED DIFFUSED 0805 SMD"
 			(at 155.9 372.9 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -25733,7 +25733,7 @@
 				)
 			)
 		)
-		(property "Mfr" "Würth Elektronik"
+		(property "Mfr" "Harvatek Corporation"
 			(at 155.9 372.9 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -25745,7 +25745,7 @@
 				)
 			)
 		)
-		(property "Mfr P/N" "150080RS75000"
+		(property "Mfr P/N" "B1701URO-20D000114U1930"
 			(at 155.9 372.9 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -25769,7 +25769,7 @@
 				)
 			)
 		)
-		(property "Supplier 1 P/N" "732-4984-1-ND"
+		(property "Supplier 1 P/N" "3147-B1701URO-20D000114U1930CT-ND"
 			(at 155.9 372.9 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -35574,7 +35574,7 @@
 		(path "/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b/3122c99e-4cd0-4984-b842-aa02926527a9")
 		(sheetname "/OtherSensors/")
 		(sheetfile "OtherSensors.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.227064 0.735)
 			(end 0.227064 0.735)
@@ -38009,7 +38009,7 @@
 		(path "/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b/4f187e87-e247-4da2-b1d5-53cbc594bc27")
 		(sheetname "/OtherSensors/")
 		(sheetfile "OtherSensors.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.227064 -0.735)
 			(end 0.227064 -0.735)
@@ -38553,7 +38553,7 @@
 		(path "/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b/d8b7d900-96db-4632-a39c-f57ca94b8ae3")
 		(sheetname "/OtherSensors/")
 		(sheetfile "OtherSensors.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.227064 -0.735)
 			(end 0.227064 -0.735)
@@ -38997,7 +38997,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.we-online.com/katalog/datasheet/150080RS75000.pdf"
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3739/B1701URO-20D000114U1930.pdf"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -39009,7 +39009,7 @@
 				)
 			)
 		)
-		(property "Description" "LED RED CLEAR 0805 SMD"
+		(property "Description" "LED RED DIFFUSED 0805 SMD"
 			(at 383.275 -54.525 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -39021,7 +39021,7 @@
 				)
 			)
 		)
-		(property "Mfr" "Würth Elektronik"
+		(property "Mfr" "Harvatek Corporation"
 			(at 383.275 -54.525 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -39033,7 +39033,7 @@
 				)
 			)
 		)
-		(property "Mfr P/N" "150080RS75000"
+		(property "Mfr P/N" "B1701URO-20D000114U1930"
 			(at 383.275 -54.525 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -39057,7 +39057,7 @@
 				)
 			)
 		)
-		(property "Supplier 1 P/N" "732-4984-1-ND"
+		(property "Supplier 1 P/N" "3147-B1701URO-20D000114U1930CT-ND"
 			(at 383.275 -54.525 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -39391,7 +39391,7 @@
 		(path "/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b/b1fa7f98-21a1-4175-bb69-53806d7b34cf")
 		(sheetname "/OtherSensors/")
 		(sheetfile "OtherSensors.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start -1.3208 -3.2258)
 			(end -1.3208 3.3782)
@@ -40382,7 +40382,7 @@
 		(path "/7681952e-9ac4-4545-8f8a-d83e518f0640/954a31c8-b21e-4bc1-b02b-14f1595e3f15")
 		(sheetname "/GPIO/")
 		(sheetfile "GPIO.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start -1.33 -1.33)
 			(end 0 -1.33)
@@ -41195,7 +41195,7 @@
 			)
 		)
 		(property "Datasheet" "B3F-1020"
-			(at 0 0 270)
+			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "761662a9-8b4c-49ef-b621-8120bc912d87")
@@ -41748,6 +41748,17 @@
 			(uuid "a6377e44-d00a-4d1d-bc0b-099e32333582")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/MainBoardModels/B3F_1020/B3F_1020.step"
+			(offset
+				(xyz 3.5 -2.25 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz -90 -0 -0)
+			)
+		)
 	)
 	(footprint "Connector_PinHeader_2.54mm:PinHeader_2x04_P2.54mm_Vertical"
 		(layer "F.Cu")
@@ -41791,7 +41802,7 @@
 				)
 			)
 		)
-		(property "Description" ""
+		(property "Description" "CONN HEADER VERT 8POS 2.54MM"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -41803,7 +41814,7 @@
 				)
 			)
 		)
-		(property "Mfr" ""
+		(property "Mfr" "METZ CONNECT USA Inc."
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -41815,7 +41826,7 @@
 				)
 			)
 		)
-		(property "Mfr P/N" ""
+		(property "Mfr P/N" "PR20204VBDN"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -41839,7 +41850,7 @@
 				)
 			)
 		)
-		(property "Supplier 1 P/N" "10129381-908001BLF-ND"
+		(property "Supplier 1 P/N" "1849-PR20204VBDN-ND"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -44492,7 +44503,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.we-online.com/katalog/datasheet/150080RS75000.pdf"
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3739/B1701URO-20D000114U1930.pdf"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -44504,7 +44515,7 @@
 				)
 			)
 		)
-		(property "Description" "LED RED CLEAR 0805 SMD"
+		(property "Description" "LED RED DIFFUSED 0805 SMD"
 			(at 390.175 -61.425 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -44516,7 +44527,7 @@
 				)
 			)
 		)
-		(property "Mfr" "Würth Elektronik"
+		(property "Mfr" "Harvatek Corporation"
 			(at 390.175 -61.425 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -44528,7 +44539,7 @@
 				)
 			)
 		)
-		(property "Mfr P/N" "150080RS75000"
+		(property "Mfr P/N" "B1701URO-20D000114U1930"
 			(at 390.175 -61.425 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -44552,7 +44563,7 @@
 				)
 			)
 		)
-		(property "Supplier 1 P/N" "732-4984-1-ND"
+		(property "Supplier 1 P/N" "3147-B1701URO-20D000114U1930CT-ND"
 			(at 390.175 -61.425 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -45577,7 +45588,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.we-online.com/katalog/datasheet/150080RS75000.pdf"
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3656/B1701UD--20D000414U1930.pdf"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -45589,7 +45600,7 @@
 				)
 			)
 		)
-		(property "Description" "LED GREEN CLEAR 0805 SMD"
+		(property "Description" "LED ORANGE DIFFUSED 0805 SMD"
 			(at 386.675 -57.925 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -45601,7 +45612,7 @@
 				)
 			)
 		)
-		(property "Mfr" "Würth Elektronik"
+		(property "Mfr" "Harvatek Corporation"
 			(at 386.675 -57.925 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -45613,7 +45624,7 @@
 				)
 			)
 		)
-		(property "Mfr P/N" "150080VS75000"
+		(property "Mfr P/N" "B1701UD--20D000414U1930"
 			(at 386.675 -57.925 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -45637,7 +45648,7 @@
 				)
 			)
 		)
-		(property "Supplier 1 P/N" "732-4986-1-ND"
+		(property "Supplier 1 P/N" "3147-B1701UD--20D000414U1930CT-ND"
 			(at 386.675 -57.925 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -49313,7 +49324,7 @@
 		(path "/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b/72803d00-faaf-472a-8585-8a6b6721bd16")
 		(sheetname "/OtherSensors/")
 		(sheetfile "OtherSensors.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start 6.4008 -3.2258)
 			(end -1.3208 -3.2258)
@@ -49654,7 +49665,7 @@
 		(path "/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b/12ca363a-389d-4798-83d5-233806fc4c5a")
 		(sheetname "/OtherSensors/")
 		(sheetfile "OtherSensors.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start -1.3208 -3.2258)
 			(end -1.3208 3.3782)
@@ -49984,7 +49995,7 @@
 		(path "/f4129289-3c0d-4adc-b4a9-f79af269c84f/fc72841e-5794-49f7-b22d-74e47aa3977e")
 		(sheetname "/Memory/")
 		(sheetfile "Memory.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.261252 -0.735)
 			(end 0.261252 -0.735)
@@ -50859,7 +50870,7 @@
 		(path "/c568ceec-b7ac-45ca-9b64-1ad9e4a2513b/30cbe801-490b-499f-ab8f-a40554e305e7")
 		(sheetname "/OtherSensors/")
 		(sheetfile "OtherSensors.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start -1.3208 -3.2258)
 			(end -1.3208 3.3782)
@@ -51633,7 +51644,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.samsungsem.com/kr/support/product-search/mlcc/CL21B103KBANNNC.jsp"
+		(property "Datasheet" "https://search.kemet.com/download/datasheet/C0805C103K5RAC7800"
 			(at 0 0 270)
 			(layer "F.Fab")
 			(hide yes)
@@ -51657,7 +51668,7 @@
 				)
 			)
 		)
-		(property "Mfr" "Samsung Electro-Mechanics"
+		(property "Mfr" "KEMET"
 			(at 57.8 276.6 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -51669,7 +51680,7 @@
 				)
 			)
 		)
-		(property "Mfr P/N" "CL21B103KBANNNC"
+		(property "Mfr P/N" "C0805C103K5RACTU"
 			(at 57.8 276.6 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -51693,7 +51704,7 @@
 				)
 			)
 		)
-		(property "Supplier 1 P/N" "1276-1015-1-ND"
+		(property "Supplier 1 P/N" "399-C0805C103K5RACTUCT-ND"
 			(at 57.8 276.6 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -52177,7 +52188,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.we-online.com/katalog/datasheet/150080RS75000.pdf"
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3739/B1701URO-20D000114U1930.pdf"
 			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -52189,7 +52200,7 @@
 				)
 			)
 		)
-		(property "Description" "LED RED CLEAR 0805 SMD"
+		(property "Description" "LED RED DIFFUSED 0805 SMD"
 			(at 366.4 -162.4 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -52201,7 +52212,7 @@
 				)
 			)
 		)
-		(property "Mfr" "Würth Elektronik"
+		(property "Mfr" "Harvatek Corporation"
 			(at 366.4 -162.4 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -52213,7 +52224,7 @@
 				)
 			)
 		)
-		(property "Mfr P/N" "150080RS75000"
+		(property "Mfr P/N" "B1701URO-20D000114U1930"
 			(at 366.4 -162.4 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -52237,7 +52248,7 @@
 				)
 			)
 		)
-		(property "Supplier 1 P/N" "732-4984-1-ND"
+		(property "Supplier 1 P/N" "3147-B1701URO-20D000114U1930CT-ND"
 			(at 366.4 -162.4 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -54557,7 +54568,7 @@
 		(path "/7681952e-9ac4-4545-8f8a-d83e518f0640/470dffaf-0f18-4e1c-b729-9950136fc868")
 		(sheetname "/GPIO/")
 		(sheetfile "GPIO.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start -1.33 -1.33)
 			(end 0 -1.33)
@@ -55713,7 +55724,7 @@
 		(path "/f4129289-3c0d-4adc-b4a9-f79af269c84f/181675c3-b7e9-4d80-8f5e-095be0afac62")
 		(sheetname "/Memory/")
 		(sheetfile "Memory.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start 7.1247 -7.8486)
 			(end 1.984441 -7.8486)
@@ -56807,7 +56818,7 @@
 		(path "/7681952e-9ac4-4545-8f8a-d83e518f0640/ad6e2fbb-4d91-4769-9034-0db19ba2d484")
 		(sheetname "/GPIO/")
 		(sheetfile "GPIO.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start -1.33 -1.33)
 			(end 0 -1.33)
@@ -57875,7 +57886,7 @@
 			)
 		)
 		(property "Datasheet" "https://cdn.amphenol-cs.com/media/wysiwyg/files/drawing/10129381.pdf"
-			(at 0 0 270)
+			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "8f896db9-548c-4874-b802-725f22ef092d")
@@ -57974,7 +57985,7 @@
 		(path "/d895d168-5c3b-4f65-b0f2-4d47b39f1a08/96a08583-c0af-43dd-a06a-ede21b740292")
 		(sheetname "/SPI_UART/")
 		(sheetfile "SPI_UART.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start -1.33 3.87)
 			(end 3.87 3.87)

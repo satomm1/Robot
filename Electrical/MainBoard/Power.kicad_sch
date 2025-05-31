@@ -5613,7 +5613,7 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" "https://www.we-online.com/katalog/datasheet/150080RS75000.pdf"
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3739/B1701URO-20D000114U1930.pdf"
 			(at 69.85 177.8 0)
 			(effects
 				(font
@@ -5622,7 +5622,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "LED RED CLEAR 0805 SMD"
+		(property "Description" "LED RED DIFFUSED 0805 SMD"
 			(at 69.85 177.8 0)
 			(effects
 				(font
@@ -5631,7 +5631,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr" "Würth Elektronik"
+		(property "Mfr" "Harvatek Corporation"
 			(at 69.85 177.8 0)
 			(effects
 				(font
@@ -5640,7 +5640,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr P/N" "150080RS75000"
+		(property "Mfr P/N" "B1701URO-20D000114U1930"
 			(at 69.85 177.8 0)
 			(effects
 				(font
@@ -5658,7 +5658,7 @@
 				(hide yes)
 			)
 		)
-		(property "Supplier 1 P/N" "732-4984-1-ND"
+		(property "Supplier 1 P/N" "3147-B1701URO-20D000114U1930CT-ND"
 			(at 69.85 177.8 0)
 			(effects
 				(font

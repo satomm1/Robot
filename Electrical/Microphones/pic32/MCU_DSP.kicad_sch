@@ -5080,7 +5080,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr P/N" "1718560006"
+		(property "Mfr P/N" "0022232061"
 			(at 83.82 62.23 0)
 			(effects
 				(font
@@ -5098,7 +5098,7 @@
 				(hide yes)
 			)
 		)
-		(property "Supplier 1 P/N" "WM10156-ND"
+		(property "Supplier 1 P/N" "WM4204-ND"
 			(at 83.82 62.23 0)
 			(effects
 				(font
@@ -5655,7 +5655,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr" "Würth Elektronik"
+		(property "Mfr" "Harvatek Corporation "
 			(at 274.32 48.895 0)
 			(effects
 				(font
@@ -5664,7 +5664,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr P/N" "150080RS75000"
+		(property "Mfr P/N" "B1701URO-20D000114U1930 "
 			(at 274.32 48.895 0)
 			(effects
 				(font
@@ -5682,7 +5682,7 @@
 				(hide yes)
 			)
 		)
-		(property "Supplier 1 P/N" "732-4984-1-ND"
+		(property "Supplier 1 P/N" "3147-B1701URO-20D000114U1930CT-ND "
 			(at 274.32 48.895 0)
 			(effects
 				(font
@@ -7002,7 +7002,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr" "Würth Elektronik"
+		(property "Mfr" "Harvatek Corporation "
 			(at 287.655 48.895 0)
 			(effects
 				(font
@@ -7011,7 +7011,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr P/N" "150080RS75000"
+		(property "Mfr P/N" "B1701URO-20D000114U1930 "
 			(at 287.655 48.895 0)
 			(effects
 				(font
@@ -7029,7 +7029,7 @@
 				(hide yes)
 			)
 		)
-		(property "Supplier 1 P/N" "732-4984-1-ND"
+		(property "Supplier 1 P/N" "3147-B1701URO-20D000114U1930CT-ND "
 			(at 287.655 48.895 0)
 			(effects
 				(font
@@ -7390,7 +7390,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr P/N" "1718560006"
+		(property "Mfr P/N" "0022232061"
 			(at 333.375 105.41 0)
 			(effects
 				(font
@@ -7408,7 +7408,7 @@
 				(hide yes)
 			)
 		)
-		(property "Supplier 1 P/N" "WM10156-ND"
+		(property "Supplier 1 P/N" "WM4204-ND"
 			(at 333.375 105.41 0)
 			(effects
 				(font
@@ -8907,7 +8907,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr P/N" "1718560006"
+		(property "Mfr P/N" "0022232061"
 			(at 119.38 62.23 0)
 			(effects
 				(font
@@ -8925,7 +8925,7 @@
 				(hide yes)
 			)
 		)
-		(property "Supplier 1 P/N" "WM10156-ND"
+		(property "Supplier 1 P/N" "WM4204-ND"
 			(at 119.38 62.23 0)
 			(effects
 				(font
