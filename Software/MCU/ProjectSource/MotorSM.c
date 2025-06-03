@@ -700,11 +700,11 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
     } else {
         RightRotations += 1;
     }
-
-    // restart Timer4 (timer to indicate if motor is stopped)
-    T4CONCLR = _T4CON_ON_MASK;     
-    TMR4 = 0;     
-    T4CONSET = _T4CON_ON_MASK;     
+    
+    // restart Timer5 (timer to indicate if right motor is stopped)
+    T5CONCLR = _T5CON_ON_MASK;     
+    TMR5 = 0;     
+    T5CONSET = _T5CON_ON_MASK;     
 }
 
 void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL7SRS) IC2Handler(void)
@@ -743,10 +743,10 @@ void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
         LeftRotations -= 1;
     }   
     
-    // restart Timer5 (timer to indicate if motor is stopped)
-    T5CONCLR = _T5CON_ON_MASK;     
-    TMR5 = 0;     
-    T5CONSET = _T5CON_ON_MASK; 
+    // restart Timer4 (timer to indicate if left motor is stopped)
+    T4CONCLR = _T4CON_ON_MASK;     
+    TMR4 = 0;     
+    T4CONSET = _T4CON_ON_MASK; 
 }
 
 void __ISR(_INPUT_CAPTURE_4_VECTOR, IPL7SRS) IC4Handler(void)
