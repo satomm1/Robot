@@ -24,11 +24,11 @@
 #include <sys/attribs.h>
 #include <math.h>
 #include "matt_circular_buffer.h"
+#include "IMU_SM.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 #define IC_PERIOD 65535 // Input capture period
 #define OC_PERIOD 312   // Output compare period (10 kHz)
-#define CONTROL_PERIOD 10000 // 1000 // Control update period --- 6250 Hz
 #define NO_SPEED_PERIOD 65535 // Period to indicate motor not spinning
 #define DEAD_RECKONING_PERIOD 3906// 1953 // 3906 // 7812 // Chosen so that we update at 50 Hz rate
 #define Kp 5 // Proportional constant for PID law
@@ -37,9 +37,11 @@
 
 #if (MOTOR_TYPE==1)
 #define ENCODER_RESOLUTION 374 // Number of pulses per revolution
+#define CONTROL_PERIOD 1000 // 1000 // Control update period --- 6250 Hz
 #elif (MOTOR_TYPE==2)
 //#define ENCODER_RESOLUTION 1440 // Number of pulses per revolution
 #define ENCODER_RESOLUTION 360
+#define CONTROL_PERIOD 10000 // 1000 // Control update period --- 6250 Hz
 #endif
 
 #define GEAR_RATIO 34 // Gear reduction ratio
@@ -379,7 +381,7 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
 //            DB_printf("LR: %d\r\n", LeftRotations);
 //            DB_printf("RR: %d\r\n", RightRotations);
             
-                ES_Timer_InitTimer(MOTOR_TIMER, 500);
+                ES_Timer_InitTimer(MOTOR_TIMER, 2000);
             } else if (ThisEvent.EventParam == RL_TIMER) {
                 // Print 2-1000 entries of RL DATA...
 //                DB_printf("%d.......\r\n", RL_Data_Printing_Index+1);
@@ -950,8 +952,9 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     
     static int32_t CurLeftRotations;
     static int32_t CurRightRotations;
-    
-    static bool status = false;
+        
+    static float roll;
+    static float pitch;
     
     IFS1CLR = _IFS1_T7IF_MASK; // clear the interrupt flag 
     
