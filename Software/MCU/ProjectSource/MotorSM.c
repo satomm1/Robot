@@ -507,12 +507,13 @@ void SetDesiredSpeed(float V, float w)
     
     V_desired = V;
     w_desired = w;
-        
+            
     // We turn off control for stopped to prevent jittering
     if (V==0 && w == 0) {
         
         // Turn control timer off
-        T1CONbits.ON = 0; // Turn timer 1 off
+        T1CONCLR = _T1CON_ON_MASK; // stop the timer 
+//        T1CONbits.ON = 0; // Turn timer 1 off
         TMR1 = 0;
                 
         // Manually set drive pins to stopped
@@ -527,7 +528,8 @@ void SetDesiredSpeed(float V, float w)
         SetDesiredRPM(0,0);
         return;
     } else {
-        T1CONbits.ON = 1; // Turn timer 1 back on
+        T1CONSET = _T1CON_ON_MASK;
+//        T1CONbits.ON = 1; // Turn timer 1 back on
     }
     
     
@@ -788,8 +790,6 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     
     IFS0CLR = _IFS0_T1IF_MASK; // Clear the timer interrupt
     
-//    LATHbits.LATH4 = 1;
-    
     // Calculate Current RPM based on Pulse Lengths from encoders
     ActualLeftRPM = SPEED_CONVERSION_FACTOR / LeftPulseLength;
     ActualRightRPM = SPEED_CONVERSION_FACTOR / RightPulseLength;
@@ -847,7 +847,7 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
         RightDutyCycle = 0;
         RightErrorSum -= RightError;
     }
-    
+        
     // Lastly, Set the duty cycle of the motors by updating Output Compare
     if (LeftDirection == Backward) {
         LeftDutyCycle = 100 - LeftDutyCycle;
