@@ -1,0 +1,4620 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "af205a0a-08c6-4c51-b3f2-c6c9ae0cda1b")
+	(paper "B")
+	(title_block
+		(title "MCU Controller")
+		(rev "0.3")
+		(company "satomm@stanford.edu")
+		(comment 1 "Department of Civil and Environmental Engineering")
+		(comment 2 "Engineering Informatics Group")
+		(comment 3 "Stanford University")
+		(comment 4 "Matthew Sato")
+	)
+	(lib_symbols
+		(symbol "Device:LED"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "D"
+				(at 0 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "LED"
+				(at 0 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Light emitting diode"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "LED diode"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "LED* LED_SMD:* LED_THT:*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "LED_0_1"
+				(polyline
+					(pts
+						(xy -3.048 -0.762) (xy -4.572 -2.286) (xy -3.81 -2.286) (xy -4.572 -2.286) (xy -4.572 -1.524)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.778 -0.762) (xy -3.302 -2.286) (xy -2.54 -2.286) (xy -3.302 -2.286) (xy -3.302 -1.524)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 0) (xy 1.27 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 -1.27) (xy -1.27 1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 -1.27) (xy 1.27 1.27) (xy -1.27 0) (xy 1.27 -1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "LED_1_1"
+				(pin passive line
+					(at -3.81 0 0)
+					(length 2.54)
+					(name "K"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 3.81 0 180)
+					(length 2.54)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Device:LED_Dual_AKA"
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "D"
+				(at 0 5.715 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "LED_Dual_AKA"
+				(at 0 -6.35 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Dual LED, common cathode on pin 2"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "LED diode bicolor dual"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "LED* LED_SMD:* LED_THT:*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "LED_Dual_AKA_0_1"
+				(polyline
+					(pts
+						(xy -4.572 0) (xy -2.54 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center -2.54 0)
+					(radius 0.2794)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 1.27) (xy -1.27 3.81)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 -1.27) (xy -1.27 -3.81)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 0 0)
+					(radius 4.572)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 1.27) (xy 1.27 3.81) (xy -1.27 2.54) (xy 1.27 1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 -3.81) (xy 1.27 -1.27) (xy -1.27 -2.54) (xy 1.27 -3.81)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.032 5.08) (xy 3.556 6.604) (xy 2.794 6.604) (xy 3.556 6.604) (xy 3.556 5.842)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.032 2.54) (xy -2.54 2.54) (xy -2.54 -2.54) (xy 2.032 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.302 4.064) (xy 4.826 5.588) (xy 4.064 5.588) (xy 4.826 5.588) (xy 4.826 4.826)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 2.54) (xy 1.905 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 -2.54) (xy 1.905 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "LED_Dual_AKA_1_1"
+				(pin input line
+					(at -7.62 0 0)
+					(length 3.048)
+					(name "K"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 7.62 2.54 180)
+					(length 3.81)
+					(name "A1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 7.62 -2.54 180)
+					(length 3.81)
+					(name "A2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Device:R_US"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "R"
+				(at 2.54 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "R_US"
+				(at -2.54 0 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 1.016 -0.254 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Resistor, US symbol"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "R res resistor"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "R_*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "R_US_0_1"
+				(polyline
+					(pts
+						(xy 0 2.286) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 2.286) (xy 1.016 1.905) (xy 0 1.524) (xy -1.016 1.143) (xy 0 0.762)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 0.762) (xy 1.016 0.381) (xy 0 0) (xy -1.016 -0.381) (xy 0 -0.762)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 -0.762) (xy 1.016 -1.143) (xy 0 -1.524) (xy -1.016 -1.905) (xy 0 -2.286)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 -2.286) (xy 0 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "R_US_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 1.27)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 1.27)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "RobotLibary:GSF7002DW"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at 1.27 1.905 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "GSF7002DW"
+				(at 1.27 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "Package_TO_SOT_SMD:SOT-363_SC-70-6"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://goodarksemi.com/docs/datasheets/mosfets/GSF7002DW.pdf"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "GSF7002DW_1_1"
+				(rectangle
+					(start -5.08 -1.27)
+					(end 7.62 -12.7)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(pin passive line
+					(at -7.62 -3.81 0)
+					(length 2.54)
+					(name "S1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -7.62 -6.985 0)
+					(length 2.54)
+					(name "G1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -7.62 -10.16 0)
+					(length 2.54)
+					(name "D2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 -3.81 180)
+					(length 2.54)
+					(name "D1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 -6.985 180)
+					(length 2.54)
+					(name "G2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 -10.16 180)
+					(length 2.54)
+					(name "S2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "power:+3.3V"
+			(power)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "#PWR"
+				(at 0 -3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Value" "+3.3V"
+				(at 0 3.556 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Power symbol creates a global label with name \"+3.3V\""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "global power"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "+3.3V_0_1"
+				(polyline
+					(pts
+						(xy -0.762 1.27) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 2.54) (xy 0.762 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "+3.3V_1_1"
+				(pin power_in line
+					(at 0 0 90)
+					(length 0)
+					(hide yes)
+					(name "+3.3V"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "power:GND"
+			(power)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "#PWR"
+				(at 0 -6.35 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Value" "GND"
+				(at 0 -3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "global power"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "GND_0_1"
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 -1.27) (xy 1.27 -1.27) (xy 0 -2.54) (xy -1.27 -1.27) (xy 0 -1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "GND_1_1"
+				(pin power_in line
+					(at 0 0 270)
+					(length 0)
+					(hide yes)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+	)
+	(rectangle
+		(start 222.25 63.5)
+		(end 289.56 128.27)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(uuid 37db8413-069f-4212-831b-8ee1565e59e3)
+	)
+	(rectangle
+		(start 87.63 63.5)
+		(end 222.25 113.03)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(uuid e3770150-ada8-45ba-9241-964a0479518b)
+	)
+	(text "Corresponding Female: DigiKey PN 900-0022013037-ND\nCorresponding Crimp : DigiKey PN WM2756CT-ND"
+		(exclude_from_sim no)
+		(at 223.52 133.985 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "1fffaa7f-ed53-45e3-9043-028afc65526d")
+	)
+	(text "Robot Active/Inactive LED"
+		(exclude_from_sim no)
+		(at 247.015 61.595 0)
+		(effects
+			(font
+				(size 2.54 2.54)
+			)
+		)
+		(uuid "220d5b52-4496-4594-b7e2-1ab06732bab0")
+	)
+	(text "2.54 mm Lead spacing"
+		(exclude_from_sim no)
+		(at 247.65 123.825 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "36c9095d-c95d-4d20-a1af-983e51fad2ac")
+	)
+	(text "General Purpose LEDs"
+		(exclude_from_sim no)
+		(at 109.22 61.595 0)
+		(effects
+			(font
+				(size 2.54 2.54)
+			)
+		)
+		(uuid "c24b5b24-f732-4ca0-8668-c241b9d804bf")
+	)
+	(junction
+		(at 185.42 71.12)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "0db9f99f-e019-4257-a8fa-9fc694de1b80")
+	)
+	(junction
+		(at 126.365 71.12)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "12eda4d8-c0f4-4a55-ae0d-fc8af6cede1b")
+	)
+	(junction
+		(at 259.08 71.755)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "1c066a58-2c09-4dd3-a901-f8171d3ee591")
+	)
+	(junction
+		(at 170.18 105.41)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "352499aa-801e-4a03-a2e3-647ae118cce3")
+	)
+	(junction
+		(at 159.385 105.41)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "3d9ec494-5ac7-4640-8fa8-72faef59efd6")
+	)
+	(junction
+		(at 144.145 71.12)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "402428f4-5a0d-4f1a-b8a0-8920c8ecbd49")
+	)
+	(junction
+		(at 189.23 105.41)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "751db518-a5a8-497f-8c60-cd5fc79f551d")
+	)
+	(junction
+		(at 147.955 105.41)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "7d484283-8eb7-4c8b-a00d-6126fc705bbe")
+	)
+	(junction
+		(at 128.905 105.41)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "99f953e4-b964-4183-ac93-151cc1d6b0a3")
+	)
+	(junction
+		(at 167.64 71.12)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "aa995a5e-e50c-4408-80c7-6f25658b2388")
+	)
+	(junction
+		(at 156.21 71.12)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "ce15feb2-97f0-489e-bc68-6f8741da25e1")
+	)
+	(wire
+		(pts
+			(xy 126.365 92.075) (xy 126.365 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "02b84002-40c9-473b-b059-038dc42bbd65")
+	)
+	(wire
+		(pts
+			(xy 147.955 105.41) (xy 159.385 105.41)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0547520a-71f7-4d75-9add-57a75e52f2c0")
+	)
+	(wire
+		(pts
+			(xy 270.51 78.105) (xy 270.51 71.755)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0833e510-1713-466f-871f-734453925381")
+	)
+	(wire
+		(pts
+			(xy 232.41 84.455) (xy 250.825 84.455)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "09758d06-0df1-4083-87dc-f18595d020c5")
+	)
+	(wire
+		(pts
+			(xy 208.915 92.075) (xy 208.915 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0c87d0aa-26a5-4bd0-9e76-07941c71e79b")
+	)
+	(wire
+		(pts
+			(xy 185.42 98.425) (xy 191.135 98.425)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0f7d72aa-a476-4274-9180-6197da51eef1")
+	)
+	(wire
+		(pts
+			(xy 259.08 71.755) (xy 259.08 69.215)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "11cf91fe-6972-497d-b2cb-dd23e1e66f3d")
+	)
+	(wire
+		(pts
+			(xy 232.41 71.755) (xy 232.41 84.455)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1d07c443-c160-436b-9d9d-1f669f8c344b")
+	)
+	(wire
+		(pts
+			(xy 189.23 92.075) (xy 189.23 105.41)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1db87de2-0546-433e-9a65-8f27a5c46075")
+	)
+	(wire
+		(pts
+			(xy 168.91 95.25) (xy 167.64 95.25)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1eb2ffd0-e8d0-4b14-8b5f-beca8bc0b393")
+	)
+	(wire
+		(pts
+			(xy 268.605 91.44) (xy 261.62 91.44)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "25145f3a-5040-4ec2-9fad-803da3e2ede9")
+	)
+	(wire
+		(pts
+			(xy 167.64 92.075) (xy 167.64 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2641d5d3-d7c7-4383-908d-6e387fdeb0cb")
+	)
+	(wire
+		(pts
+			(xy 159.385 105.41) (xy 170.18 105.41)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "271d7ba4-35c6-41ad-b5ff-c09e632f3e6e")
+	)
+	(wire
+		(pts
+			(xy 183.515 95.25) (xy 191.135 95.25)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2864a316-ba21-4caf-9375-783bd392b785")
+	)
+	(wire
+		(pts
+			(xy 259.08 71.755) (xy 232.41 71.755)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "300e9f5d-b851-48b3-87d1-a7531667dd4d")
+	)
+	(wire
+		(pts
+			(xy 128.905 105.41) (xy 128.905 98.425)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3c47e9fa-b1ed-40b0-be74-2d5c387af747")
+	)
+	(wire
+		(pts
+			(xy 97.155 95.25) (xy 108.585 95.25)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3d521af1-d713-489f-b2c7-dde9e386c105")
+	)
+	(wire
+		(pts
+			(xy 210.185 95.25) (xy 208.915 95.25)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "43d0dfc3-521a-443f-85bc-c4397ed3d790")
+	)
+	(wire
+		(pts
+			(xy 170.18 105.41) (xy 170.18 98.425)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "47bdf024-ed98-46fd-adc9-e22b87d335b2")
+	)
+	(wire
+		(pts
+			(xy 208.915 98.425) (xy 211.455 98.425)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4ac1d9f6-c10b-40d3-9592-3d2ca734c7ee")
+	)
+	(wire
+		(pts
+			(xy 147.955 92.075) (xy 147.955 105.41)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5f835baa-cf9e-43d1-974c-c916414dc895")
+	)
+	(wire
+		(pts
+			(xy 268.605 78.105) (xy 270.51 78.105)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6eece016-1f7b-4637-8eab-2c16305c5049")
+	)
+	(wire
+		(pts
+			(xy 297.18 254.635) (xy 297.18 256.54)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "71a5966e-d4b6-4e9f-a38b-3e307a73f4a9")
+	)
+	(wire
+		(pts
+			(xy 167.64 71.12) (xy 185.42 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7dc93b7b-ad2a-4307-ab87-2316f00d35bd")
+	)
+	(wire
+		(pts
+			(xy 128.905 105.41) (xy 147.955 105.41)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7f14965e-1c3a-4193-baf3-c573b0a022ea")
+	)
+	(wire
+		(pts
+			(xy 247.65 81.28) (xy 250.825 81.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "828dc7ec-5405-45a8-a73e-5a7a4f02e9fe")
+	)
+	(wire
+		(pts
+			(xy 191.135 92.075) (xy 189.23 92.075)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "846781de-d909-43dd-ad79-6b78df2e017e")
+	)
+	(wire
+		(pts
+			(xy 270.51 71.755) (xy 259.08 71.755)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "849b0926-6350-482c-bd8c-6a7f8cdc7459")
+	)
+	(wire
+		(pts
+			(xy 128.905 98.425) (xy 126.365 98.425)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8a9673de-935d-4b96-8a41-f11f64ab6bb6")
+	)
+	(wire
+		(pts
+			(xy 126.365 71.12) (xy 144.145 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8cca8c68-3369-4a5d-9496-a046320827b0")
+	)
+	(wire
+		(pts
+			(xy 268.605 84.455) (xy 268.605 91.44)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "90b5b458-2362-490b-9a84-71b0fc1c46d7")
+	)
+	(wire
+		(pts
+			(xy 106.68 105.41) (xy 128.905 105.41)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "95dccde0-ec81-4a4d-9551-295797b7cda7")
+	)
+	(wire
+		(pts
+			(xy 250.825 78.105) (xy 230.505 78.105)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "96c6a279-c13d-4614-8898-ddeb3dc2124d")
+	)
+	(wire
+		(pts
+			(xy 297.18 256.54) (xy 299.72 256.54)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "97805126-625d-4a89-b14f-717740e59821")
+	)
+	(wire
+		(pts
+			(xy 126.365 95.25) (xy 127.635 95.25)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "99177196-0d46-4c79-a259-33486c115c84")
+	)
+	(wire
+		(pts
+			(xy 108.585 98.425) (xy 102.87 98.425)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9a1db5ed-997e-4cd6-9a4d-87d20438c4e5")
+	)
+	(wire
+		(pts
+			(xy 149.86 98.425) (xy 144.145 98.425)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9add5554-924a-46de-9c10-407c36871fdd")
+	)
+	(wire
+		(pts
+			(xy 170.18 105.41) (xy 189.23 105.41)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a3c99ddd-18aa-4ab8-b7db-ef2a3af0ae4a")
+	)
+	(wire
+		(pts
+			(xy 185.42 71.12) (xy 208.915 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a4de5c9b-43b7-4e35-89e0-e01b1ae48cfa")
+	)
+	(wire
+		(pts
+			(xy 189.23 105.41) (xy 211.455 105.41)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "aa944c34-b551-4cc9-aefe-a94067654ea7")
+	)
+	(wire
+		(pts
+			(xy 170.18 98.425) (xy 167.64 98.425)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "adb32345-8885-4cd7-b1b6-e565a9ec831d")
+	)
+	(wire
+		(pts
+			(xy 230.505 78.105) (xy 230.505 91.44)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ade43648-2fce-4570-80eb-545771cccbc3")
+	)
+	(wire
+		(pts
+			(xy 286.385 251.46) (xy 279.4 251.46)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b202bd43-758f-470a-873a-07bb1e289e0b")
+	)
+	(wire
+		(pts
+			(xy 149.86 92.075) (xy 147.955 92.075)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b2acc3a8-cb12-42e7-8078-fc1c6e429ff2")
+	)
+	(wire
+		(pts
+			(xy 108.585 92.075) (xy 106.68 92.075)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b877617b-634d-4dd1-aa26-71f64aca3337")
+	)
+	(wire
+		(pts
+			(xy 230.505 91.44) (xy 256.54 91.44)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b88b3653-0486-4a6a-b87d-3537f3d29c65")
+	)
+	(wire
+		(pts
+			(xy 211.455 105.41) (xy 211.455 98.425)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b98c3b43-7b32-4fb2-8c78-9794913703c0")
+	)
+	(wire
+		(pts
+			(xy 141.605 95.25) (xy 149.86 95.25)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b9dd6da8-1e2e-4dad-8ae1-8a8b27c403fe")
+	)
+	(wire
+		(pts
+			(xy 144.145 98.425) (xy 144.145 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "bcff9e12-6e86-46a7-ace8-d97b82dd31c8")
+	)
+	(wire
+		(pts
+			(xy 156.21 71.12) (xy 167.64 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c24d62a6-7c0e-49b3-b901-8b15b3907514")
+	)
+	(wire
+		(pts
+			(xy 286.385 252.095) (xy 286.385 251.46)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c7842a6f-254a-4746-8292-0e9816e1e6fb")
+	)
+	(wire
+		(pts
+			(xy 106.68 92.075) (xy 106.68 105.41)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cf8761cb-2798-47cf-a913-27528ac71f72")
+	)
+	(wire
+		(pts
+			(xy 102.87 71.12) (xy 126.365 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d560c14c-ed0f-4ec5-a292-93e6a6aba312")
+	)
+	(wire
+		(pts
+			(xy 102.87 98.425) (xy 102.87 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f35d70c1-37c9-47ba-a315-1a10768a75c2")
+	)
+	(wire
+		(pts
+			(xy 268.605 81.28) (xy 271.145 81.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f8cf92ca-96c3-4aa4-8fac-9377e8e3f99d")
+	)
+	(wire
+		(pts
+			(xy 144.145 71.12) (xy 156.21 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fb0070b7-b3c6-4988-a475-f4dd275a9033")
+	)
+	(wire
+		(pts
+			(xy 185.42 98.425) (xy 185.42 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fe1b3b6f-ac6a-471b-adee-2473b1dfdb89")
+	)
+	(hierarchical_label "3V3"
+		(shape input)
+		(at 299.72 256.54 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "125c33fb-ecf3-4740-85bd-23b93979cf52")
+	)
+	(hierarchical_label "Status_Green"
+		(shape input)
+		(at 247.65 81.28 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "20920cf5-570e-44c8-92aa-1b9967b35c72")
+	)
+	(hierarchical_label "LED6"
+		(shape input)
+		(at 210.185 95.25 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "267b5d5e-0b74-4adc-80f1-d4f05dd5f47d")
+	)
+	(hierarchical_label "LED1"
+		(shape input)
+		(at 97.155 95.25 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "4903b6ea-d38c-4e8c-afe2-9f10c3c4ea38")
+	)
+	(hierarchical_label "Status_Yellow"
+		(shape input)
+		(at 271.145 81.28 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "525625ab-cc91-447d-83b8-b0cf596e3e3b")
+	)
+	(hierarchical_label "LED2"
+		(shape input)
+		(at 127.635 95.25 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "8cfe9c0f-287b-4116-b80f-2677d6cf633e")
+	)
+	(hierarchical_label "LED3"
+		(shape input)
+		(at 141.605 95.25 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "96b1d00d-8e7b-4d37-a019-0654925a5f7f")
+	)
+	(hierarchical_label "LED5"
+		(shape input)
+		(at 183.515 95.25 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "a3806172-a3ef-4d1a-848e-1dfba9750a58")
+	)
+	(hierarchical_label "LED4"
+		(shape input)
+		(at 168.91 95.25 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a4cf9483-7b76-4e47-ba22-b554746e789f")
+	)
+	(hierarchical_label "GND"
+		(shape output)
+		(at 279.4 251.46 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "f6780588-c7ed-4e17-8476-42c6d3791648")
+	)
+	(symbol
+		(lib_id "Device:R_US")
+		(at 126.365 74.93 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "1cf85075-d629-4ec6-ae7d-29eb94518001")
+		(property "Reference" "R5"
+			(at 120.65 73.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "130R"
+			(at 119.38 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+			(at 127.381 75.184 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
+			(at 126.365 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "RES 130 OHM 1% 1/8W 0805"
+			(at 126.365 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Stackpole Electronics Inc"
+			(at 126.365 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "RMCF0805FT130R"
+			(at 126.365 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 126.365 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "RMCF0805FT130RCT-ND"
+			(at 126.365 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 126.365 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 126.365 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "6ce5e5fe-361f-4b1e-af6b-3eceb3702dde")
+		)
+		(pin "2"
+			(uuid "5a0f29df-8dec-423b-a03e-56867358ab2b")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "R5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:LED")
+		(at 102.87 82.55 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "278c34f6-326c-4703-8cca-f25bb4cebd70")
+		(property "Reference" "D2"
+			(at 97.79 81.28 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "LED"
+			(at 95.25 83.82 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder"
+			(at 102.87 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3739/B1701URO-20D000114U1930.pdf"
+			(at 102.87 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "LED RED DIFFUSED 0805 SMD"
+			(at 102.87 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Harvatek Corporation"
+			(at 102.87 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "B1701URO-20D000114U1930"
+			(at 102.87 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 102.87 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "3147-B1701URO-20D000114U1930CT-ND"
+			(at 102.87 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 102.87 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 102.87 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "8dcc2baa-8d24-4f9e-904b-17285f33964d")
+		)
+		(pin "2"
+			(uuid "8c56032c-30a6-4680-b688-54a05cf4ed79")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "D2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R_US")
+		(at 167.64 74.93 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "29490b0e-d1aa-4bb6-ba84-d14b0ff517b6")
+		(property "Reference" "R7"
+			(at 161.925 73.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "130R"
+			(at 160.655 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+			(at 168.656 75.184 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
+			(at 167.64 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "RES 130 OHM 1% 1/8W 0805"
+			(at 167.64 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Stackpole Electronics Inc"
+			(at 167.64 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "RMCF0805FT130R"
+			(at 167.64 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 167.64 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "RMCF0805FT130RCT-ND"
+			(at 167.64 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 167.64 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 167.64 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "bcff282f-dc6f-4b09-a406-b4f823e9c5bf")
+		)
+		(pin "2"
+			(uuid "e290c7b7-9a12-4532-8383-c7d80a37b954")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "R7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R_US")
+		(at 256.54 95.25 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "2c0cb7ca-75ea-4d31-9569-684cf605a651")
+		(property "Reference" "R10"
+			(at 254.635 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "130R"
+			(at 255.27 96.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+			(at 255.524 94.996 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
+			(at 256.54 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "RES 130 OHM 1% 1/8W 0805"
+			(at 256.54 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Stackpole Electronics Inc"
+			(at 256.54 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "RMCF0805FT130R"
+			(at 256.54 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 256.54 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "RMCF0805FT130RCT-ND"
+			(at 256.54 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 256.54 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 256.54 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "3aa1bbdd-c26e-47b1-9f42-e78f4ab3aba7")
+		)
+		(pin "2"
+			(uuid "a0243e98-3e64-4189-8463-9c17325a4405")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "R10")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:LED")
+		(at 185.42 82.55 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "46d64136-bb88-44a8-b8ba-c8d48b15c20b")
+		(property "Reference" "D6"
+			(at 179.705 81.28 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "LED"
+			(at 177.8 83.82 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder"
+			(at 185.42 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3739/B1701URO-20D000114U1930.pdf"
+			(at 185.42 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "LED RED DIFFUSED 0805 SMD"
+			(at 185.42 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Harvatek Corporation"
+			(at 185.42 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "B1701URO-20D000114U1930"
+			(at 185.42 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 185.42 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "3147-B1701URO-20D000114U1930CT-ND"
+			(at 185.42 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 185.42 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 185.42 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "21158639-7dc5-44ac-b1fa-529997099457")
+		)
+		(pin "2"
+			(uuid "2e1cd1a2-b089-4eb7-b221-aa25f92edb28")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "D6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:LED")
+		(at 144.145 82.55 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "66f87ad5-680f-404d-8cfb-05b3e54ce0a5")
+		(property "Reference" "D4"
+			(at 138.43 81.28 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "LED"
+			(at 136.525 83.82 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder"
+			(at 144.145 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3739/B1701URO-20D000114U1930.pdf"
+			(at 144.145 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "LED RED DIFFUSED 0805 SMD"
+			(at 144.145 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Harvatek Corporation"
+			(at 144.145 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "B1701URO-20D000114U1930"
+			(at 144.145 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 144.145 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "3147-B1701URO-20D000114U1930CT-ND"
+			(at 144.145 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 144.145 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 144.145 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "878c6bc0-5bad-449e-ac69-9c1a10ca03d4")
+		)
+		(pin "2"
+			(uuid "ef45e229-eaa9-4b91-8cca-13b0a4c64cd4")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "D4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3.3V")
+		(at 259.08 71.755 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "68eb0ed0-c660-4525-8f2d-523089fba2c2")
+		(property "Reference" "#PWR087"
+			(at 259.08 75.565 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3.3V"
+			(at 259.08 67.945 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 259.08 71.755 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 259.08 71.755 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 259.08 71.755 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "bb461b55-5fed-4661-9e04-67eb00512ee7")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "#PWR087")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 159.385 105.41 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "6dddaee5-702a-4f89-af39-0fac1b481d7d")
+		(property "Reference" "#PWR085"
+			(at 159.385 111.76 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 159.385 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 159.385 105.41 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 159.385 105.41 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 159.385 105.41 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "3575b6ec-d6ed-49e1-9765-2fa42f013b1e")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "#PWR085")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "RobotLibary:GSF7002DW")
+		(at 258.445 74.295 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "750fa19a-0ec1-457e-abd7-64213279ca70")
+		(property "Reference" "U8"
+			(at 259.715 74.295 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GSF7002DW"
+			(at 259.715 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-363_SC-70-6"
+			(at 258.445 74.295 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://goodarksemi.com/docs/datasheets/mosfets/GSF7002DW.pdf"
+			(at 258.445 74.295 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "MOSFET 2N-CH 60V 0.34A SOT363"
+			(at 258.445 74.295 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Good-Ark Semiconductor"
+			(at 258.445 74.295 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "GSF7002DW"
+			(at 258.445 74.295 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 258.445 74.295 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "4786-GSF7002DWCT-ND"
+			(at 258.445 74.295 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 258.445 74.295 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 258.445 74.295 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "e9e8c843-63dd-41b5-befb-668cf2e4dd20")
+		)
+		(pin "2"
+			(uuid "a38990a1-f603-4987-bcbe-275f50e2fc8a")
+		)
+		(pin "3"
+			(uuid "e0ddfab8-cc11-4277-b1a3-1e1b62baad64")
+		)
+		(pin "4"
+			(uuid "47b3d3d6-19b0-40e8-a4ff-feb97309e640")
+		)
+		(pin "5"
+			(uuid "cbc51bfe-c5f8-408e-b50d-e2df47b98361")
+		)
+		(pin "6"
+			(uuid "1e36e2c1-3591-4b23-b8e5-fead5530b702")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "U8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "RobotLibary:GSF7002DW")
+		(at 157.48 88.265 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "7f228dc5-d30b-42a4-922b-245f7fd2467c")
+		(property "Reference" "U6"
+			(at 158.75 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GSF7002DW"
+			(at 158.75 102.235 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-363_SC-70-6"
+			(at 157.48 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://goodarksemi.com/docs/datasheets/mosfets/GSF7002DW.pdf"
+			(at 157.48 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "MOSFET 2N-CH 60V 0.34A SOT363"
+			(at 157.48 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Good-Ark Semiconductor"
+			(at 157.48 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "GSF7002DW"
+			(at 157.48 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 157.48 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "4786-GSF7002DWCT-ND"
+			(at 157.48 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 157.48 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 157.48 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "7ac5102e-5399-46fa-99f3-45ecda19a24a")
+		)
+		(pin "2"
+			(uuid "bda4caae-c44a-4d13-b645-8a0accf71968")
+		)
+		(pin "3"
+			(uuid "b80a54fa-70bf-473d-bc93-67fdab82edb2")
+		)
+		(pin "4"
+			(uuid "4a9b0b42-ead8-48c2-97df-6a0a146424d1")
+		)
+		(pin "5"
+			(uuid "e9c2eec0-bae6-4814-83fd-f5ee0aeab214")
+		)
+		(pin "6"
+			(uuid "d9afd0c4-cd28-48d3-bac6-17d8755f3ef7")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "U6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:LED_Dual_AKA")
+		(at 259.08 106.68 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "828faf65-9e07-4185-ad08-514029857060")
+		(property "Reference" "D8"
+			(at 269.875 105.41 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Status_LED"
+			(at 269.875 107.95 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "RobotLibrary:CONN3_22232031_MOL"
+			(at 259.08 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.kingbrightusa.com/images/catalog/SPEC/WP115WGYW.pdf"
+			(at 259.08 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "LED GREEN/YELLOW DIFF T-1 T/H"
+			(at 259.08 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Kingbright"
+			(at 259.08 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "WP115WGYW"
+			(at 259.08 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 259.08 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "754-1864-ND"
+			(at 259.08 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 259.08 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 259.08 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Header Pin" "DigiKey"
+			(at 259.08 106.68 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "P/N" "WM4201-ND"
+			(at 259.08 106.68 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "5a88c835-996d-4e34-9ca6-9464e60818bb")
+		)
+		(pin "2"
+			(uuid "fae4914a-61dc-47cd-86a7-7116e3350a23")
+		)
+		(pin "3"
+			(uuid "0f6f82eb-cf27-4315-8754-a67baa1b8368")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "D8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "RobotLibary:GSF7002DW")
+		(at 198.755 88.265 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "839fc33f-ee26-4e59-984d-3f71f949572d")
+		(property "Reference" "U7"
+			(at 200.025 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GSF7002DW"
+			(at 200.025 102.235 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-363_SC-70-6"
+			(at 198.755 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://goodarksemi.com/docs/datasheets/mosfets/GSF7002DW.pdf"
+			(at 198.755 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "MOSFET 2N-CH 60V 0.34A SOT363"
+			(at 198.755 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Good-Ark Semiconductor"
+			(at 198.755 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "GSF7002DW"
+			(at 198.755 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 198.755 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "4786-GSF7002DWCT-ND"
+			(at 198.755 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 198.755 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 198.755 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "eef44bd8-5ca5-4d03-8a74-434bc5b5e477")
+		)
+		(pin "2"
+			(uuid "e377b360-fb7c-4c72-b85c-578f5b3e7bcf")
+		)
+		(pin "3"
+			(uuid "739994fc-3d92-4f6f-a5a0-7f572bac6515")
+		)
+		(pin "4"
+			(uuid "ba2f3bd2-850c-485f-9c48-ab34e5027e9e")
+		)
+		(pin "5"
+			(uuid "af6ff5d3-9963-41dc-914c-b90ee1d1b6a5")
+		)
+		(pin "6"
+			(uuid "6cddb502-6b4e-4c97-8c84-c5d3a067054d")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "U7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R_US")
+		(at 185.42 74.93 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "9186d856-3aa4-4ab0-9f07-3321030c7f70")
+		(property "Reference" "R8"
+			(at 179.705 73.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "130R"
+			(at 178.435 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+			(at 186.436 75.184 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
+			(at 185.42 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "RES 130 OHM 1% 1/8W 0805"
+			(at 185.42 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Stackpole Electronics Inc"
+			(at 185.42 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "RMCF0805FT130R"
+			(at 185.42 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 185.42 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "RMCF0805FT130RCT-ND"
+			(at 185.42 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 185.42 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 185.42 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "d1f3681c-1eef-440b-857c-3e4c5350c992")
+		)
+		(pin "2"
+			(uuid "2fa29ea1-aed8-4f99-9f90-9dfcf5dde0a1")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "R8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:LED")
+		(at 208.915 82.55 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "ac1b46b5-d358-4615-8075-208e2593b3e9")
+		(property "Reference" "D7"
+			(at 203.2 81.28 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "LED"
+			(at 201.295 83.82 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder"
+			(at 208.915 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3656/B1701UD--20D000414U1930.pdf"
+			(at 208.915 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "LED ORANGE DIFFUSED 0805 SMD"
+			(at 208.915 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Harvatek Corporation"
+			(at 208.915 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "B1701UD--20D000414U1930"
+			(at 208.915 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 208.915 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "3147-B1701UD--20D000414U1930CT-ND"
+			(at 208.915 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 208.915 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 208.915 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "a80a4d50-ce2b-483f-a657-967c83e32023")
+		)
+		(pin "2"
+			(uuid "931adcfb-0c2a-4acd-9f84-abad4d50a794")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "D7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "RobotLibary:GSF7002DW")
+		(at 116.205 88.265 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "b2156886-1d35-4715-aae1-ed76655b524b")
+		(property "Reference" "U5"
+			(at 117.475 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GSF7002DW"
+			(at 117.475 102.235 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-363_SC-70-6"
+			(at 116.205 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://goodarksemi.com/docs/datasheets/mosfets/GSF7002DW.pdf"
+			(at 116.205 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "MOSFET 2N-CH 60V 0.34A SOT363"
+			(at 116.205 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Good-Ark Semiconductor"
+			(at 116.205 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "GSF7002DW"
+			(at 116.205 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 116.205 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "4786-GSF7002DWCT-ND"
+			(at 116.205 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 116.205 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 116.205 88.265 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "194a43ca-e2d3-414a-9a9a-01ab2b61e3ab")
+		)
+		(pin "2"
+			(uuid "eb1cd8ec-ac66-4e6f-8e8f-1a32fe3011c0")
+		)
+		(pin "3"
+			(uuid "42edf783-4a51-4e4c-83cb-a51b778d8f9c")
+		)
+		(pin "4"
+			(uuid "7ea0c243-0464-4e75-ae59-e169953a00de")
+		)
+		(pin "5"
+			(uuid "580380f9-1f64-4067-98b6-aa3aad6f90c2")
+		)
+		(pin "6"
+			(uuid "41b9de8c-7e43-4f3e-a709-0ded28d2806e")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "U5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R_US")
+		(at 261.62 95.25 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "b533a65f-f1f4-483b-8672-2c148c81b3a6")
+		(property "Reference" "R11"
+			(at 267.335 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "130R"
+			(at 268.605 96.52 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+			(at 260.604 94.996 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
+			(at 261.62 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "RES 130 OHM 1% 1/8W 0805"
+			(at 261.62 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Stackpole Electronics Inc"
+			(at 261.62 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "RMCF0805FT130R"
+			(at 261.62 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 261.62 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "RMCF0805FT130RCT-ND"
+			(at 261.62 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 261.62 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 261.62 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "1400db9a-2b53-4e83-a66e-a75c6010e616")
+		)
+		(pin "2"
+			(uuid "d23f0bd9-048e-49c7-b355-9ee926d0f5d7")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "R11")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:LED")
+		(at 126.365 82.55 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "cebb0fa8-d05c-48aa-b3ca-0d19614add0f")
+		(property "Reference" "D3"
+			(at 120.015 81.28 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "LED"
+			(at 118.745 83.82 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder"
+			(at 126.365 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3656/B1701UD--20D000414U1930.pdf"
+			(at 126.365 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "LED ORANGE DIFFUSED 0805 SMD"
+			(at 126.365 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Harvatek Corporation"
+			(at 126.365 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "B1701UD--20D000414U1930"
+			(at 126.365 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 126.365 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "3147-B1701UD--20D000414U1930CT-ND"
+			(at 126.365 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 126.365 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 126.365 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "f5e33316-db31-45a9-8027-88c21c3a2f6b")
+		)
+		(pin "2"
+			(uuid "c5371712-e7a5-4ce0-8363-f0549833f49d")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "D3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:LED")
+		(at 167.64 82.55 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "d5fcd465-5c48-4f3c-a4a5-3a1b23106e0c")
+		(property "Reference" "D5"
+			(at 161.925 81.28 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "LED"
+			(at 160.02 83.82 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "LED_SMD:LED_0805_2012Metric_Pad1.15x1.40mm_HandSolder"
+			(at 167.64 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/3656/B1701UD--20D000414U1930.pdf"
+			(at 167.64 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "LED ORANGE DIFFUSED 0805 SMD"
+			(at 167.64 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Harvatek Corporation"
+			(at 167.64 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "B1701UD--20D000414U1930"
+			(at 167.64 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 167.64 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "3147-B1701UD--20D000414U1930CT-ND"
+			(at 167.64 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 167.64 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 167.64 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "bf8b0afe-88fa-4237-9087-11cc66295aad")
+		)
+		(pin "2"
+			(uuid "a4c1d023-2619-4ae2-b2f7-fa30080efd94")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "D5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R_US")
+		(at 102.87 74.93 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "d68a71b1-df84-4390-821c-cc087d08320e")
+		(property "Reference" "R4"
+			(at 97.155 73.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "130R"
+			(at 95.885 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+			(at 103.886 75.184 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
+			(at 102.87 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "RES 130 OHM 1% 1/8W 0805"
+			(at 102.87 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Stackpole Electronics Inc"
+			(at 102.87 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "RMCF0805FT130R"
+			(at 102.87 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 102.87 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "RMCF0805FT130RCT-ND"
+			(at 102.87 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 102.87 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 102.87 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "d7c9fc2c-c0af-42b1-be25-33b74d37c841")
+		)
+		(pin "2"
+			(uuid "b9a4126b-7b53-408b-8108-d0ba6dbbcb16")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "R4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3.3V")
+		(at 156.21 71.12 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "d75b51c7-14e4-4125-950b-bb897fa108e5")
+		(property "Reference" "#PWR084"
+			(at 156.21 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3.3V"
+			(at 156.21 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 156.21 71.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 156.21 71.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 156.21 71.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "bc501728-0ef7-4157-ad3e-efdeb419bf34")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "#PWR084")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R_US")
+		(at 208.915 74.93 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "d8ba6264-0bef-45ab-aa6b-2d482f1bf73c")
+		(property "Reference" "R9"
+			(at 203.2 73.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "130R"
+			(at 201.93 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+			(at 209.931 75.184 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
+			(at 208.915 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "RES 130 OHM 1% 1/8W 0805"
+			(at 208.915 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Stackpole Electronics Inc"
+			(at 208.915 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "RMCF0805FT130R"
+			(at 208.915 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 208.915 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "RMCF0805FT130RCT-ND"
+			(at 208.915 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 208.915 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 208.915 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "cbcf602a-3506-4e88-9de9-cbc91d5b936e")
+		)
+		(pin "2"
+			(uuid "e6e9aa36-7b90-41d4-a25e-7f934fe8a1ad")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "R9")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3.3V")
+		(at 297.18 254.635 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "dfca8a8b-b47a-43a4-9f3b-81563fba1c9f")
+		(property "Reference" "#PWR086"
+			(at 297.18 258.445 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3.3V"
+			(at 297.18 249.555 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 297.18 254.635 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 297.18 254.635 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 297.18 254.635 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "56b1069a-c664-4774-ade8-5bd53e0a3ac0")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "#PWR086")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 259.08 114.3 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "e375a27f-7c99-45d0-b452-674eb4ca1481")
+		(property "Reference" "#PWR088"
+			(at 259.08 120.65 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 259.08 118.11 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 259.08 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 259.08 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 259.08 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "6ff59c69-7275-4cd0-afb9-df492687b350")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "#PWR088")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R_US")
+		(at 144.145 74.93 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "f70028c0-0750-4309-8b50-e146c21a7952")
+		(property "Reference" "R6"
+			(at 138.43 73.66 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "130R"
+			(at 137.16 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
+			(at 145.161 75.184 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
+			(at 144.145 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "RES 130 OHM 1% 1/8W 0805"
+			(at 144.145 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Stackpole Electronics Inc"
+			(at 144.145 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "RMCF0805FT130R"
+			(at 144.145 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 144.145 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "RMCF0805FT130RCT-ND"
+			(at 144.145 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 144.145 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 144.145 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "fbff1f64-7e18-463b-a55b-2bf4b83f5b48")
+		)
+		(pin "2"
+			(uuid "daad70a0-528c-48ea-9689-fa587d093598")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "R6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 286.385 252.095 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "f9b8b26d-24c8-4a91-b4ad-702eed682d17")
+		(property "Reference" "#PWR083"
+			(at 286.385 258.445 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 286.385 257.175 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 286.385 252.095 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 286.385 252.095 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 286.385 252.095 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "b15682c6-e560-4c9c-a64e-04ec35add28b")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "#PWR083")
+					(unit 1)
+				)
+			)
+		)
+	)
+)
