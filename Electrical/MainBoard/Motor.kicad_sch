@@ -10932,7 +10932,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr P/N" "0022272061"
+		(property "Mfr P/N" "0022232061"
 			(at 189.23 62.865 0)
 			(effects
 				(font
@@ -10950,7 +10950,7 @@
 				(hide yes)
 			)
 		)
-		(property "Supplier 1 P/N" "WM4115-ND"
+		(property "Supplier 1 P/N" "WM4204-ND"
 			(at 189.23 62.865 0)
 			(effects
 				(font
@@ -13003,7 +13003,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr P/N" "0022272061"
+		(property "Mfr P/N" "0022232061"
 			(at 380.365 60.96 0)
 			(effects
 				(font
@@ -13021,7 +13021,7 @@
 				(hide yes)
 			)
 		)
-		(property "Supplier 1 P/N" "WM4115-ND"
+		(property "Supplier 1 P/N" "WM4204-ND"
 			(at 380.365 60.96 0)
 			(effects
 				(font

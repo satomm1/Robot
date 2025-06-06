@@ -675,7 +675,7 @@
           "show": false
         }
       ],
-      "filter_string": "J",
+      "filter_string": "U",
       "group_symbols": true,
       "include_excluded_from_bom": true,
       "name": "",
