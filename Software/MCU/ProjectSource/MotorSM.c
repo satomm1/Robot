@@ -277,7 +277,7 @@ bool InitMotorSM(uint8_t Priority)
   IC3CONbits.ON = 1; // Turn input capture on
   OC1CONbits.ON = 1; // Turn OC1 on
   OC2CONbits.ON = 1; // Turn OC2 on
-  T1CONbits.ON = 1; // Turn timer 1 on
+  T1CONbits.ON = 0; // Timer 1 does not need to be on yet
   T2CONbits.ON = 1; // Turn timer 2 on
   T3CONbits.ON = 1; // Turn timer 3 on
   T4CONbits.ON = 1; // Turn timer 4 on
@@ -468,7 +468,6 @@ MotorState_t QueryMotorSM(void)
 ****************************************************************************/
 void SetDesiredRPM(uint16_t LeftRPM, uint16_t RightRPM)
 {    
-//  DB_printf("Desired RPM: %d, %d\r\n", LeftRPM, RightRPM);
   DesiredLeftRPM = LeftRPM;
   DesiredRightRPM = RightRPM;
 }
@@ -809,6 +808,16 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     // Calculate error from desired RPM
     LeftError = DesiredLeftRPM - ActualLeftRPM;
     RightError = DesiredRightRPM - ActualRightRPM;
+    
+    if (abs(ActualLeftRPM) > 500) {
+        // The RPM Readings are likely in error, use previous error instead
+        LeftError = LeftPrevError;
+    }
+    
+    if (abs(ActualRightRPM) > 500) {
+        // The RPM Readings are likely in error, use previous error instead
+        RightError = RightPrevError;
+    }
     
 #ifdef RL_MOTOR_LOGGING
 //    LeftReward = -3*LeftError*LeftError - LeftDelta*LeftDelta;
