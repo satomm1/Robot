@@ -695,7 +695,8 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
     }                                                     
     
     // Calculate the time length between encoder pulses
-    RightPulseLength = MyTimer.FullTime - RightPrevTime;         
+    uint32_t CurrentPulseLength = MyTimer.FullTime - RightPrevTime; 
+    RightPulseLength = (uint32_t)(0.8*CurrentPulseLength + 0.2*RightPulseLength);
     RightPrevTime = MyTimer.FullTime; // update our last time variable 
     
     // Update number of rotations for dead reckoning
@@ -737,7 +738,8 @@ void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
     }                                                     
     
     // Calculate the time length between encoder pulses
-    LeftPulseLength = MyTimer.FullTime - LeftPrevTime;         
+    uint32_t CurrentPulseLength = MyTimer.FullTime - LeftPrevTime;    
+    LeftPulseLength = (uint32_t)(0.8*CurrentPulseLength + 0.2*LeftPulseLength);         
     LeftPrevTime = MyTimer.FullTime; // update our last time variable 
     
     // Update number of rotations for dead reckoning
