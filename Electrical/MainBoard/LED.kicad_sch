@@ -188,10 +188,9 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Device:LED_Dual_AKA"
+		(symbol "Device:LED_Dual_KAK"
 			(pin_names
 				(offset 0)
-				(hide yes)
 			)
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -204,7 +203,7 @@
 					)
 				)
 			)
-			(property "Value" "LED_Dual_AKA"
+			(property "Value" "LED_Dual_KAK"
 				(at 0 -6.35 0)
 				(effects
 					(font
@@ -213,7 +212,7 @@
 				)
 			)
 			(property "Footprint" ""
-				(at 0 0 0)
+				(at 1.27 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -222,7 +221,7 @@
 				)
 			)
 			(property "Datasheet" "~"
-				(at 0 0 0)
+				(at 1.27 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -230,7 +229,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "Dual LED, common cathode on pin 2"
+			(property "Description" "Dual LED, common anode on pin 2"
 				(at 0 0 0)
 				(effects
 					(font
@@ -257,7 +256,7 @@
 					(hide yes)
 				)
 			)
-			(symbol "LED_Dual_AKA_0_1"
+			(symbol "LED_Dual_KAK_0_1"
 				(polyline
 					(pts
 						(xy -4.572 0) (xy -2.54 0)
@@ -283,7 +282,7 @@
 				)
 				(polyline
 					(pts
-						(xy -1.27 1.27) (xy -1.27 3.81)
+						(xy -1.27 3.81) (xy -1.27 1.27) (xy 1.27 2.54) (xy -1.27 3.81)
 					)
 					(stroke
 						(width 0.254)
@@ -295,7 +294,7 @@
 				)
 				(polyline
 					(pts
-						(xy -1.27 -1.27) (xy -1.27 -3.81)
+						(xy -1.27 -1.27) (xy -1.27 -3.81) (xy 1.27 -2.54) (xy -1.27 -1.27)
 					)
 					(stroke
 						(width 0.254)
@@ -318,7 +317,7 @@
 				)
 				(polyline
 					(pts
-						(xy 1.27 1.27) (xy 1.27 3.81) (xy -1.27 2.54) (xy 1.27 1.27)
+						(xy 1.27 3.81) (xy 1.27 1.27)
 					)
 					(stroke
 						(width 0.254)
@@ -330,7 +329,7 @@
 				)
 				(polyline
 					(pts
-						(xy 1.27 -3.81) (xy 1.27 -1.27) (xy -1.27 -2.54) (xy 1.27 -3.81)
+						(xy 1.27 -1.27) (xy 1.27 -3.81)
 					)
 					(stroke
 						(width 0.254)
@@ -401,11 +400,11 @@
 					)
 				)
 			)
-			(symbol "LED_Dual_AKA_1_1"
+			(symbol "LED_Dual_KAK_1_1"
 				(pin input line
 					(at -7.62 0 0)
 					(length 3.048)
-					(name "K"
+					(name "A"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -423,7 +422,7 @@
 				(pin input line
 					(at 7.62 2.54 180)
 					(length 3.81)
-					(name "A1"
+					(name "K1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -441,7 +440,7 @@
 				(pin input line
 					(at 7.62 -2.54 180)
 					(length 3.81)
-					(name "A2"
+					(name "K2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1047,9 +1046,9 @@
 		)
 		(uuid e3770150-ada8-45ba-9241-964a0479518b)
 	)
-	(text "Corresponding Female: DigiKey PN 900-0022013037-ND\nCorresponding Crimp : DigiKey PN WM2756CT-ND"
+	(text "Corresponding Male  : DigiKey PN WM4201-ND\nCorresponding Female: DigiKey PN 900-0022013037-ND\nCorresponding Crimp : DigiKey PN WM2756CT-ND"
 		(exclude_from_sim no)
-		(at 223.52 133.985 0)
+		(at 223.52 134.62 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1068,6 +1067,16 @@
 		)
 		(uuid "220d5b52-4496-4594-b7e2-1ab06732bab0")
 	)
+	(text "Green"
+		(exclude_from_sim no)
+		(at 253.365 83.82 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "29c2bb35-2c2c-4699-aec0-61df942ef3c1")
+	)
 	(text "2.54 mm Lead spacing"
 		(exclude_from_sim no)
 		(at 247.65 123.825 0)
@@ -1078,6 +1087,16 @@
 			(justify left bottom)
 		)
 		(uuid "36c9095d-c95d-4d20-a1af-983e51fad2ac")
+	)
+	(text "Red"
+		(exclude_from_sim no)
+		(at 268.605 85.09 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "55465d59-029d-440c-b6b7-e6ccf48f23c4")
 	)
 	(text "General Purpose LEDs"
 		(exclude_from_sim no)
@@ -1100,12 +1119,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "12eda4d8-c0f4-4a55-ae0d-fc8af6cede1b")
-	)
-	(junction
-		(at 259.08 71.755)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "1c066a58-2c09-4dd3-a901-f8171d3ee591")
 	)
 	(junction
 		(at 170.18 105.41)
@@ -1144,6 +1157,12 @@
 		(uuid "99f953e4-b964-4183-ac93-151cc1d6b0a3")
 	)
 	(junction
+		(at 261.62 117.475)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "a6723677-d415-410e-81c2-cb6b72847973")
+	)
+	(junction
 		(at 167.64 71.12)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1177,26 +1196,6 @@
 	)
 	(wire
 		(pts
-			(xy 270.51 78.105) (xy 270.51 71.755)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0833e510-1713-466f-871f-734453925381")
-	)
-	(wire
-		(pts
-			(xy 232.41 84.455) (xy 250.825 84.455)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "09758d06-0df1-4083-87dc-f18595d020c5")
-	)
-	(wire
-		(pts
 			(xy 208.915 92.075) (xy 208.915 86.36)
 		)
 		(stroke
@@ -1217,26 +1216,6 @@
 	)
 	(wire
 		(pts
-			(xy 259.08 71.755) (xy 259.08 69.215)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "11cf91fe-6972-497d-b2cb-dd23e1e66f3d")
-	)
-	(wire
-		(pts
-			(xy 232.41 71.755) (xy 232.41 84.455)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "1d07c443-c160-436b-9d9d-1f669f8c344b")
-	)
-	(wire
-		(pts
 			(xy 189.23 92.075) (xy 189.23 105.41)
 		)
 		(stroke
@@ -1254,16 +1233,6 @@
 			(type default)
 		)
 		(uuid "1eb2ffd0-e8d0-4b14-8b5f-beca8bc0b393")
-	)
-	(wire
-		(pts
-			(xy 268.605 91.44) (xy 261.62 91.44)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "25145f3a-5040-4ec2-9fad-803da3e2ede9")
 	)
 	(wire
 		(pts
@@ -1297,16 +1266,6 @@
 	)
 	(wire
 		(pts
-			(xy 259.08 71.755) (xy 232.41 71.755)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "300e9f5d-b851-48b3-87d1-a7531667dd4d")
-	)
-	(wire
-		(pts
 			(xy 128.905 105.41) (xy 128.905 98.425)
 		)
 		(stroke
@@ -1324,6 +1283,16 @@
 			(type default)
 		)
 		(uuid "3d521af1-d713-489f-b2c7-dde9e386c105")
+	)
+	(wire
+		(pts
+			(xy 270.51 97.79) (xy 270.51 103.505)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3d8d620e-d28e-4459-abe6-004f32befc22")
 	)
 	(wire
 		(pts
@@ -1357,6 +1326,16 @@
 	)
 	(wire
 		(pts
+			(xy 263.525 93.345) (xy 263.525 96.52)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "59120e47-6afb-4141-9ac0-3a786415da7e")
+	)
+	(wire
+		(pts
 			(xy 147.955 92.075) (xy 147.955 105.41)
 		)
 		(stroke
@@ -1367,13 +1346,13 @@
 	)
 	(wire
 		(pts
-			(xy 268.605 78.105) (xy 270.51 78.105)
+			(xy 230.505 109.855) (xy 252.73 109.855)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "6eece016-1f7b-4637-8eab-2c16305c5049")
+		(uuid "70eaebbe-e783-4a68-a114-05851fc28ba1")
 	)
 	(wire
 		(pts
@@ -1407,7 +1386,17 @@
 	)
 	(wire
 		(pts
-			(xy 247.65 81.28) (xy 250.825 81.28)
+			(xy 263.525 96.52) (xy 230.505 96.52)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "81230255-4bff-4b28-850c-cbf56e90dd70")
+	)
+	(wire
+		(pts
+			(xy 249.555 106.68) (xy 252.73 106.68)
 		)
 		(stroke
 			(width 0)
@@ -1427,13 +1416,13 @@
 	)
 	(wire
 		(pts
-			(xy 270.51 71.755) (xy 259.08 71.755)
+			(xy 258.445 97.79) (xy 270.51 97.79)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "849b0926-6350-482c-bd8c-6a7f8cdc7459")
+		(uuid "88583519-d5a8-46e4-adae-1aaa36befd4b")
 	)
 	(wire
 		(pts
@@ -1457,7 +1446,7 @@
 	)
 	(wire
 		(pts
-			(xy 268.605 84.455) (xy 268.605 91.44)
+			(xy 270.51 109.855) (xy 270.51 117.475)
 		)
 		(stroke
 			(width 0)
@@ -1477,7 +1466,7 @@
 	)
 	(wire
 		(pts
-			(xy 250.825 78.105) (xy 230.505 78.105)
+			(xy 252.73 103.505) (xy 232.41 103.505)
 		)
 		(stroke
 			(width 0)
@@ -1567,7 +1556,7 @@
 	)
 	(wire
 		(pts
-			(xy 230.505 78.105) (xy 230.505 91.44)
+			(xy 232.41 103.505) (xy 232.41 117.475)
 		)
 		(stroke
 			(width 0)
@@ -1607,7 +1596,7 @@
 	)
 	(wire
 		(pts
-			(xy 230.505 91.44) (xy 256.54 91.44)
+			(xy 232.41 117.475) (xy 261.62 117.475)
 		)
 		(stroke
 			(width 0)
@@ -1687,6 +1676,16 @@
 	)
 	(wire
 		(pts
+			(xy 261.62 117.475) (xy 270.51 117.475)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ea7ed727-adbc-45ce-b7a0-6ee3d006b89b")
+	)
+	(wire
+		(pts
 			(xy 102.87 98.425) (xy 102.87 86.36)
 		)
 		(stroke
@@ -1697,13 +1696,33 @@
 	)
 	(wire
 		(pts
-			(xy 268.605 81.28) (xy 271.145 81.28)
+			(xy 258.445 93.345) (xy 258.445 97.79)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f744b827-26ef-4d49-ae51-7fd7b71f4482")
+	)
+	(wire
+		(pts
+			(xy 270.51 106.68) (xy 273.05 106.68)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "f8cf92ca-96c3-4aa4-8fac-9377e8e3f99d")
+	)
+	(wire
+		(pts
+			(xy 230.505 96.52) (xy 230.505 109.855)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f93111f5-aadb-4b11-9bdc-012f611dd5fa")
 	)
 	(wire
 		(pts
@@ -1738,7 +1757,7 @@
 	)
 	(hierarchical_label "Status_Green"
 		(shape input)
-		(at 247.65 81.28 180)
+		(at 249.555 106.68 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1771,7 +1790,7 @@
 	)
 	(hierarchical_label "Status_Yellow"
 		(shape input)
-		(at 271.145 81.28 0)
+		(at 273.05 106.68 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2206,7 +2225,7 @@
 	)
 	(symbol
 		(lib_id "Device:R_US")
-		(at 256.54 95.25 180)
+		(at 258.445 89.535 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2214,7 +2233,7 @@
 		(dnp no)
 		(uuid "2c0cb7ca-75ea-4d31-9569-684cf605a651")
 		(property "Reference" "R10"
-			(at 254.635 93.98 0)
+			(at 256.54 88.265 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2223,7 +2242,7 @@
 			)
 		)
 		(property "Value" "130R"
-			(at 255.27 96.52 0)
+			(at 257.175 90.805 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2232,7 +2251,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 255.524 94.996 90)
+			(at 257.429 89.281 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2241,7 +2260,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
-			(at 256.54 95.25 0)
+			(at 258.445 89.535 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2250,7 +2269,7 @@
 			)
 		)
 		(property "Description" "RES 130 OHM 1% 1/8W 0805"
-			(at 256.54 95.25 0)
+			(at 258.445 89.535 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2259,7 +2278,7 @@
 			)
 		)
 		(property "Mfr" "Stackpole Electronics Inc"
-			(at 256.54 95.25 0)
+			(at 258.445 89.535 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2268,7 +2287,7 @@
 			)
 		)
 		(property "Mfr P/N" "RMCF0805FT130R"
-			(at 256.54 95.25 0)
+			(at 258.445 89.535 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2277,7 +2296,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 256.54 95.25 0)
+			(at 258.445 89.535 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2286,7 +2305,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "RMCF0805FT130RCT-ND"
-			(at 256.54 95.25 0)
+			(at 258.445 89.535 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2295,7 +2314,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 256.54 95.25 0)
+			(at 258.445 89.535 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2304,7 +2323,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 256.54 95.25 0)
+			(at 258.445 89.535 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2322,6 +2341,133 @@
 			(project "MainBoard"
 				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
 					(reference "R10")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:LED_Dual_KAK")
+		(at 260.985 78.105 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "3ed24936-c959-411c-b811-bdbaa233fa93")
+		(property "Reference" "D11"
+			(at 269.24 76.8984 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Status_LED"
+			(at 269.24 79.4384 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "RobotLibrary:CONN3_22232031_MOL"
+			(at 260.985 79.375 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.kingbrightusa.com/images/catalog/SPEC/WP59EGW-CA.pdf"
+			(at 260.985 79.375 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "LED GRN/RED DIFFUSED T-1 3/4 T/H"
+			(at 260.985 78.105 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr" "Kingbright"
+			(at 260.985 78.105 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr P/N" "WP59EGW/CA"
+			(at 260.985 78.105 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1" "DigiKey"
+			(at 260.985 78.105 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 1 P/N" "754-2191-ND"
+			(at 260.985 78.105 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2" ""
+			(at 260.985 78.105 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Supplier 2 P/N" ""
+			(at 260.985 78.105 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "93389be2-f6e1-4edc-abe1-3abb42b50ad8")
+		)
+		(pin "1"
+			(uuid "2ac04d60-80d1-4eb7-82e9-a724e8a7fb86")
+		)
+		(pin "3"
+			(uuid "af43cbbc-6afe-4873-80b1-056faf2d9358")
+		)
+		(instances
+			(project ""
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
+					(reference "D11")
 					(unit 1)
 				)
 			)
@@ -2575,7 +2721,7 @@
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 259.08 71.755 0)
+		(at 260.985 70.485 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2583,7 +2729,7 @@
 		(dnp no)
 		(uuid "68eb0ed0-c660-4525-8f2d-523089fba2c2")
 		(property "Reference" "#PWR087"
-			(at 259.08 75.565 0)
+			(at 260.985 74.295 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2592,7 +2738,7 @@
 			)
 		)
 		(property "Value" "+3.3V"
-			(at 259.08 67.945 0)
+			(at 260.985 66.675 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2600,7 +2746,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 259.08 71.755 0)
+			(at 260.985 70.485 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2609,7 +2755,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 259.08 71.755 0)
+			(at 260.985 70.485 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2618,7 +2764,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 259.08 71.755 0)
+			(at 260.985 70.485 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2703,7 +2849,7 @@
 	)
 	(symbol
 		(lib_id "RobotLibary:GSF7002DW")
-		(at 258.445 74.295 0)
+		(at 260.35 99.695 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2711,7 +2857,7 @@
 		(dnp no)
 		(uuid "750fa19a-0ec1-457e-abd7-64213279ca70")
 		(property "Reference" "U8"
-			(at 259.715 74.295 0)
+			(at 261.62 99.695 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2719,7 +2865,7 @@
 			)
 		)
 		(property "Value" "GSF7002DW"
-			(at 259.715 88.265 0)
+			(at 261.62 113.665 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2727,7 +2873,7 @@
 			)
 		)
 		(property "Footprint" "Package_TO_SOT_SMD:SOT-363_SC-70-6"
-			(at 258.445 74.295 0)
+			(at 260.35 99.695 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2736,7 +2882,7 @@
 			)
 		)
 		(property "Datasheet" "https://goodarksemi.com/docs/datasheets/mosfets/GSF7002DW.pdf"
-			(at 258.445 74.295 0)
+			(at 260.35 99.695 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2745,7 +2891,7 @@
 			)
 		)
 		(property "Description" "MOSFET 2N-CH 60V 0.34A SOT363"
-			(at 258.445 74.295 0)
+			(at 260.35 99.695 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2754,7 +2900,7 @@
 			)
 		)
 		(property "Mfr" "Good-Ark Semiconductor"
-			(at 258.445 74.295 0)
+			(at 260.35 99.695 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2763,7 +2909,7 @@
 			)
 		)
 		(property "Mfr P/N" "GSF7002DW"
-			(at 258.445 74.295 0)
+			(at 260.35 99.695 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2772,7 +2918,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 258.445 74.295 0)
+			(at 260.35 99.695 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2781,7 +2927,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "4786-GSF7002DWCT-ND"
-			(at 258.445 74.295 0)
+			(at 260.35 99.695 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2790,7 +2936,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 258.445 74.295 0)
+			(at 260.35 99.695 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2799,7 +2945,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 258.445 74.295 0)
+			(at 260.35 99.695 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2962,148 +3108,6 @@
 			(project "MainBoard"
 				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
 					(reference "U6")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:LED_Dual_AKA")
-		(at 259.08 106.68 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "828faf65-9e07-4185-ad08-514029857060")
-		(property "Reference" "D8"
-			(at 269.875 105.41 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "Status_LED"
-			(at 269.875 107.95 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "RobotLibrary:CONN3_22232031_MOL"
-			(at 259.08 106.68 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.kingbrightusa.com/images/catalog/SPEC/WP115WGYW.pdf"
-			(at 259.08 106.68 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "LED GREEN/YELLOW DIFF T-1 T/H"
-			(at 259.08 106.68 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Mfr" "Kingbright"
-			(at 259.08 106.68 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Mfr P/N" "WP115WGYW"
-			(at 259.08 106.68 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Supplier 1" "DigiKey"
-			(at 259.08 106.68 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Supplier 1 P/N" "754-1864-ND"
-			(at 259.08 106.68 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Supplier 2" ""
-			(at 259.08 106.68 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Supplier 2 P/N" ""
-			(at 259.08 106.68 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Header Pin" "DigiKey"
-			(at 259.08 106.68 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "P/N" "WM4201-ND"
-			(at 259.08 106.68 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "5a88c835-996d-4e34-9ca6-9464e60818bb")
-		)
-		(pin "2"
-			(uuid "fae4914a-61dc-47cd-86a7-7116e3350a23")
-		)
-		(pin "3"
-			(uuid "0f6f82eb-cf27-4315-8754-a67baa1b8368")
-		)
-		(instances
-			(project "MainBoard"
-				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9/783fabe8-20be-46c9-9aa7-e8ec2689d507"
-					(reference "D8")
 					(unit 1)
 				)
 			)
@@ -3623,7 +3627,7 @@
 	)
 	(symbol
 		(lib_id "Device:R_US")
-		(at 261.62 95.25 180)
+		(at 263.525 89.535 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -3631,7 +3635,7 @@
 		(dnp no)
 		(uuid "b533a65f-f1f4-483b-8672-2c148c81b3a6")
 		(property "Reference" "R11"
-			(at 267.335 93.98 0)
+			(at 269.24 88.265 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3640,7 +3644,7 @@
 			)
 		)
 		(property "Value" "130R"
-			(at 268.605 96.52 0)
+			(at 270.51 90.805 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3649,7 +3653,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 260.604 94.996 90)
+			(at 262.509 89.281 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3658,7 +3662,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
-			(at 261.62 95.25 0)
+			(at 263.525 89.535 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3667,7 +3671,7 @@
 			)
 		)
 		(property "Description" "RES 130 OHM 1% 1/8W 0805"
-			(at 261.62 95.25 0)
+			(at 263.525 89.535 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3676,7 +3680,7 @@
 			)
 		)
 		(property "Mfr" "Stackpole Electronics Inc"
-			(at 261.62 95.25 0)
+			(at 263.525 89.535 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3685,7 +3689,7 @@
 			)
 		)
 		(property "Mfr P/N" "RMCF0805FT130R"
-			(at 261.62 95.25 0)
+			(at 263.525 89.535 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3694,7 +3698,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 261.62 95.25 0)
+			(at 263.525 89.535 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3703,7 +3707,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "RMCF0805FT130RCT-ND"
-			(at 261.62 95.25 0)
+			(at 263.525 89.535 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3712,7 +3716,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 261.62 95.25 0)
+			(at 263.525 89.535 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3721,7 +3725,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 261.62 95.25 0)
+			(at 263.525 89.535 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4367,7 +4371,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 259.08 114.3 0)
+		(at 261.62 117.475 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4375,7 +4379,7 @@
 		(dnp no)
 		(uuid "e375a27f-7c99-45d0-b452-674eb4ca1481")
 		(property "Reference" "#PWR088"
-			(at 259.08 120.65 0)
+			(at 261.62 123.825 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4384,7 +4388,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 259.08 118.11 0)
+			(at 261.62 121.285 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4392,7 +4396,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 259.08 114.3 0)
+			(at 261.62 117.475 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4401,7 +4405,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 259.08 114.3 0)
+			(at 261.62 117.475 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4410,7 +4414,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 259.08 114.3 0)
+			(at 261.62 117.475 0)
 			(effects
 				(font
 					(size 1.27 1.27)
