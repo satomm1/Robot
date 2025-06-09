@@ -29,8 +29,8 @@
 #define ROBOT_ID 1
 
 // Define the PCB Revision Number being used
-//#define PCB_REV 1
 #define PCB_REV 2
+//#define PCB_REV 2
 
 // Define which motor type is being used
 //#define MOTOR_TYPE 1  // The 350RPM motor with 374 pulses per rev
@@ -39,6 +39,9 @@
 // Define if we want to log data for RL Motor control
 //#define RL_MOTOR_LOGGING
 
+// Set the distance between the wheels
+//#define WHEEL_BASE 0.258572 // Distance between wheels on the robot (m) (Centered Wheels)
+#define WHEEL_BASE 0.2713 // 122 RPM Car Setup
 
 /****************************************************************************/
 // The maximum number of services sets an upper bound on the number of

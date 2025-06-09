@@ -46,7 +46,6 @@
 
 #define GEAR_RATIO 34 // Gear reduction ratio
 #define SPEED_CONVERSION_FACTOR (1.6e7*60)/ENCODER_RESOLUTION
-#define WHEEL_BASE 0.258572 // Distance between wheels on the robot (m)
 #define WHEEL_RADIUS 0.04 // Radius of wheels (m))
 #define DEAD_RECKONING_TIME 0.00999936 //0.00499968 //0.00999936 //0.01999872 // Time between dead reckoning updates in seconds (depends on DEAD_RECKONING_PERIOD)
 #define DEAD_RECKONING_RATIO 2*3.14159 / ENCODER_RESOLUTION / DEAD_RECKONING_TIME * WHEEL_RADIUS // This number times change in encoder clicks is linear velocity in m/second
