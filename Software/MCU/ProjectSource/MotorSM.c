@@ -951,6 +951,8 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     static float V_r; // Right wheel linear velocity (m/s)
     static float V;   // Robot linear velocity (m/s)
     static float omega; // Robot angular velocity (rad/second)
+    static float prev_theta;
+    static float effective_V;
     
     static int32_t CurLeftRotations;
     static int32_t CurRightRotations;
@@ -959,6 +961,9 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     static float pitch;
     
     IFS1CLR = _IFS1_T7IF_MASK; // clear the interrupt flag 
+    
+    // Get the current roll/pitch of the mobile robot
+    GetAngles(&roll, &pitch);
     
     // First thing we do is grab current number of rotations so this doesn't change mid function
     CurLeftRotations = LeftRotations;
@@ -980,7 +985,7 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     w_current = omega; // used to store current angular velocity
     
     // Calculate the update in theta and ensure theta stays within [-pi, pi]
-    float prev_theta = theta;
+    prev_theta = theta;
     theta = theta + omega * DEAD_RECKONING_TIME;
     while (theta > M_PI) {
         theta -= 2*M_PI;
@@ -989,12 +994,25 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
         theta += 2*M_PI;
     }
     
+    pitch *= 0.0174533; // Convert pitch to radians
+    effective_V = V * cosf(pitch); // Get effective velocity for pitch
+    
     if (omega < 0.01 && omega > -0.01) {
-        x = x + V * cosf(prev_theta) * DEAD_RECKONING_TIME;
-        y = y + V * sinf(prev_theta) * DEAD_RECKONING_TIME;
+        // No account for pitch
+//        x = x + V * cosf(prev_theta) * DEAD_RECKONING_TIME;
+//        y = y + V * sinf(prev_theta) * DEAD_RECKONING_TIME;
+        
+        // Account for pitch
+        x = x + effective_V * cosf(prev_theta) * DEAD_RECKONING_TIME;
+        y = y + effective_V * sinf(prev_theta) * DEAD_RECKONING_TIME;
     } else {
-        x = x + V/omega * (sinf(theta) - sinf(prev_theta));
-        y = y - V/omega * (cosf(theta) - cosf(prev_theta));
+        // No account for pitch
+//        x = x + V/omega * (sinf(theta) - sinf(prev_theta));
+//        y = y - V/omega * (cosf(theta) - cosf(prev_theta));
+        
+        // Account for pitch
+        x = x + effective_V/omega * (sinf(theta) - sinf(prev_theta));
+        y = y - effective_V/omega * (cosf(theta) - cosf(prev_theta));
     }
 }
 
