@@ -512,29 +512,13 @@ void SetDesiredSpeed(float V, float w)
             
     // We turn off control for stopped to prevent jittering
     if (V==0 && w == 0) {
-        
-        // Turn control timer off
-        T1CONCLR = _T1CON_ON_MASK; // stop the timer 
-//        T1CONbits.ON = 0; // Turn timer 1 off
-        TMR1 = 0;
-                
-        // Manually set drive pins to stopped
-        LATJbits.LATJ3 = 0; // Set direction pin forward
-        LeftDirection = Forward;
-        LATFbits.LATF8 = 0; // Set direction pin forward
-        RightDirection = Forward;
-        
-        OC1RS = 0;
-        OC2RS = 0;
-        
-        SetDesiredRPM(0,0);
+        SetDesiredRPM(0,0); // This will cause T1 to be turned off in the ISR
         return;
     } else {
         T1CONSET = _T1CON_ON_MASK;
-//        T1CONbits.ON = 1; // Turn timer 1 back on
     }
     
-    
+    // Don't go faster than our Max values
     if (V > V_MAX) {
         V = V_MAX;
     } else if (V < -V_MAX) {
@@ -793,6 +777,30 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     static uint16_t ActualRightRPM = 0;
     
     IFS0CLR = _IFS0_T1IF_MASK; // Clear the timer interrupt
+    
+    // If desired is static:
+    if (DesiredLeftRPM == 0 && DesiredRightRPM == 0) {
+        // Turn control timer off
+        T1CONCLR = _T1CON_ON_MASK; // stop the timer 
+        TMR1 = 0;
+                
+        // Manually set drive pins to stopped
+        LATJbits.LATJ3 = 0; // Set direction pin forward
+        LeftDirection = Forward;
+        LATFbits.LATF8 = 0; // Set direction pin forward
+        RightDirection = Forward;
+        
+        OC1RS = 0;
+        OC2RS = 0;
+        
+        // Reset stored values
+        LeftErrorSum = 0;
+        RightErrorSum = 0;
+        LeftPrevError = 0;
+        RightPrevError = 0;
+        
+        return;
+    }
     
     // Calculate Current RPM based on Pulse Lengths from encoders
     ActualLeftRPM = SPEED_CONVERSION_FACTOR / LeftPulseLength;
