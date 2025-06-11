@@ -3063,9 +3063,9 @@
 		)
 		(uuid "b91675d6-7b54-4721-8988-c7376ce8ed96")
 	)
-	(text "Molex + Switch\n\nFemale, DigiKey P/N: WM2124-ND\nCrimp,  DigiKey P/N: WM20948CT-ND"
+	(text "Molex + Switch\n\nMale, DigiKey P/N: WM4622-ND\nFemale, DigiKey P/N: WM2124-ND\nCrimp,  DigiKey P/N: WM20948CT-ND\n\n5A Fuse, DigiKey P/N: F1725-ND"
 		(exclude_from_sim no)
-		(at 289.56 173.355 0)
+		(at 288.29 178.435 0)
 		(effects
 			(font
 				(size 1.27 1.27)

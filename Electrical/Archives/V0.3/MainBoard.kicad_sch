@@ -6,7 +6,7 @@
 	(paper "B")
 	(title_block
 		(title "MCU Controller")
-		(date "2025-05-18")
+		(date "2025-06-11")
 		(rev "0.3")
 		(company "satomm@stanford.edu")
 		(comment 1 "Department of Civil and Environmental Engineering")

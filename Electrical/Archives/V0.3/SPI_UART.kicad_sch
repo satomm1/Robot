@@ -2783,7 +2783,7 @@
 				(hide yes)
 			)
 		)
-		(property "Mfr P/N" "0022272061"
+		(property "Mfr P/N" "0022232061"
 			(at 163.576 124.206 0)
 			(effects
 				(font
@@ -2801,7 +2801,7 @@
 				(hide yes)
 			)
 		)
-		(property "Supplier 1 P/N" "WM4115-ND"
+		(property "Supplier 1 P/N" "WM4204-ND"
 			(at 163.576 124.206 0)
 			(effects
 				(font
