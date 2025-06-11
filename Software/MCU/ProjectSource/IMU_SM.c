@@ -505,11 +505,11 @@ void InitIMU(void)
     // addresses are consecutive:
     // Accel
     data2send.DataStruct.LowerByte = 0b00011001; // cutoff = acc_odr/2, acc_range = +/- 4g, 8.19 LSB/mg, Sample Rate = 200 Hz
-    data2send.DataStruct.UpperByte = 0b01000001; // Normal mode, averaging of 2 samples
+    data2send.DataStruct.UpperByte = 0b01000010; // Normal mode, averaging of 4 samples
 
     // Gyro
     data2send2.DataStruct.LowerByte = 0b00011001; // cutoff = gyr_odr/2, gyr_range = +/- 250 deg/s, 131.2 LSB/deg/s, Sample Rate = 200 Hz
-    data2send2.DataStruct.UpperByte = 0b01000001; // Normal mode, averaging of 2 samples
+    data2send2.DataStruct.UpperByte = 0b01000010; // Normal mode, averaging of 4 samples
     WriteIMU2Transfer(0x20, data2send, data2send2);
 
     return;

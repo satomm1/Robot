@@ -980,6 +980,9 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     
     // Get the current roll/pitch of the mobile robot
     GetAngles(&roll, &pitch);
+    if (abs(pitch) < 2.5) {
+        pitch = 0;
+    }
     
     // First thing we do is grab current number of rotations so this doesn't change mid function
     CurLeftRotations = LeftRotations;
