@@ -1,6 +1,6 @@
 # CAD
 
-This directory contains the CAD files for the mobile robot. The components for all parts are modeled with SolidWorks and are available in the `mechanical` zip file. First, unzip the `mechanical` zip file before proceeding.
+This directory contains the CAD files for the mobile robot. The components for all parts are modeled with Autodesk Inventor and are available in the `Inventor` directory. An older version of the mobile robot design in SolidWorks is available in the `mechanical` zip file.
 
 The remainder of this README provides instructions for creating the mechanical form of the mobile robot for the approximately 1 meter tall robot:
 
