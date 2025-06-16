@@ -12,7 +12,10 @@ A comprehensive parts list is located in `BOM.xlsx` that will be needed for cons
 1) **Laser cut the platforms out of a thin, stiff wood.** I use tempered hardwood (Duron) of 1/8"-1/4" thickness. Every file that should be laser cut is listed in the `lasercut.xlsx` file. The corresponding `.dxf` files are located in this directory. For reference, to make sure the files are the correct size/units, the diameter of the circular platforms is 354 mm (14 inches).
 2) **Prepare the 3D printed parts.** 3D Print the required parts using PLA plastic. Every file that should be 3D printed is listed in the `3d_print.xlsx` file. The corresponding `.stl` files are located in this directory. To to verify that the 3D printed parts are the correct size/units, the length of the bearing blocks should be 3 inches (76 mm).
 
-**Note**: If you use different components (motor, wheels, etc), the laser cut or 3D printed files may need to be modified first.
+**Note**: If you use different components (motor, wheels, etc), the laser cut or 3D printed files may need to be modified first. 
+
+> [!IMPORTANT]
+> The height of the motor holders and bearing blocks must be adjusted so that the bottom of the wheels are in plane with the ball casters. Adjust the hardboard_thickness in `Inventor/parameters.xlsx` and update the Inventor model. Verify everything is correct and re-export the motor holders and bearing block stl files.
 
 3) **Insert heat set inserts.** Use a soldering iron to insert the heat set inserts into any 3D printed part that requiers heat set inserts. The small end of the heat  set insert should enter the 3D printed part first. I recommend using a low temperature (~400F or 200C). 
 
@@ -34,11 +37,12 @@ A comprehensive parts list is located in `BOM.xlsx` that will be needed for cons
 
 ![Drive Train](./images/drive_train.jpg)
 
-8) **Install battery holders and Jetson holder onto the second level platform.** Use M3 screws to attach the 2 battery holders and Nvidia Jetson Holder onto the second level platform.
+8) **Install battery holders, Jetson holder, and IMU onto the second level platform.** Use M3 screws to attach the 2 battery holders and Nvidia Jetson Holder onto the top of the second level platform. Use M3 screws and plastic standoffs to attach the IMU to the bottom of the second level platform --- use only 3 screws/standoffs for the IMU to prevent unwanted stresses in the IMU!
 
-![Second Level](./images/second_level.png)
+![Second Level Top](./images/second_level.png)
+![Second Level Bottom](./images/second_level_bottom.png)
 
-9) **Install standoffs on the first layer** Install the 3 inch standoffs to connect the first and second layer platform. Below they are shown as metal standoffs, but 3D printed versions can be used as well.
+9) **Install standoffs on the first layer** Install the 3 inch standoffs to the first layer platform. Connect the motors and IMU to the PCB, and secure the second layer to the standoffs.
 
 ![First Layer Standoffs](./images/first_layer_standoff.jpg)
 
