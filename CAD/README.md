@@ -15,10 +15,14 @@ A comprehensive parts list is located in `BOM.xlsx` that will be needed for cons
 1) **Laser cut the platforms out of a thin, stiff wood.** I use tempered hardwood (Duron) of 1/8"-1/4" thickness. Every file that should be laser cut is listed in the `lasercut.xlsx` file. The corresponding `.dxf` files are located in this directory. For reference, to make sure the files are the correct size/units, the diameter of the circular platforms is 354 mm (14 inches).
 2) **Prepare the 3D printed parts.** 3D Print the required parts using PLA plastic. Every file that should be 3D printed is listed in the `3d_print.xlsx` file. The corresponding `.stl` files are located in this directory. To to verify that the 3D printed parts are the correct size/units, the length of the bearing blocks should be 3 inches (76 mm).
 
-**Note**: If you use different components (motor, wheels, etc), the laser cut or 3D printed files may need to be modified first. 
+> [!NOTE]
+> If you use different components (motor, wheels, etc), the laser cut or 3D printed files may need to be modified first. 
 
 > [!IMPORTANT]
 > The height of the motor holders and bearing blocks must be adjusted so that the bottom of the wheels are in plane with the ball casters. Adjust the hardboard_thickness in `Inventor/parameters.xlsx` and update the Inventor model. Verify everything is correct and re-export the motor holders and bearing block stl files.
+
+> [!IMPORTANT]
+> You should print the correct bearing block depending on whether your ball bearings have flanges. If the bearings don't have flanges, 3D print the bearing block designated with "no_flange."
 
 3) **Insert heat set inserts.** Use a soldering iron to insert the heat set inserts into any 3D printed part that requires heat set inserts. The small end of the heat  set insert should enter the 3D printed part first. I recommend using a low temperature (~400F or 200C). 
 
