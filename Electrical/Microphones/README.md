@@ -2,7 +2,11 @@
 
 This directory holds the electrical design for the microphones. Note, you will need one  PIC32 board and two microphone boards for a single system. The two microphones allows for stereo audio. The PIC32 board is an intermediary that translates the audio signal into a format that the Jetson can read.
 
-**Note**: Soldering the microphones is not easy. You will need solder paste and a reflow oven.  You can order a stencil for the solder paste, or manually apply the solder paste to the microphone pads (be careful not to add too much solder!).
+> [!WARNING] 
+> Soldering the microphones is not easy. You will need solder paste and a reflow oven.  You can order a stencil for the solder paste, or manually apply the solder paste to the microphone pads (be careful not to add too much solder!).
+
+> [!TIP]
+> Make sure to solder the 6 pin right angle connector in the correct direction. See picture below for guidance.
 
 ## Putting the Microphones Together
 Once you have a soldered microphone PCB, we can construct the full microphone in its housing. 3D print the housings (instructions in the [Mechanical Directory](../../CAD/README.md)). For a more robust microphone, we use a gasket and an acoustically transparent fabric to prevent debris from entering the microphone port. To construct the housing

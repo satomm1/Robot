@@ -4,8 +4,11 @@ This directory contains the CAD files for the mobile robot. The components for a
 
 The remainder of this README provides instructions for creating the mechanical form of the mobile robot for the approximately 1 meter tall robot:
 
+<p align="center">
+
 ![Mobile Robot CAD Model](./images/CAD_model.png)
 ![Real Mobile Robot](./images/robot.png)
+</p>
 
 A comprehensive parts list is located in `BOM.xlsx` that will be needed for constructing this mobile robot.
 
@@ -17,9 +20,12 @@ A comprehensive parts list is located in `BOM.xlsx` that will be needed for cons
 > [!IMPORTANT]
 > The height of the motor holders and bearing blocks must be adjusted so that the bottom of the wheels are in plane with the ball casters. Adjust the hardboard_thickness in `Inventor/parameters.xlsx` and update the Inventor model. Verify everything is correct and re-export the motor holders and bearing block stl files.
 
-3) **Insert heat set inserts.** Use a soldering iron to insert the heat set inserts into any 3D printed part that requiers heat set inserts. The small end of the heat  set insert should enter the 3D printed part first. I recommend using a low temperature (~400F or 200C). 
+3) **Insert heat set inserts.** Use a soldering iron to insert the heat set inserts into any 3D printed part that requires heat set inserts. The small end of the heat  set insert should enter the 3D printed part first. I recommend using a low temperature (~400F or 200C). 
 
 ![Heat set inserts](./images/heat_set.jpg)
+
+> [!TIP]
+> IF you are not familiar with installing heat set inserts, watch this quick video: https://youtu.be/P7nHyI1TwKY?t=189.
 
 4) **Install the motors.** Insert the motors into the motor blocks and secure with screws. **Important**: select the proper length screw (not too long!!!) so that the screw does not go too far and break the motor.
 
@@ -33,32 +39,53 @@ A comprehensive parts list is located in `BOM.xlsx` that will be needed for cons
 
 ![Wheel](./images/wheel.jpg)
 
-7) **Install all parts on the first platform layer.** Secure the motor, wheel, bearing blocks, shaft, and spider coupler to the first platform layer. Use M3 screws. The ball bearing should be facing the wheel.
+7) **Install all parts on the first platform layer.** 
+    - Secure the motor, wheel, bearing blocks, shaft, and spider coupler to the first platform layer. Use M3 screws. The ball bearing should be facing the wheel.
+    - Secure the two ball casters to the bottom of the first level using (2) M3 screws per caster.
 
 ![Drive Train](./images/drive_train.jpg)
+![Casters](./images/casters.png)
 
-8) **Install battery holders, Jetson holder, and IMU onto the second level platform.** Use M3 screws to attach the 2 battery holders and Nvidia Jetson Holder onto the top of the second level platform. Use M3 screws and plastic standoffs to attach the IMU to the bottom of the second level platform --- use only 3 screws/standoffs for the IMU to prevent unwanted stresses in the IMU!
+8) **Install battery holders, Jetson holder, and IMU onto the second level platform.** 
+
+    - Use (16) M3 screws to attach the 2 battery holders and Nvidia Jetson Holder onto the top of the second level platform. 
+    - Use (3) M3 screws and plastic standoffs to attach the IMU to the bottom of the second level platform. Please see the [IMU README](../Electrical/IMU_Breakout/README.md) for details on soldering and installing the IMU board.
+    - Use (4) M3 screws to attach 3 inch plastic standoffs to the 2nd level platform.
+
+> [!NOTE]
+> Use only 3 screws/standoffs for the IMU to prevent unwanted stresses in the IMU!
 
 ![Second Level Top](./images/second_level.png)
 ![Second Level Bottom](./images/second_level_bottom.png)
 
-9) **Install standoffs on the first layer** Install the 3 inch standoffs to the first layer platform. Connect the motors and IMU to the PCB, and secure the second layer to the standoffs.
+9) **Install standoffs on the first layer.** Install the 3 inch standoffs to the first layer platform. Connect the motors and IMU to the PCB, and secure the second layer to the standoffs.
 
 ![First Layer Standoffs](./images/first_layer_standoff.jpg)
 
-10) **Secure 3 Pronged standoffs to each platform** Connect the 3 pronged standoff to the top of levels 3, 4, and 5. This means you will insert 3 M3 screws through the bottom of the platform. Make sure the prongs are aligned so that when you connect the other side they are lined up with the empty holes!
+![Fist and Second Layer Connected](./images/first_and_second.png)
+
+10) **Secure 3 Pronged standoffs to each platform.** Connect the 3 pronged standoff to the top of levels 3, 4, and 5. This means you will insert (3) M3 screws through the bottom of the platform. Make sure the prongs are aligned so that when you connect the other side they are lined up with the empty holes!
 
 ![Three Prong Standoffs](./images/three_prong.png)
 
-***
-At this point, I recommend preparing the Jetson and inserting the Jetson into it's platform. Read more instructions here in the `Electrical` directory.
-***
+> [!TIP]
+> At this point, I recommend preparing the Jetson and inserting the Jetson into it's platform. Read more instructions [here](../Electrical/README.md) in the `Electrical` directory.
 
-11) **Connect the 2nd and 3rd level.** Connect the 2nd and 3rd level using the 3D printed 3 inch standoffs and M3 screws.
+11) **Add Levels 4, 5, and 6.** Add these levels one by one by connecting to the 3 pronged standoffs. This is the most tedious part of the whole process as you will need to attach three M3 screws per standoff. 
 
-12) **Add Levels 4, 5, and 6.** Add these levels one by one by connecting to the 3 pronged standoffs. This is the most tedious part of the whole process as you will need to attach three M3 screws per standoff. 
+![Three Prong All Connected](./images/three_prong_all.png)
 
-13) **Attach the LiDAR to the platform and to the top level.** Screw the LiDAR sensor into the platform. **Important**: do not use too long of screws. Next, attach the LiDAR platform to the top level with the 3.5 inch standoffs. The LiDAR cable should be facing the front of the robot.
+12) **Connect the 2nd and 3rd level.** Connect the 2nd and 3rd level using the 3D printed 3 inch standoffs and M3 screws. At this point all the levels are connected!
+
+![All Levels Connected](./images/all_levels.png)
+
+13) **Attach the LiDAR to the platform and to the top level.** Screw the LiDAR sensor into the platform. Then, attach the LiDAR platform to the top level with the 3.5 inch standoffs. 
+
+> [!IMPORTANT] 
+> Do not use too long of screws. 
+
+> [!IMPORTANT]
+> The LiDAR cable should be facing the front of the robot.
 
 ![LiDAR](./images/LiDAR.jpg)
 
@@ -74,7 +101,9 @@ At this point, I recommend preparing the Jetson and inserting the Jetson into it
 
 ![USB Camera](./images/usb_cam.jpg)
 
-17) **Attach the microphones.** First, the microphones neede to be inserted into the housings. For best performance, use a gasket and acoustically transparent membrane. I use a piece of foam-like double sided tape for the gasket and muslin fabric for the acoustically transparent membrane. With these layers, use a M3 screw to secure the microphone/PCB to the housing. Then, glue the housing to it's back. Last, connect the entire housing to one of the three pronged standoffs using a M3 screw.
+17) **Attach the microphones.** 
+    - First, the microphones need to be inserted into the housings. To view detailed information on constructing the microphone housing, visit the [microphone README](../Electrical/Microphones/README.md).
+    - Second, connect the entire housing to one of the three pronged standoffs using a M3 screw and nut.
 
 ![Microphone](./images/microphone.jpg)
 
