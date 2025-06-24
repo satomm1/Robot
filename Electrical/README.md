@@ -56,5 +56,6 @@ After populating the board, we need to make several connections from the board t
 For detailed instructions on the Microphone, visit the [Microphone README Page](./Microphones/README.md).
 
 ## IMU Breakout
+For detailed instructions on the IMU, visit the [IMU README Page](./IMU_Breakout/README.md).
 
 ## Reflective Sensor

@@ -1,6 +1,6 @@
 # Components to be 3D printed
 
-Please visit the `stl` directory to obtain these files. 
+Please visit the `stl` directory to obtain these files. For full construction instructions, visit the [Mechanical README](./README.md).
 
 > [!NOTE] 
 > Some of these STL files may need to be modified depending on the materials you purchase. For example, the motor holders and wheel bearing blocks will change depending on the thickness of the hardwood.
@@ -20,6 +20,13 @@ Here at Stanford, a Prusa MK3.9 3D printer (Lab64) or Bambu Lab P1S (PRL AMPS) 3
 ## 3D Printed Parts List
 The table below contains all the parts to be 3D printed. Components designated with a \* are components that do not depend on the specific materials purchased (i.e., doesn't depend on the motor, wheel size, wood thickness).
 
+### Heat Set Inserts
+Some of the components are designed to be used with M3 heat set inserts. Heat set inserts are small brass inserts that are melted into the plastic using a soldering iron (I recommend a low temperature of ~400F/200C). They provide strong, threaded connection points for screws (and are used instead of nuts). These parts are desiged for M3 heat set inserts with diameter 4.6 mm and length 5.7 mm.
+
+> [!TIP]
+> IF you are not familiar with installing heat set inserts, watch this quick video: https://youtu.be/P7nHyI1TwKY?t=189.
+
+### Component List
 | File Name | Quantity per Robot | Time per Robot (Prusa MK3.9/Bambu Lab P1S) | Filament per Robot (g, estimated) | Preview |
 |-----------|--------------------|------------------------------------------- | -----------------------------------|---------|
 | motor_holder.STL | 2 | 1 hr 17 min/45 min | 21.56 | ![](./stl/previews/motor_holder.png) |
