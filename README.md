@@ -12,9 +12,10 @@ This repo contains mechanical (CAD) designs, electrical schematics, and software
 ![Mobile Robot](./CAD/images/CAD_model.png)
 ![Mobile Robot](./CAD/images/robot.png)
 
-- The mechanical design is provided in the `./CAD` directory. In this directory, you will find detailed instructions for constructing the mobile robot along with relevant STL/DXF files and a bill of materials. The CAD files were generated in Solidworks, but can be imported into Fusion as well.
-- The electrical design for the motor control and sensing board is located in the `./Electrical` directory. In this directory, you will find electrical schematics and the PCB design for the motor control board. A detailed list of the components and instructions for creating the board is included. This directory also contains the schematics/PCB design for the microphones.
-- The software design for the motor control board is in the `./Software` directory. This software is for the PIC32 located on the motor control board and facilitates communication between the PIC32 and Jetson, performs PID control, odometry, etc. Additionally, the software for the intermediate microphone board is included in this directory.
+- The mechanical design is provided in the `./CAD` directory. In this directory, you will find [detailed instructions](./CAD/README.md) for constructing the mobile robot along with relevant STL/DXF files and a bill of materials. The CAD files were generated in Inventor.
+- The electrical design for the various components are located in the `./Electrical` directory. In this directory, you will find electrical schematics and the PCB design for the main control board, IMU breakout board, microphone breakout board, and microphone controller board. A [detailed list of the components and instructions](./Electrical/README.md) for each of these boards is included.
+- The software design for the main control board is in the `./Software` directory. This software is for the PIC32 located on the main control board and facilitates communication between the PIC32 and Jetson, performs PID control, odometry, etc. Additionally, the software for the microphone control board is included in this directory. Please visit the [README](./Software/README.md) for more detailed instructions.
+- Instructions for the Nvidia Jetson Orin Nano aare provided in the `./Jetson` directory. This directory includes instructions for bringing up the Jetson, setting up the WiFi mesh node connectivity, setting up the Docker environments, and setting up the ROS environment/software stack. Please visit the [Jetson README](./Jetson/README.md) for more details.
 
 ## License
 
