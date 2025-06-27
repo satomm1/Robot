@@ -165,3 +165,235 @@ Configuring the WiFi driver to roam is not straightforward. But, roaming will al
         ```
 
 6) Reboot the Jetson for everything to take effect.
+
+## Docker Setup
+Getting a Docker container that does everything we need is not trivial. The following steps worked for my NVIDIA Jetson Orin Nano. If you already have a docker image saved as a .tar.gz file, please look at the end for instructions.
+
+1)  Follow system setup (through at least the “Relocating Docker Data Root” step) from https://github.com/dusty-nv/jetson-containers/blob/master/docs/setup.md
+    
+    If you have NVME storage to add, I found this tutorial helpful for setting up the NVME storage: https://www.digitalocean.com/community/tutorials/how-to-partition-and-format-storage-devices-in-linux
+
+	Also, be sure to add the following line to `etc/docker/daemon.json`:
+	`"data-root": "/mnt/data"`
+
+	Note: `/data` should be whatever your mount folder name is…
+
+----
+If you already have a docker container image, skip to the next section!
+
+Docker images can be downloaded from: https://drive.google.com/file/d/1__ZI9WkVhz9b7KRzaHHCewiELtFPr_nl/view?usp=sharing.
+
+----
+
+2)	Choose a base container. I like l4t-ml since it contains cuda enabled pytorch, cuda enabled tensorflow2, and cuda enabled opencv. The full list of containers can be found https://github.com/dusty-nv/jetson-containers/tree/master
+
+    Now, run the container, e.g.:
+    ```
+	jetson-containers run $(autotag l4t-ml)
+    ```
+
+3)	Now we can install ROS. For example, for ROS Noetic, follow the instructions here: https://wiki.ros.org/noetic/Installation/Ubuntu
+
+    > [!IMPORTANT]
+    > Install the **ROS-Base** version. The other version will attempt to modify the opencv, which we cannot do! Thus, install the bare bones version and the selectively install additional packages we may need.
+
+    The following is also useful to put in your `~/.bashrc` file
+    ```
+    source /workspace/catkin_ws/devel/setup.bash
+    export ROS_IP=192.168.xx.xx
+    export ROS_MASTER_URI=http://$ROS_IP:11311
+    export ROBOT_ID=x
+    ```
+
+4)	Install any additional ros packages you need, e.g.
+    ```
+	sudo apt install ros-noetic-PACKAGE
+    ```
+    I installed the following:
+    - tf2-msgs
+    - tf
+    - gmapping
+    - diagnostic-updater
+    
+    For the camera to work, I find it necessary to first run:
+    ```
+    apt-get purge -y '*opencv*'
+    ```
+    Then, follow instructions at https://github.com/satomm1/ros_astra_camera, with the following exception: run these lines outside of the docker container
+    ```
+    ./scripts/create_udev_rules
+    sudo udevadm control --reload && sudo  udevadm trigger
+    ```
+ 
+5)	Install other python packages you need.
+
+    > [!IMPORTANT]
+    > Any package which has an opencv-python dependency must be sure not to modify the opencv-python package already installed from the original container. Updating will break the package!
+
+    Some packages I install include:
+    - spidev
+    - confluent-kafka
+    - rospy-message-converter
+    - pyignite
+    - matplotlib
+    - scipy
+    - ultralytics****be careful with opencv-python here!
+
+6)	Install Cyclone DDS and it’s python binding.
+
+    Follow the directions of https://github.com/eclipse-cyclonedds/cyclonedds to first install cycloneDDS. Be careful! Check what the latest version of the cyclonedds python binding is and match this version!  The install directory should be /path/to/cyclonedds/install. Next:
+    ```
+    export CYCLONEDDS_HOME="$(pwd)/install"
+    ```
+    Even better, put this in the `~/.bashrc` file since we need this anytime we use the python binding. Last, we install the python binding via:
+    ```
+    pip3 install cyclonedds --no-binary cyclonedds
+    ```
+
+7)	Commit the docker container so you can use it later, e.g.:
+	docker commit c3f279d17e0a ml_ros:latest
+
+8)	Now, to run the container, we can use the command:
+    ```
+	jetson-containers run $(autotag ml_ros:latest)
+    ```
+
+    You can include any of the usual docker commands with this. For example, my full command is:
+    ```
+    jetson-containers run -v ~/workspaces/catkin_ws:/workspace/catkin_ws -v ~/gemini_api:/gemini_code -v /dev/bus/usb:/dev/bus/usb -v /dev/video0:/dev/video0 -v /dev/video1:/dev/video1 -i --device=/dev/ttyUSB0 --device=/dev/spidev0.0 --rm --privileged --name ros_noetic $(autotag ml_ros:latest)
+    ```
+    OR
+    ```
+    sudo docker run --runtime nvidia --network=host -v ~/workspaces/catkin_ws:/workspace/catki
+    n_ws -v ~/gemini_api:/gemini_code -v /dev/bus/usb:/dev/bus/usb -v /dev/video0:/dev/video0 -v /dev/video1:/dev/video1 -it --device=/dev/ttyUSB0 --device=/dev/spidev0.0 --rm --
+    privileged --name ros_noetic ml_ros:latest
+    ```
+
+9)	To save the image (for easy loading on a new machine), use the following command:
+    ```
+	docker save myimage:latest | gzip > myimage_latest.tar.gz
+    ```
+
+If everything has gone according to plan, you should now have a docker container which has ROS, cuda enabled pytorch/tensorflow, and everything else you might need!
+
+----
+**What if I already have a docker image saved as a \*.tar.gz file?**
+
+Use this pre-existing docker image: https://drive.google.com/file/d/1__ZI9WkVhz9b7KRzaHHCewiELtFPr_nl/view?usp=sharing
+
+In this case, just set docker up and the call:
+```
+docker load < your_image.tar.gz
+```
+You should source ROS via:
+```
+source /opt/ros/noetic/setup.bash
+```
+----
+**Setting Up ROS Workspace**
+1) Start the ROS docker container. Within the docker container, navigate to `/workspace/catkin_ws` (you may need to create this directory):
+    ```
+    cd /workspace/catkin_ws
+    ```
+
+2) Now, create the devel and src directories:
+    ```
+    mkdir devel src
+    ```
+
+3) Now, build the workspace:
+    ```
+    catkin_make
+    ```
+    (if you receive an error, make sure to source the setup file: `source /opt/ros/noetic/setup.bash`)
+
+4) Source the build and go to the `src` directory:
+    ```
+    source devel/setup.bash
+	cd src
+    ```
+
+5) Now, clone the following repositories and switch to the noetic branch. To make cloning easier, I have provided a script to automatically clone all the relevant repositories. Copy the `clone_repos.sh` script to your Jetson, make it executable, and then run the script:
+    ```
+	nano clone_repos.sh
+	(copy clone_repos.sh code here)
+	ctrl+x, y (to save file)
+	chmod +x clone_repos.sh
+	./clone_repos.sh
+    ```
+
+    The script will clone the following repositories from https://github.com/satomm1/
+    
+    - mattbot_record
+    - mattbot_bringup          
+    - mattbot_dds         
+    - mattbot_image_detection  
+    - mattbot_mcl              
+    - mattbot_navigation	 
+    - mattbot_teleop
+    - ros_astra_camera
+    - rplidar_ros
+    - twist_mux
+    - slam_gmapping
+
+6) Navigate back to the `catkin_ws` directory and build the packages:
+    ```
+	cd /workspace/catkin_ws
+	catkin_make
+	source devel/setup.bash
+    ```
+
+7) Add important information to the `bashrc` file:
+    ```
+	nano ~/.bashrc
+    ```
+    Append the following:
+    ```
+    source /workspace/catkin_ws/devel/setup.bash
+    export ROS_IP=<Your Robot IP Here>                                
+    export ROS_MASTER_URI=http://$ROS_IP:11311
+    export ROBOT_ID=<Robot ID Here (Integer)>
+    export CYCLONEDDS_HOME="/home/cyclonedds/install"
+    ```
+    Source the bashrc file:
+    ```
+    source ~/.bashrc
+    ```
+
+8) Test the setup, call roscore. If you have no errors, this is good!
+    ```
+	roscore 
+    ```
+
+9) Set up the Astra Camera.  You will also need to navigate to the `ros_astra_camera` directory and perform these two commands outside of the docker container:
+    ```
+    cd ~/workspaces/catkin_ws/src/ros_astra_camera
+    ./scripts/create_udev_rules
+    sudo udevadm control --reload && sudo udevadm trigger
+    ```
+----
+**Setting up the Gemini Container**
+
+1) Download and load the Gemini image:
+You can download the image here: https://drive.google.com/file/d/1xQtwj8xyFaPMbaMlJZ36KgxLJ6gVcdOr/view?usp=sharing
+
+    ```
+    docker load < gemini_latest.tar.gz
+    ```
+
+2) Clone the gemini_api repo:
+    ```
+    cd ~
+    git clone https://github.com/satomm1/gemini_api.git
+    ```
+
+3) Start the container:
+    ```
+    docker run -v ~/gemini_api:/gemini_code -v ~/Desktop/audio:/audio -it --rm --privileged -p 5000:5000  --name gemini gemini:latest
+    ```
+
+4) To run the needed file, run endpoint.py:
+    ```
+    cd gemini_code
+    python3 endpoint.py
+    ```
