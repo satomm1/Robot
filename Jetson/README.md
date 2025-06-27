@@ -172,12 +172,19 @@ Getting a Docker container that does everything we need is not trivial. The foll
     If you have NVME storage to add, I found this tutorial helpful for setting up the NVME storage: https://www.digitalocean.com/community/tutorials/how-to-partition-and-format-storage-devices-in-linux
 
 	Also, be sure to add the following line to `etc/docker/daemon.json`:
-	`"data-root": "/mnt/data"`
+    ```
+	"data-root": "/mnt/data"
+    ```
 
 	Note: `/data` should be whatever your mount folder name is…
 
+    Then, restart docker:
+    ```
+    sudo systemctl restart docker
+    ```
+
 ----
-If you already have a docker container image, skip to the next section!
+If you already have a docker container image, skip to the [next section](#load-docker-image)!
 
 Docker images can be downloaded from: https://drive.google.com/file/d/1__ZI9WkVhz9b7KRzaHHCewiELtFPr_nl/view?usp=sharing.
 
@@ -273,7 +280,8 @@ Docker images can be downloaded from: https://drive.google.com/file/d/1__ZI9WkVh
 If everything has gone according to plan, you should now have a docker container which has ROS, cuda enabled pytorch/tensorflow, and everything else you might need!
 
 ----
-**What if I already have a docker image saved as a \*.tar.gz file?**
+<a name="load-docker-image"></a>
+### What if I already have a docker image saved as a \*.tar.gz file?
 
 Use this pre-existing docker image: https://drive.google.com/file/d/1__ZI9WkVhz9b7KRzaHHCewiELtFPr_nl/view?usp=sharing
 
@@ -286,7 +294,7 @@ You should source ROS via:
 source /opt/ros/noetic/setup.bash
 ```
 ----
-**Setting Up ROS Workspace**
+### Setting Up ROS Workspace
 1) Start the ROS docker container. Within the docker container, navigate to `/workspace/catkin_ws` (you may need to create this directory):
     ```
     cd /workspace/catkin_ws
@@ -368,7 +376,7 @@ source /opt/ros/noetic/setup.bash
     sudo udevadm control --reload && sudo udevadm trigger
     ```
 ----
-**Setting up the Gemini Container**
+### Setting up the Gemini Container
 
 1) Download and load the Gemini image:
 You can download the image here: https://drive.google.com/file/d/1xQtwj8xyFaPMbaMlJZ36KgxLJ6gVcdOr/view?usp=sharing
