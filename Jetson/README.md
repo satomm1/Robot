@@ -23,7 +23,7 @@ Alternatively, you can use the Nvidia SDK Manager to flash the Jetson. If you ha
     - Reboot the Jetson for the new pin functions to take effect
     - Call `sudo modprobe spidev`
 
-6) I0f you have issues with `dev/ttyUSB0`, you may need to call `sudo apt remove brltty`
+6) If you have issues with `dev/ttyUSB0`, you may need to call `sudo apt remove brltty`
 
 7) Connect the corresponding SPI pins on the header to the SPI pins on the MCU control board. The corresponding pins are listed in the [Electrical README](../Electrical/README.md).
 
@@ -90,8 +90,7 @@ Configuring the WiFi driver to roam is not straightforward. But, roaming will al
     }
     ```
 
-    > [!IMPORTANT]
-    > Be sure to replace the placeholdes with your own WiFi SSD and password
+    **IMPORTANT**: Be sure to replace the placeholders with your own WiFi SSD and password
 
     Restart wpa_supplicant: 
     
@@ -99,8 +98,7 @@ Configuring the WiFi driver to roam is not straightforward. But, roaming will al
     sudo systemctl restart wpa_supplicant
     ```
 
-    > [!NOTE]
-    > In bgscan, -60 = -60 dBm to trigger a scan, 30 = scan every 30 seconds while below -60 dBM, 600 = scan every 600 seconds no matter what.
+    **Note**: In bgscan, -60 = -60 dBm to trigger a scan, 30 = scan every 30 seconds while below -60 dBM, 600 = scan every 600 seconds no matter what.
 
 4) Create a shell script for connecting to the WiFi network at `/usr/local/bin/custom_wifi.sh`:
 
@@ -194,8 +192,7 @@ Docker images can be downloaded from: https://drive.google.com/file/d/1__ZI9WkVh
 
 3)	Now we can install ROS. For example, for ROS Noetic, follow the instructions here: https://wiki.ros.org/noetic/Installation/Ubuntu
 
-    > [!IMPORTANT]
-    > Install the **ROS-Base** version. The other version will attempt to modify the opencv, which we cannot do! Thus, install the bare bones version and the selectively install additional packages we may need.
+    **IMPORTANT**: Install the **ROS-Base** version. The other version will attempt to modify the opencv, which we cannot do! Thus, install the bare bones version and the selectively install additional packages we may need.
 
     The following is also useful to put in your `~/.bashrc` file
     ```
@@ -227,8 +224,7 @@ Docker images can be downloaded from: https://drive.google.com/file/d/1__ZI9WkVh
  
 5)	Install other python packages you need.
 
-    > [!IMPORTANT]
-    > Any package which has an opencv-python dependency must be sure not to modify the opencv-python package already installed from the original container. Updating will break the package!
+    **IMPORTANT**: Any package which has an opencv-python dependency must be sure not to modify the opencv-python package already installed from the original container. Updating will break the package!
 
     Some packages I install include:
     - spidev
