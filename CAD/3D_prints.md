@@ -26,6 +26,12 @@ Some of the components are designed to be used with M3 heat set inserts. Heat se
 > [!TIP]
 > IF you are not familiar with installing heat set inserts, watch this quick video: https://youtu.be/P7nHyI1TwKY?t=189.
 
+### Ensuring Correct Sizes
+To ensure the STL files are imported correctly into your 3D printing software, we provide some reference dimensions for the 3D printed components:
+
+- The length of the bearing blocks should be 3 inches (76 mm)
+- The lengths of the 3 inch, 3.5 inch, and 9 inch standoffs should be the length designated in the file name
+
 ### Component List
 | File Name | Quantity per Robot | Time per Robot (Prusa MK3.9/Bambu Lab P1S) | Filament per Robot (g, estimated) | Preview |
 |-----------|--------------------|------------------------------------------- | -----------------------------------|---------|
