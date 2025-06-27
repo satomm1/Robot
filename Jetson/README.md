@@ -3,8 +3,11 @@
 We use an 8 GB Nvidia Jetson Orin Nano Developer Kit for high level control of the mobile robot.
 
 ## Jetson Bring Up Instructions
-1) Flash a microSD card with the Jetpack Image and insert into the Jetson. I have had WiFi card issues with Jetpack 6.x, so I recommend using Jetpack 5.x (latest version as of May 2025 is 5.1.5). Please find the SD card image at this webpage: https://developer.nvidia.com/embedded/jetpack-sdk-515. <br> <br>
-Alternatively, you can use the Nvidia SDK Manager to flash the Jetson. If you have a device that is natively running Ubuntu, this will work great. Otherwise, you will need a VM (specifically VMware Workstation). Some tips if using a VM – make sure you allocate plenty of hard disk memory for the VM and change the settings so that the USB connection to the Jetson automatically is sent to the VM.
+1) Flash a microSD card with the Jetpack Image and insert into the Jetson. I have had WiFi card issues with Jetpack 6.x, so I recommend using Jetpack 5.x (latest version as of May 2025 is 5.1.5). Please find the SD card image at this webpage: https://developer.nvidia.com/embedded/jetpack-sdk-515.
+
+    To flash the SD card, you will need to first format the SD card using: https://www.sdcard.org/downloads/formatter/. Then, use [Balena etcher](https://etcher.balena.io/) to flash the SD card.
+
+    Alternatively, you can use the Nvidia SDK Manager to flash the Jetson. If you have a device that is natively running Ubuntu, this will work great. Otherwise, you will need a VM (specifically VMware Workstation). Some tips if using a VM – make sure you allocate plenty of hard disk memory for the VM and change the settings so that the USB connection to the Jetson automatically is sent to the VM.
 
 2) Switch out the default WiFi card. The default WiFi card does not support roaming (which is necessary to switch between mesh nodes). We use the Intel AC9260 WiFi card. The WiFi card is located on the bottom of the Jetson and can be removed with a screwdriver. 
 
@@ -18,7 +21,7 @@ Alternatively, you can use the Nvidia SDK Manager to flash the Jetson. If you ha
 5) Set up SPI capabilities on headers pins so that we can communicate with the MCU:
     - Navigate to opt/nvidia/jetson-io: `cd /opt/nvidia/jetson-io`
     - Call `sudo python3 jetson-io.py`
-        - Manually update the pin functions
+        - We need to manullay conifgure the 40 pin header
         - Select options to activate SPI1 and I2S
     - Reboot the Jetson for the new pin functions to take effect
     - Call `sudo modprobe spidev`
@@ -163,6 +166,9 @@ Configuring the WiFi driver to roam is not straightforward. But, roaming will al
         ```
 
 6) Reboot the Jetson for everything to take effect.
+
+> [!TIP]
+> I recommend assigning an IP address to the MAC address of the Jetson so that the Jetson always has the same IP address. This is usually done in the DHCP settings of the LAN.
 
 ## Docker Setup
 Getting a Docker container that does everything we need is not trivial. The following steps worked for my NVIDIA Jetson Orin Nano. If you already have a docker image saved as a .tar.gz file, please look at the end for instructions.
@@ -375,6 +381,12 @@ source /opt/ros/noetic/setup.bash
     ./scripts/create_udev_rules
     sudo udevadm control --reload && sudo udevadm trigger
     ```
+
+10) You should commit the docker container to save any changes. Outside of the docker container (but with the docker container running), run this command:
+    ```
+    docker commit ros_noetic ml_ros:latest
+    ```
+
 ----
 ### Setting up the Gemini Container
 
@@ -387,8 +399,7 @@ You can download the image here: https://drive.google.com/file/d/1xQtwj8xyFaPMba
 
 2) Clone the gemini_api repo:
     ```
-    cd ~
-    git clone https://github.com/satomm1/gemini_api.git
+    cd ~ && git clone https://github.com/satomm1/gemini_api.git
     ```
 
 3) Start the container:
@@ -401,3 +412,47 @@ You can download the image here: https://drive.google.com/file/d/1xQtwj8xyFaPMba
     cd gemini_code
     python3 endpoint.py
     ```
+
+----
+### Setting up the Display
+
+1) Clone the display repository:
+    ```
+    git clone https://github.com/satomm1/mattbot_display.git
+    cd mattbot_display
+    ```
+
+2) Install dependencies:
+    ```
+    pip3 install pygame
+    pip3 install -U pyinstaller
+    ```
+
+3) Make the `Desktop/audio` directory:
+    ```
+    mkdir ~/Desktop/audio
+    ```
+    Copy the `default.mp3` file to the `audio` directory:
+    ```
+    cp default.mp3 ~/Desktop/audio
+    ```
+
+4) You can run the display script via:
+
+    ```
+    python3 display_app.py
+    ```
+    This will print messages sent to localhost:65432 to the screen. You may need to adjust the line `os.environ['AUDIODEV'] = 'plughw:<card number>,<device number>'` for your specific device/card number for the sound to work. I recommend adjusting the card number between 0 and 2.
+
+5) Create an executable:
+    ```
+    pyinstaller display_app.spec
+    ```
+    This executable will be located at `/dist/display_app`.
+
+6) Copy the executable to the Desktop:
+    ```
+    cp dist/display_app ~/Desktop
+    ```
+
+7) Now, the executable can be run by double-clicking the icon on the desktop!
