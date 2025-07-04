@@ -760,10 +760,10 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     static float RightPrevError = 0.0;
     static float LeftErrorDiff;
     static float RightErrorDiff;
-    static int16_t LeftDutyCycle; // Only static here for speed
-    static int16_t RightDutyCycle; // Only static here for speed
-    static int16_t PrevLeftDutyCycle; // Only static here for speed
-    static int16_t PrevRightDutyCycle; // Only static here for speed
+    static float LeftDutyCycle; // Only static here for speed
+    static float RightDutyCycle; // Only static here for speed
+    static float PrevLeftDutyCycle; // Only static here for speed
+    static float PrevRightDutyCycle; // Only static here for speed
     static int16_t LeftDelta=0; // Only static here for speed
     static int16_t RightDelta=0; // Only static here for speed
     static int16_t LeftReward; // Only static here for speed
@@ -872,12 +872,12 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     if (LeftDirection == Backward) {
         LeftDutyCycle = 100 - LeftDutyCycle;
     }
-    OC2RS = (OC_PERIOD + 1)/100 * LeftDutyCycle;
+    OC2RS = (int16_t)((OC_PERIOD + 1)/100 * LeftDutyCycle);
     
     if (RightDirection == Backward) {
         RightDutyCycle = 100 - RightDutyCycle;
     }
-    OC1RS = (OC_PERIOD + 1)/100 * RightDutyCycle;
+    OC1RS = (int16_t)((OC_PERIOD + 1)/100 * RightDutyCycle);
     
 #ifdef RL_MOTOR_LOGGING
     LeftDelta = LeftDutyCycle - PrevLeftDutyCycle;
