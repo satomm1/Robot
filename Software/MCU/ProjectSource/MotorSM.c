@@ -646,6 +646,13 @@ void SetPosition(float x_set, float y_set, float theta_set) {
     theta = theta_set;
 }
 
+// GetPosition stores the values in pointers passed by the caller
+void GetPosition(float* x_get, float* y_get, float* theta_get) {
+    if (x_get) *x_get = x;
+    if (y_get) *y_get = y;
+    if (theta_get) *theta_get = theta;
+}
+
 void PrintBufferSize(void) {
     DB_printf("Buffer Size: %d\r\n", circular_buffer_size(&cb));
 }
@@ -991,7 +998,7 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     // Next we calculate the linear velocity of each wheel
     V_l = (CurLeftRotations - LeftPrevRotations) * DEAD_RECKONING_RATIO; 
     V_r = (CurRightRotations - RightPrevRotations) * DEAD_RECKONING_RATIO;
-    
+        
     // Store the current number of rotations for next time
     LeftPrevRotations = CurLeftRotations;
     RightPrevRotations = CurRightRotations;
@@ -999,6 +1006,13 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     // Calculate the instantaneous linear/angular velocity of robot
     V = (V_l + V_r) / 2; 
     omega = (V_r - V_l) / WHEEL_BASE;
+    
+    // Don't use too large of velocities in case of slipping
+    if (abs(V) > V_MAX || abs(V) > abs(V_desired*1.5)) {
+        V = V_desired;
+    } else if (abs(omega) > w_MAX || abs(omega) > abs(w_desired*1.5)) {
+        omega = w_desired;
+    }
     
     V_current = V; // used to store current velocity
     w_current = omega; // used to store current angular velocity

@@ -50,6 +50,7 @@ void WritePositionToSPI(uint8_t *Message2Send);
 void WriteDeadReckoningVelocityToSPI(uint8_t *Message2Send);
 void ResetPosition(void);
 void SetPosition(float x_set, float y_set, float theta_set);
+void GetPosition(float* x_get, float* y_get, float* theta_get);
 void PrintBufferSize(void);
 #endif /* MotorFSM_H */
 
