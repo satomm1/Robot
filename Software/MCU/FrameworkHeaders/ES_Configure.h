@@ -29,8 +29,9 @@
 #define ROBOT_ID 1
 
 // Define the PCB Revision Number being used
+//#define PCB_REV 1
 #define PCB_REV 2
-//#define PCB_REV 2
+//#define PCB_REV 3
 
 // Define which motor type is being used
 //#define MOTOR_TYPE 1  // The 350RPM motor with 374 pulses per rev

@@ -126,7 +126,7 @@ bool InitImuSM(uint8_t Priority)
     
     SPI4CON = 0;
     SPI4CON2 = 0;
-  } else if (PCB_REV == 2) {
+  } else if (PCB_REV >= 2) {
 //     Set interrupt pins to inputs
     TRISDSET = _TRISD_TRISD12_MASK | _TRISD_TRISD13_MASK;
 
@@ -194,7 +194,7 @@ bool InitImuSM(uint8_t Priority)
   if (PCB_REV == 1) {
     IPC41bits.SPI4TXIP = 7; // SPI4TX
     IPC41bits.SPI4RXIP = 7; // SPI4RX
-  } else if (PCB_REV == 2) {
+  } else if (PCB_REV >= 2) {
     IPC27bits.SPI1TXIP = 7; // SPI1TX
     IPC27bits.SPI1RXIP = 7; // SPI1RX
   }
@@ -203,14 +203,14 @@ bool InitImuSM(uint8_t Priority)
   // Disable the RX/TX interrupt
   if (PCB_REV == 1) {
     IEC5CLR = _IEC5_SPI4RXIE_MASK | _IEC5_SPI4TXIE_MASK; // SPI4
-  } else if (PCB_REV == 2) {
+  } else if (PCB_REV >= 2) {
     IEC3CLR = _IEC3_SPI1RXIE_MASK | _IEC3_SPI1TXIE_MASK; // SPI1
   }
   
   // Clear interrupt flags
   if (PCB_REV == 1) {
     IFS5CLR = _IFS5_SPI4RXIF_MASK | _IFS5_SPI4TXIF_MASK; // SPI4
-  } else if (PCB_REV == 2) {
+  } else if (PCB_REV >= 2) {
     IFS3CLR = _IFS3_SPI1RXIF_MASK | _IFS3_SPI1TXIF_MASK; // SPI1
   }
   IFS0CLR = _IFS0_T6IF_MASK; // T6
@@ -282,7 +282,7 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
         ResetIMU(); // Perform a soft reset of the IMU
         
         // now put the machine into the actual initial state
-        CurrentState = IMUReset;
+//        CurrentState = IMUReset;
         ES_Timer_InitTimer(IMU_TIMER, 500);
       }
     }
@@ -317,7 +317,7 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
             T6CONbits.ON = 1; // Turn T6 on
             if (PCB_REV == 1){
                 IEC5SET = _IEC5_SPI4RXIE_MASK;
-            } else if (PCB_REV == 2){
+            } else if (PCB_REV >= 2){
                 IEC3SET = _IEC3_SPI1RXIE_MASK; // Enable the RX interrupt
             }
 //            ES_Timer_InitTimer(IMU_TIMER, 1000); // Init timer
@@ -858,7 +858,7 @@ void __ISR(_SPI4_TX_VECTOR, IPL7SRS) SPI4TXHandler(void)
     IEC5CLR = _IEC5_SPI4TXIE_MASK; // Disable the interrupt
     IFS5CLR = _IFS5_SPI4TXIF_MASK; // clear the interrupt flag 
 }
-#elif (PCB_REV == 2)
+#elif (PCB_REV >= 2)
 void __ISR(_SPI1_RX_VECTOR, IPL7SRS) SPI1RXHandler(void)
 {
     static uint8_t data_read = 0;
