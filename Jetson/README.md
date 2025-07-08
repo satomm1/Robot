@@ -273,9 +273,7 @@ Docker images can be downloaded from: https://drive.google.com/file/d/1__ZI9WkVh
     ```
     OR
     ```
-    sudo docker run --runtime nvidia --network=host -v ~/workspaces/catkin_ws:/workspace/catki
-    n_ws -v ~/gemini_api:/gemini_code -v /dev/bus/usb:/dev/bus/usb -v /dev/video0:/dev/video0 -v /dev/video1:/dev/video1 -it --device=/dev/ttyUSB0 --device=/dev/spidev0.0 --rm --
-    privileged --name ros_noetic ml_ros:latest
+    sudo docker run --runtime nvidia --network=host -v ~/workspaces/catkin_ws:/workspace/catkin_ws -v ~/gemini_api:/gemini_code -v /dev/bus/usb:/dev/bus/usb -v /dev/video0:/dev/video0 -v /dev/video1:/dev/video1 -it --device=/dev/ttyUSB0 --device=/dev/spidev0.0 --rm --privileged --name ros_noetic ml_ros:latest
     ```
 
 9)	To save the image (for easy loading on a new machine), use the following command:
@@ -293,15 +291,21 @@ Use this pre-existing docker image: https://drive.google.com/file/d/1__ZI9WkVhz9
 
 In this case, just set docker up and the call:
 ```
-docker load < your_image.tar.gz
-```
-You should source ROS via:
-```
-source /opt/ros/noetic/setup.bash
+sudo docker load < your_image.tar.gz
 ```
 ----
 ### Setting Up ROS Workspace
-1) Start the ROS docker container. Within the docker container, navigate to `/workspace/catkin_ws` (you may need to create this directory):
+1) Start the ROS docker container. 
+    ```
+    sudo docker run --runtime nvidia --network=host -v ~/workspaces/catkin_ws:/workspace/catkin_ws -v ~/gemini_api:/gemini_code -v /dev/bus/usb:/dev/bus/usb -v /dev/video0:/dev/video0 -v /dev/video1:/dev/video1 -it --device=/dev/ttyUSB0 --device=/dev/spidev0.0 --rm --privileged --name ros_noetic ml_ros:latest
+    ```
+
+    You should source ROS via:
+    ```
+    source /opt/ros/noetic/setup.bash
+    ```
+
+    Within the docker container, navigate to `/workspace/catkin_ws` (you may need to create this directory):
     ```
     cd /workspace/catkin_ws
     ```
@@ -315,7 +319,6 @@ source /opt/ros/noetic/setup.bash
     ```
     catkin_make
     ```
-    (if you receive an error, make sure to source the setup file: `source /opt/ros/noetic/setup.bash`)
 
 4) Source the build and go to the `src` directory:
     ```
@@ -329,7 +332,7 @@ source /opt/ros/noetic/setup.bash
 	(copy clone_repos.sh code here)
 	ctrl+x, y (to save file)
 	chmod +x clone_repos.sh
-	./clone_repos.sh
+	. clone_repos.sh
     ```
 
     The script will clone the following repositories from https://github.com/satomm1/
@@ -384,7 +387,7 @@ source /opt/ros/noetic/setup.bash
 
 10) You should commit the docker container to save any changes. Outside of the docker container (but with the docker container running), run this command:
     ```
-    docker commit ros_noetic ml_ros:latest
+    sudo docker commit ros_noetic ml_ros:latest
     ```
 
 ----
@@ -394,7 +397,7 @@ source /opt/ros/noetic/setup.bash
 You can download the image here: https://drive.google.com/file/d/1xQtwj8xyFaPMbaMlJZ36KgxLJ6gVcdOr/view?usp=sharing
 
     ```
-    docker load < gemini_latest.tar.gz
+    sudo docker load < gemini_latest.tar.gz
     ```
 
 2) Clone the gemini_api repo:
@@ -404,7 +407,7 @@ You can download the image here: https://drive.google.com/file/d/1xQtwj8xyFaPMba
 
 3) Start the container:
     ```
-    docker run -v ~/gemini_api:/gemini_code -v ~/Desktop/audio:/audio -it --rm --privileged -p 5000:5000  --name gemini gemini:latest
+    sudo docker run -v ~/gemini_api:/gemini_code -v ~/Desktop/audio:/audio -it --rm --privileged -p 5000:5000  --name gemini gemini:latest
     ```
 
 4) To run the needed file, run endpoint.py:
