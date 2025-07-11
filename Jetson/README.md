@@ -407,7 +407,7 @@ You can download the image here: https://drive.google.com/file/d/1xQtwj8xyFaPMba
 
 3) Start the container:
     ```
-    sudo docker run -v ~/gemini_api:/gemini_code -v ~/Desktop/audio:/audio -it --rm --privileged -p 5000:5000  --name gemini gemini:latest
+    sudo docker run -v ~/gemini_api:/gemini_code -v ~/Desktop/audio:/audio -w /gemini_code -it --rm --privileged -p 5000:5000  --name gemini gemini:latest
     ```
 
 4) To run the needed file, run endpoint.py:
