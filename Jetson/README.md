@@ -410,10 +410,9 @@ You can download the image here: https://drive.google.com/file/d/1xQtwj8xyFaPMba
     sudo docker run -v ~/gemini_api:/gemini_code -v ~/Desktop/audio:/audio -w /gemini_code -it --rm --privileged -p 5000:5000  --name gemini gemini:latest
     ```
 
-4) To run the needed file, run endpoint.py:
+4) To run the needed file, run the `start_scripts.sh` script (which just runs `endpoint.py`):
     ```
-    cd gemini_code
-    python3 endpoint.py
+    . start_scripts.sh
     ```
 
 ----
