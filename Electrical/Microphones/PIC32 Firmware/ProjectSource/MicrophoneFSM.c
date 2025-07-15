@@ -192,7 +192,11 @@ bool InitMicrophoneFSM(uint8_t Priority)
   uint32_t rData = SPI2BUF; // Clear the receive buffer
   SPI2CONbits.ENHBUF = 1; // Use Enhanced Buffer Mode
   
-  // No Interrupts Used for SPI2
+  // Interrupts Used for SPI2
+  IEC1CLR = _IEC1_SPI2TXIE_MASK | _IEC1_SPI2EIE_MASK; // Disable transmit interrupt
+  IFS1CLR = _IFS1_SPI2TXIF_MASK | _IFS1_SPI2EIF_MASK; // Clear transmit interrupt
+  IPC13bits.SPI2TXIP = 7; // Receive interrupt Priority
+  IPC13bits.SPI2TXIS = 2; // Receive interrupt subpriority
   
   // ******
   // Setup Control Register 2
@@ -214,6 +218,7 @@ bool InitMicrophoneFSM(uint8_t Priority)
   SPI2CONbits.DISSDO = 0; // SDO2 pin is controlled by the module
   SPI2CONbits.SSEN = 1; // SS2 pin used for Client mode
   SPI2CONbits.CKE = 1; // Serial output data changes on transition from active clock state to Idle clock state
+  SPI2CONbits.STXISEL = 0b01; // SPIxTXIF is set when the buffer is completely empty
     
   // post the initial transition event
   ThisEvent.EventType = ES_INIT;
@@ -371,6 +376,7 @@ void __ISR(_SPI1_RX_VECTOR, IPL7SRS) SPI1RXHandler(void)
     static bool received_left = false;
     static bool received_right = false;
     static uint32_t print_index = 0;
+    static uint32_t time_since_last_update = 0;
         
     data1 = SPI1BUF;
     data2 = SPI1BUF;
@@ -381,6 +387,7 @@ void __ISR(_SPI1_RX_VECTOR, IPL7SRS) SPI1RXHandler(void)
     
     SPI1STATbits.SPIROV = 0 ;
     
+    time_since_last_update += 1;
     if (SPI2STATbits.TXBUFELM < 3) {
 //         LATBbits.LATB10 = 1;
 #ifdef TESTING
@@ -394,6 +401,7 @@ void __ISR(_SPI1_RX_VECTOR, IPL7SRS) SPI1RXHandler(void)
 #ifdef PRODUCTION
         SPI2BUF = data1;
         SPI2BUF = data2;
+        time_since_last_update = 0;
 #endif
 //        LATBbits.LATB10 = 0;
     }
@@ -436,9 +444,32 @@ void __ISR(_SPI1_RX_VECTOR, IPL7SRS) SPI1RXHandler(void)
 #ifdef PRODUCTION
         SPI2BUF = data3;
         SPI2BUF = data4;
+        time_since_last_update = 0;
 #endif
+    }
+    
+    if (time_since_last_update > 100){
+        // Jetson isn't receiving data --- don't run the mic SPI for now
+        SPI1CONbits.ON = 0;
+        
+        time_since_last_update = 0;
+        
+        // Enable receive interrupt to know when to start MIC SPI again.
+        IEC1SET = _IEC1_SPI2TXIE_MASK;        
     }
     
     // Clear interrupt flag
     IFS1CLR = _IFS1_SPI1RXIF_MASK;
+}
+
+
+void __ISR(_SPI1_TX_VECTOR, IPL7SRS) SPI1TXHandler(void) {
+    // Turn on SPI1
+    SPI1CONbits.ON = 1;
+    
+    // Disable the SPI2 interrupt
+    IEC1CLR = _IEC1_SPI2TXIE_MASK;
+    
+    // Clear the Interrupt Flag
+    IFS1CLR = _IFS1_SPI2TXIF_MASK;
 }
