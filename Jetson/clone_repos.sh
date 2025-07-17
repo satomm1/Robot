@@ -8,6 +8,7 @@ repositories=(
     "https://github.com/satomm1/mattbot_mcl.git"
     "https://github.com/satomm1/mattbot_navigation.git"
     "https://github.com/satomm1/mattbot_teleop.git"
+    "https://github.com/satomm1/mattbot_database.git"
     "https://github.com/satomm1/ros_astra_camera.git"
     "https://github.com/satomm1/rplidar_ros.git"
     "https://github.com/satomm1/twist_mux.git"
