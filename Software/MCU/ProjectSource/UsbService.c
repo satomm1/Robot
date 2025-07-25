@@ -315,6 +315,13 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
         DB_printf("Roll, Pitch = %d, %d\r\n", (int16_t)roll, (int16_t)pitch);
       }
       
+      if ('z' == ThisEvent.EventParam)
+      {
+        float x_val, y_val, theta_val;
+        GetPosition(&x_val, &y_val, &theta_val);
+        DB_printf("%d, %d, %d\r\n", (int32_t)x_val, (int32_t)y_val, (int32_t)theta_val);
+      }
+      
     }
     break;
     
