@@ -1020,12 +1020,7 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     // Calculate the update in theta and ensure theta stays within [-pi, pi]
     prev_theta = theta;
     theta = theta + omega * DEAD_RECKONING_TIME;
-    while (theta > M_PI) {
-        theta -= 2*M_PI;
-    }
-    while (theta < -M_PI) {
-        theta += 2*M_PI;
-    }
+    theta = fmod(theta + M_PI, 2*M_PI) - M_PI;
     
     pitch *= 0.0174533; // Convert pitch to radians
     effective_V = V * cosf(pitch); // Get effective velocity for pitch
