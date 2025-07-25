@@ -31,13 +31,13 @@
 #define OC_PERIOD 312   // Output compare period (10 kHz)
 #define NO_SPEED_PERIOD 65535 // Period to indicate motor not spinning
 #define DEAD_RECKONING_PERIOD 3906// 1953 // 3906 // 7812 // Chosen so that we update at 50 Hz rate
-#define Kp 5 // Proportional constant for PID law
-#define Ki 0.8 // Integral constant for PID law
-#define Kd 3 // Derivative constant for PID law
+#define Kp 0.2 // Proportional constant for PID law
+#define Ki 0.01 // Integral constant for PID law
+#define Kd 0.0 // Derivative constant for PID law
 
 #if (MOTOR_TYPE==1)
 #define ENCODER_RESOLUTION 374 // Number of pulses per revolution
-#define CONTROL_PERIOD 1000 // 1000 // Control update period --- 6250 Hz
+#define CONTROL_PERIOD 10000 // 1000 // Control update period --- 6250 Hz
 #elif (MOTOR_TYPE==2)
 //#define ENCODER_RESOLUTION 1440 // Number of pulses per revolution
 #define ENCODER_RESOLUTION 360
@@ -51,7 +51,7 @@
 #define DEAD_RECKONING_RATIO 2*3.14159 / ENCODER_RESOLUTION / DEAD_RECKONING_TIME * WHEEL_RADIUS // This number times change in encoder clicks is linear velocity in m/second
 
 #define V_MAX 1 // max 1 m/sec
-#define w_MAX 2 // max 2 rad/sec
+#define w_MAX 3 // max 2 rad/sec
 
 #define BUFF_SIZE 65
 /*---------------------------- Module Functions ---------------------------*/
