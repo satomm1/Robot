@@ -28,7 +28,7 @@
 
 /*----------------------------- Module Defines ----------------------------*/
 #define IC_PERIOD 65535 // Input capture period
-#define OC_PERIOD 312   // Output compare period (10 kHz)
+#define OC_PERIOD 200  // 312   // Output compare period (312 ~ 10 kHz, 200==15.625 kHz)
 #define NO_SPEED_PERIOD 65535 // Period to indicate motor not spinning
 #define DEAD_RECKONING_PERIOD 3906// 1953 // 3906 // 7812 // Chosen so that we update at 50 Hz rate
 #define Kp 0.2 // Proportional constant for PID law
@@ -37,7 +37,7 @@
 
 #if (MOTOR_TYPE==1)
 #define ENCODER_RESOLUTION 374 // Number of pulses per revolution
-#define CONTROL_PERIOD 10000 // 1000 // Control update period --- 6250 Hz
+#define CONTROL_PERIOD 30000 // 1000 // Control update period --- (1000 == 6250 Hz, 30000 == 208 Hz)
 #elif (MOTOR_TYPE==2)
 //#define ENCODER_RESOLUTION 1440 // Number of pulses per revolution
 #define ENCODER_RESOLUTION 360
