@@ -1553,7 +1553,7 @@
 				)
 			)
 		)
-		(property "Mfr" ""
+		(property "Mfr" "Samsung Electro-Mechanics "
 			(at 0 0 90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -1566,7 +1566,7 @@
 				)
 			)
 		)
-		(property "Mfr P/N" ""
+		(property "Mfr P/N" "CL21B104KBCNNNC "
 			(at 0 0 90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -1579,7 +1579,7 @@
 				)
 			)
 		)
-		(property "Supplier 1" ""
+		(property "Supplier 1" "DigiKey"
 			(at 0 0 90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -1592,7 +1592,7 @@
 				)
 			)
 		)
-		(property "Supplier 1 P/N" ""
+		(property "Supplier 1 P/N" "1276-1003-1-ND "
 			(at 0 0 90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -1831,7 +1831,7 @@
 				)
 			)
 		)
-		(property "Mfr" ""
+		(property "Mfr" "Samsung Electro-Mechanics "
 			(at 0 0 90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -1844,7 +1844,7 @@
 				)
 			)
 		)
-		(property "Mfr P/N" ""
+		(property "Mfr P/N" "CL21B104KBCNNNC "
 			(at 0 0 90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -1857,7 +1857,7 @@
 				)
 			)
 		)
-		(property "Supplier 1" ""
+		(property "Supplier 1" "DigiKey"
 			(at 0 0 90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -1870,7 +1870,7 @@
 				)
 			)
 		)
-		(property "Supplier 1 P/N" ""
+		(property "Supplier 1 P/N" "1276-1003-1-ND "
 			(at 0 0 90)
 			(unlocked yes)
 			(layer "F.Fab")

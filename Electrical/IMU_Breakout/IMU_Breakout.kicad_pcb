@@ -3054,6 +3054,16 @@
 		)
 	)
 	(gr_line
+		(start 231.9506 122.9792)
+		(end 231.9506 125.6208)
+		(stroke
+			(width 0.15)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "180a31f9-325a-4c29-b378-466545a351c3")
+	)
+	(gr_line
 		(start 229.75 115.375)
 		(end 230.95 115.375)
 		(stroke
@@ -3072,6 +3082,16 @@
 		)
 		(layer "F.SilkS")
 		(uuid "30782334-c5f0-4efd-a7af-2181138df76b")
+	)
+	(gr_line
+		(start 228.6994 122.9792)
+		(end 228.6994 125.6208)
+		(stroke
+			(width 0.15)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "4c63bac8-7c13-4cf1-a776-1c8cff0e3a74")
 	)
 	(gr_line
 		(start 230.375 117.45)
