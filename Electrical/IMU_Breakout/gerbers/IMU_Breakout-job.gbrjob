@@ -5,13 +5,13 @@
       "Application": "Pcbnew",
       "Version": "9.0.2"
     },
-    "CreationDate": "2025-06-11T13:19:55-07:00"
+    "CreationDate": "2025-08-06T09:05:08-07:00"
   },
   "GeneralSpecs": {
     "ProjectId": {
       "Name": "IMU_Breakout",
       "GUID": "494d555f-4272-4656-916b-6f75742e6b69",
-      "Revision": "0.1"
+      "Revision": "0.2"
     },
     "Size": {
       "X": 26.6,
