@@ -1,0 +1,9 @@
+Manufacturer=BOSCH
+PartNumber=BME690
+PartCategory=Integrated Circuit
+PackageCategory=Other
+PinCount=8
+Version=1.2
+Released=2024-12-30 05:57:07
+Downloaded=2025-08-05 22:20:25
+3D=Y

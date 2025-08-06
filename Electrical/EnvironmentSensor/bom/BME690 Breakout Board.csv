@@ -1,0 +1,6 @@
+References,Value,Mfr,Mfr P/N,Supplier 1,Supplier 1 P/N,Quantity
+"C1, C2",0.1uF,Samsung Electro-Mechanics ,CL21B104KBCNNNC ,DigiKey,1276-1003-1-ND ,2
+IC1,BME690,Bosch,BME690,DigiKey,828-BME690CT-ND,1
+J1,Conn_01x06_Pin,Molex,530480610,DigiKey,WM1746-ND,1
+J1-1,Conn_01x06_Rcpt,Molex,510210600,DigiKey,WM1724-ND,1
+J1-2,Conn_Crimp,Molex,500798000,DigiKey,WM1142CT-ND,6
