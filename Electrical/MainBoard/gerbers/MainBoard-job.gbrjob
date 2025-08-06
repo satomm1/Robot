@@ -5,13 +5,13 @@
       "Application": "Pcbnew",
       "Version": "9.0.2"
     },
-    "CreationDate": "2025-06-11T14:24:19-07:00"
+    "CreationDate": "2025-08-06T12:33:46-07:00"
   },
   "GeneralSpecs": {
     "ProjectId": {
       "Name": "MainBoard",
       "GUID": "4d61696e-426f-4617-9264-2e6b69636164",
-      "Revision": "0.3"
+      "Revision": "0.4"
     },
     "Size": {
       "X": 100.1,

@@ -6,8 +6,8 @@
 	(paper "B")
 	(title_block
 		(title "MCU Controller")
-		(date "2025-06-11")
-		(rev "0.3")
+		(date "2025-08-06")
+		(rev "0.4")
 		(company "satomm@stanford.edu")
 		(comment 1 "Department of Civil and Environmental Engineering")
 		(comment 2 "Engineering Informatics Group")
@@ -8732,6 +8732,16 @@
 	)
 	(wire
 		(pts
+			(xy 398.78 134.62) (xy 411.48 134.62)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "71bec477-33a8-45c9-a85f-4abddad139b4")
+	)
+	(wire
+		(pts
 			(xy 298.45 157.48) (xy 307.975 157.48)
 		)
 		(stroke
@@ -9729,6 +9739,16 @@
 			(type default)
 		)
 		(uuid "cd1733e2-e5b0-4ff4-98b6-f6af78e03361")
+	)
+	(wire
+		(pts
+			(xy 411.48 134.62) (xy 411.48 133.35)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cdc05960-8eb9-494f-96ea-37507b04ccdf")
 	)
 	(wire
 		(pts
@@ -14070,6 +14090,70 @@
 			(project "MainBoard"
 				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9"
 					(reference "R2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3.3V")
+		(at 411.48 133.35 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "6125a0d7-45b1-4dda-ab00-453fa647a134")
+		(property "Reference" "#PWR048"
+			(at 411.48 137.16 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3.3V"
+			(at 411.48 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 411.48 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 411.48 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 411.48 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "13d73e5f-0501-4d8e-8529-dbe4f3bfcb67")
+		)
+		(instances
+			(project "MainBoard"
+				(path "/bd24c4db-4e36-4117-bd4f-5228ef241da9"
+					(reference "#PWR048")
 					(unit 1)
 				)
 			)
@@ -19932,6 +20016,16 @@
 					(size 1.27 1.27)
 				)
 				(justify left)
+			)
+		)
+		(pin "3V3" input
+			(at 398.78 134.62 0)
+			(uuid "bd00255e-b062-4679-8409-5a0f33f54856")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
 			)
 		)
 		(instances
