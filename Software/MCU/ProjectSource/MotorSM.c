@@ -34,19 +34,18 @@
 #define Kp 0.2 // Proportional constant for PID law
 #define Ki 0.01 // Integral constant for PID law
 #define Kd 0.0 // Derivative constant for PID law
+#define CONTROL_PERIOD 10000 // Control update period --- (1000 == 6250 Hz, 30000 == 208 Hz)
 
 #if (MOTOR_TYPE==1)
 #define ENCODER_RESOLUTION 374 // Number of pulses per revolution
-#define CONTROL_PERIOD 30000 // 1000 // Control update period --- (1000 == 6250 Hz, 30000 == 208 Hz)
 #elif (MOTOR_TYPE==2)
 //#define ENCODER_RESOLUTION 1440 // Number of pulses per revolution
 #define ENCODER_RESOLUTION 360
-#define CONTROL_PERIOD 10000 // 1000 // Control update period --- 6250 Hz
 #endif
 
 #define GEAR_RATIO 34 // Gear reduction ratio
-#define SPEED_CONVERSION_FACTOR (1.6e7*60)/ENCODER_RESOLUTION
-#define WHEEL_RADIUS 0.04 // Radius of wheels (m))
+#define SPEED_CONVERSION_FACTOR ((1.6e7*60)/ENCODER_RESOLUTION)
+#define WHEEL_RADIUS 0.036 // Radius of wheels (m))
 #define DEAD_RECKONING_TIME 0.00999936 //0.00499968 //0.00999936 //0.01999872 // Time between dead reckoning updates in seconds (depends on DEAD_RECKONING_PERIOD)
 #define DEAD_RECKONING_RATIO 2*3.14159 / ENCODER_RESOLUTION / DEAD_RECKONING_TIME * WHEEL_RADIUS // This number times change in encoder clicks is linear velocity in m/second
 
@@ -85,8 +84,8 @@ static volatile float theta = 0; // angular position of the robot
 static volatile float V_current = 0.;
 static volatile float w_current = 0.;
 
-static uint16_t DesiredLeftRPM;
-static uint16_t DesiredRightRPM;
+static float DesiredLeftRPM;
+static float DesiredRightRPM;
 
 static Direction_t LeftDirection = Forward;
 static Direction_t RightDirection = Forward;
@@ -282,7 +281,7 @@ bool InitMotorSM(uint8_t Priority)
   T4CONbits.ON = 1; // Turn timer 4 on
   T5CONbits.ON = 1; // Turn timer 5 on
   T7CONbits.ON = 1; // Turn timer 7 on
-  
+    
   MyPriority = Priority;
   // put us into the Initial PseudoState
   CurrentState = InitPState_Motor;
@@ -776,10 +775,10 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     static int16_t LeftReward; // Only static here for speed
     static int16_t peek_data; // Only static here for speed
     static uint8_t peek_count; // Only static here for speed
-    
+
     // Initialize variables used throughout the ISR (Static for speed)
-    static uint16_t ActualLeftRPM = 0;
-    static uint16_t ActualRightRPM = 0;
+    static float ActualLeftRPM = 0;
+    static float ActualRightRPM = 0;
     
     IFS0CLR = _IFS0_T1IF_MASK; // Clear the timer interrupt
     
@@ -810,7 +809,7 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     // Calculate Current RPM based on Pulse Lengths from encoders
     ActualLeftRPM = SPEED_CONVERSION_FACTOR / LeftPulseLength;
     ActualRightRPM = SPEED_CONVERSION_FACTOR / RightPulseLength;
-    
+
     // Calculate error from desired RPM
     LeftError = DesiredLeftRPM - ActualLeftRPM;
     RightError = DesiredRightRPM - ActualRightRPM;
