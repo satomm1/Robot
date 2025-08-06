@@ -40,7 +40,7 @@
 /* prototypes for private functions for this machine.They should be functions
    relevant to the behavior of this state machine
 */
-void InitIMU(void);
+bool InitIMU(void);
 void ResetIMU(void);
 void WriteIMU(uint8_t Address, uint8_t LowerByte, uint8_t UpperByte, uint8_t NumBytes);
 void WriteIMU2(uint8_t Address, AccelGyroData_t data);
@@ -282,7 +282,7 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
         ResetIMU(); // Perform a soft reset of the IMU
         
         // now put the machine into the actual initial state
-//        CurrentState = IMUReset;
+        CurrentState = IMUReset;
         ES_Timer_InitTimer(IMU_TIMER, 500);
       }
     }
@@ -295,9 +295,11 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
                
         case ES_TIMEOUT:
         {
-            InitIMU(); // After giving some time from resetting, apply custom settings
-            CurrentState = IMUWait;
-            ES_Timer_InitTimer(IMU_TIMER, 500);
+            bool init_success = InitIMU(); // After giving some time from resetting, apply custom settings
+            if (init_success) {
+                CurrentState = IMUWait;
+                ES_Timer_InitTimer(IMU_TIMER, 500);
+            }
         }
         break;
         
@@ -322,6 +324,8 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
             }
 //            ES_Timer_InitTimer(IMU_TIMER, 1000); // Init timer
             CurrentState = IMURun;
+            
+            LATHbits.LATH4 = 1;
         }
       }
     }
@@ -483,7 +487,7 @@ void GetAngles(float* roll, float* pitch)
      Sends the correct sequence of writes to the IMU via SPI to correctly set 
      up the IMU and the IMU FIFO
 ****************************************************************************/
-void InitIMU(void)
+bool InitIMU(void)
 {
     AccelGyroData_t data2send;
     AccelGyroData_t data2send2;
@@ -491,9 +495,10 @@ void InitIMU(void)
     uint16_t data = ReadIMU16(0x00); // Dummy call to set up SPI  
     
     data = ReadIMU8(0x00); // Get chip ID
-    while (data != 0b01000011) {
+    if (data != 0b01000011) {
         DB_printf("Incorrect Chip ID: %d\r\n", data);
-        data = ReadIMU16(0x00); // Get chip ID
+//        ES_Timer_InitTimer(IMU_TIMER, 1000);
+        return false;
     }
     DB_printf("Chip ID: %d\r\n", data);
 
@@ -512,7 +517,7 @@ void InitIMU(void)
     data2send2.DataStruct.UpperByte = 0b01000010; // Normal mode, averaging of 4 samples
     WriteIMU2Transfer(0x20, data2send, data2send2);
 
-    return;
+    return true;
 }
 
 /****************************************************************************
