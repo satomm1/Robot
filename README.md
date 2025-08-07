@@ -1,4 +1,6 @@
 # Mobile Robot
+This repository contains many instructions for setting up and constructing the robot. However, for a comprehensive guide, please visit: [https://satomm1.github.io/mattbot/instructions.html](https://satomm1.github.io/mattbot/index.html).
+
 
 ## Authors
 Matthew Sato and Kincho Law<br>
