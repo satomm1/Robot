@@ -53,7 +53,7 @@
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 10
+#define NUM_SERVICES 11
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service.
@@ -194,11 +194,11 @@
 // These are the definitions for Service 10
 #if NUM_SERVICES > 10
 // the header file with the public function prototypes
-#define SERV_10_HEADER "TestHarnessService10.h"
+#define SERV_10_HEADER "EnvironmentSensorSM.h"
 // the name of the Init function
-#define SERV_10_INIT InitTestHarnessService10
+#define SERV_10_INIT InitEnvironmentSensorSM
 // the name of the run function
-#define SERV_10_RUN RunTestHarnessService10
+#define SERV_10_RUN RunEnvironmentSensorSM
 // How big should this services Queue be?
 #define SERV_10_QUEUE_SIZE 3
 #endif
@@ -207,11 +207,11 @@
 // These are the definitions for Service 11
 #if NUM_SERVICES > 11
 // the header file with the public function prototypes
-#define SERV_11_HEADER "TestHarnessService11.h"
+#define SERV_11_HEADER "SDCardSM.h"
 // the name of the Init function
-#define SERV_11_INIT InitTestHarnessService11
+#define SERV_11_INIT InitSDCardSM
 // the name of the run function
-#define SERV_11_RUN RunTestHarnessService11
+#define SERV_11_RUN RunSDCardSM
 // How big should this services Queue be?
 #define SERV_11_QUEUE_SIZE 3
 #endif

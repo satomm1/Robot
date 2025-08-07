@@ -55,6 +55,8 @@
       <itemPath>ProjectHeaders/ReflectService.h</itemPath>
       <itemPath>ProjectHeaders/ADC_HAL.h</itemPath>
       <itemPath>ProjectHeaders/matt_circular_buffer.h</itemPath>
+      <itemPath>ProjectHeaders/EnvironmentSensorSM.h</itemPath>
+      <itemPath>ProjectHeaders/SDCardSM.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -77,6 +79,8 @@
       <itemPath>ProjectSource/ReflectService.c</itemPath>
       <itemPath>ProjectSource/ADC_HAL.c</itemPath>
       <itemPath>ProjectSource/matt_circular_buffer.c</itemPath>
+      <itemPath>ProjectSource/EnvironmentSensorSM.c</itemPath>
+      <itemPath>ProjectSource/SDCardSM.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

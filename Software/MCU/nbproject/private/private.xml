@@ -5,12 +5,13 @@
         <group>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/UsbService.c</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/IMU_SM.c</file>
-            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectHeaders/IMU_SM.h</file>
-            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/EventCheckers.c</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/MotorSM.c</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/FrameworkHeaders/ES_Configure.h</file>
-            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/LEDService.c</file>
             <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/JetsonSM.c</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectHeaders/EnvironmentSensorSM.h</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/EnvironmentSensorSM.c</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectSource/SDCardSM.c</file>
+            <file>file:/C:/Users/satom/Desktop/Robot/Software/MCU/ProjectHeaders/SDCardSM.h</file>
         </group>
     </open-files>
 </project-private>
