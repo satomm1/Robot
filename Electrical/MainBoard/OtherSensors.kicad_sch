@@ -1444,7 +1444,7 @@
 	)
 	(text "GND"
 		(exclude_from_sim no)
-		(at 295.91 114.3 0)
+		(at 297.18 114.3 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1466,7 +1466,7 @@
 	)
 	(text "3.3V"
 		(exclude_from_sim no)
-		(at 274.955 156.845 0)
+		(at 274.32 154.94 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1477,7 +1477,7 @@
 	)
 	(text "GND"
 		(exclude_from_sim no)
-		(at 293.37 156.845 0)
+		(at 294.64 154.94 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1488,7 +1488,7 @@
 	)
 	(text "Sensor 1:"
 		(exclude_from_sim no)
-		(at 257.175 83.82 0)
+		(at 256.54 83.82 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1499,7 +1499,7 @@
 	)
 	(text "Sensor 2:"
 		(exclude_from_sim no)
-		(at 256.54 128.905 0)
+		(at 256.54 129.54 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1532,7 +1532,7 @@
 	)
 	(text "Sig"
 		(exclude_from_sim no)
-		(at 277.495 159.385 0)
+		(at 276.86 157.48 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1554,7 +1554,7 @@
 	)
 	(text "Sig"
 		(exclude_from_sim no)
-		(at 280.035 116.84 0)
+		(at 279.4 116.84 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1576,7 +1576,7 @@
 	)
 	(text "3.3V"
 		(exclude_from_sim no)
-		(at 277.495 114.3 0)
+		(at 276.86 114.3 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1587,7 +1587,7 @@
 	)
 	(text "3.3V"
 		(exclude_from_sim no)
-		(at 279.4 71.755 0)
+		(at 279.4 71.12 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1598,7 +1598,7 @@
 	)
 	(text "Sig"
 		(exclude_from_sim no)
-		(at 281.94 74.295 0)
+		(at 281.94 73.66 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1609,7 +1609,7 @@
 	)
 	(text "GND"
 		(exclude_from_sim no)
-		(at 297.815 71.755 0)
+		(at 297.18 71.12 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1619,116 +1619,116 @@
 		(uuid "fe8e119b-ea32-402e-9de1-93a50ed75b0b")
 	)
 	(junction
-		(at 304.165 175.26)
+		(at 307.34 86.36)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "09d0e20f-310b-43b5-8c02-622cdd8d5be4")
+	)
+	(junction
+		(at 304.8 172.72)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "0dafb9a7-e236-451b-8ecc-c9be293dc24d")
 	)
 	(junction
-		(at 123.19 114.935)
+		(at 314.96 91.44)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "1cecf4b1-3294-49f8-afc0-3164aa489db8")
+	)
+	(junction
+		(at 124.46 114.3)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "1cffa381-93a5-403b-a133-7fc58ccfa379")
 	)
 	(junction
-		(at 123.19 98.425)
+		(at 124.46 99.06)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "3bbb2967-416f-4cb3-84e5-f025553a676c")
 	)
 	(junction
-		(at 137.795 98.425)
+		(at 137.16 99.06)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "4d23ba6b-cd58-4861-ab71-238650b8c425")
 	)
 	(junction
-		(at 123.19 83.185)
+		(at 124.46 83.82)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "5252fb71-87bd-4c32-805c-b2d58f4a7bbb")
 	)
 	(junction
-		(at 137.795 114.935)
+		(at 137.16 114.3)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "588988f5-4a78-4fec-b393-071f038aab98")
 	)
 	(junction
-		(at 283.21 114.3)
+		(at 284.48 114.3)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "5ac1c2fe-caf1-4299-963d-3fa8dc95e9df")
 	)
 	(junction
-		(at 306.705 132.715)
+		(at 307.34 132.08)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "60595009-7e9f-4bd1-92aa-365b118547ad")
 	)
 	(junction
-		(at 300.99 170.18)
+		(at 302.26 167.64)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "65806d4b-efbe-40ee-afac-2512dbdeeaf9")
 	)
 	(junction
-		(at 305.435 85.09)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "80063c5c-1fa4-4ab6-bf92-c555e267e757")
-	)
-	(junction
-		(at 280.67 156.845)
+		(at 281.94 154.94)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "b31de5c4-659a-4295-84f5-644805268787")
 	)
 	(junction
-		(at 285.115 71.755)
+		(at 284.48 71.12)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "b7041663-6fdb-43ac-8e8c-c177e6e82929")
 	)
 	(junction
-		(at 137.795 83.185)
+		(at 137.16 83.82)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "cacf1679-0d78-4538-a17e-adf7185ecf61")
 	)
 	(junction
-		(at 303.53 127.635)
+		(at 304.8 127)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "d1ea2eea-f316-4757-84a0-bd192f18de85")
 	)
 	(junction
-		(at 137.795 132.08)
+		(at 137.16 132.08)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "ea966e9b-4cb5-46ae-b4b8-759e200088aa")
 	)
-	(junction
-		(at 308.61 90.17)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "f15a4a8d-5e07-464a-9ff4-e2c91081a7bf")
-	)
 	(no_connect
-		(at 297.815 74.295)
+		(at 297.18 73.66)
 		(uuid "6ecdc535-c837-4217-8dcd-6b2017d1e8d7")
 	)
 	(no_connect
-		(at 295.91 116.84)
+		(at 297.18 116.84)
 		(uuid "778646f8-d8eb-4a94-abd9-3db35984f37a")
 	)
 	(no_connect
-		(at 293.37 159.385)
+		(at 294.64 157.48)
 		(uuid "824faa98-510b-4100-941c-a34e564a3db7")
 	)
 	(wire
 		(pts
-			(xy 303.53 114.3) (xy 303.53 127.635)
+			(xy 304.8 114.3) (xy 304.8 127)
 		)
 		(stroke
 			(width 0)
@@ -1738,7 +1738,7 @@
 	)
 	(wire
 		(pts
-			(xy 300.99 156.845) (xy 300.99 170.18)
+			(xy 302.26 154.94) (xy 302.26 167.64)
 		)
 		(stroke
 			(width 0)
@@ -1748,7 +1748,7 @@
 	)
 	(wire
 		(pts
-			(xy 305.435 85.09) (xy 305.435 96.52)
+			(xy 307.34 86.36) (xy 307.34 96.52)
 		)
 		(stroke
 			(width 0)
@@ -1758,7 +1758,7 @@
 	)
 	(wire
 		(pts
-			(xy 276.86 114.3) (xy 283.21 114.3)
+			(xy 276.86 114.3) (xy 284.48 114.3)
 		)
 		(stroke
 			(width 0)
@@ -1768,7 +1768,7 @@
 	)
 	(wire
 		(pts
-			(xy 274.32 156.845) (xy 280.67 156.845)
+			(xy 274.32 154.94) (xy 281.94 154.94)
 		)
 		(stroke
 			(width 0)
@@ -1778,7 +1778,7 @@
 	)
 	(wire
 		(pts
-			(xy 306.705 132.715) (xy 302.26 132.715)
+			(xy 307.34 132.08) (xy 302.26 132.08)
 		)
 		(stroke
 			(width 0)
@@ -1788,7 +1788,7 @@
 	)
 	(wire
 		(pts
-			(xy 339.725 167.005) (xy 339.725 170.18)
+			(xy 340.36 167.64) (xy 340.36 170.18)
 		)
 		(stroke
 			(width 0)
@@ -1798,7 +1798,7 @@
 	)
 	(wire
 		(pts
-			(xy 133.35 98.425) (xy 137.795 98.425)
+			(xy 134.62 99.06) (xy 137.16 99.06)
 		)
 		(stroke
 			(width 0)
@@ -1808,7 +1808,7 @@
 	)
 	(wire
 		(pts
-			(xy 307.975 182.88) (xy 267.97 182.88)
+			(xy 309.88 182.88) (xy 269.24 182.88)
 		)
 		(stroke
 			(width 0)
@@ -1818,7 +1818,7 @@
 	)
 	(wire
 		(pts
-			(xy 133.35 132.08) (xy 137.795 132.08)
+			(xy 134.62 132.08) (xy 137.16 132.08)
 		)
 		(stroke
 			(width 0)
@@ -1828,7 +1828,7 @@
 	)
 	(wire
 		(pts
-			(xy 336.55 80.645) (xy 336.55 83.82)
+			(xy 337.82 81.28) (xy 337.82 83.82)
 		)
 		(stroke
 			(width 0)
@@ -1838,7 +1838,7 @@
 	)
 	(wire
 		(pts
-			(xy 133.35 83.185) (xy 137.795 83.185)
+			(xy 134.62 83.82) (xy 137.16 83.82)
 		)
 		(stroke
 			(width 0)
@@ -1848,7 +1848,7 @@
 	)
 	(wire
 		(pts
-			(xy 123.19 83.185) (xy 123.19 98.425)
+			(xy 124.46 83.82) (xy 124.46 99.06)
 		)
 		(stroke
 			(width 0)
@@ -1858,7 +1858,7 @@
 	)
 	(wire
 		(pts
-			(xy 274.32 162.56) (xy 274.32 156.845)
+			(xy 274.32 160.02) (xy 274.32 154.94)
 		)
 		(stroke
 			(width 0)
@@ -1868,7 +1868,7 @@
 	)
 	(wire
 		(pts
-			(xy 280.67 149.225) (xy 280.67 156.845)
+			(xy 281.94 147.32) (xy 281.94 154.94)
 		)
 		(stroke
 			(width 0)
@@ -1878,17 +1878,7 @@
 	)
 	(wire
 		(pts
-			(xy 337.82 161.29) (xy 337.82 161.925)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "3368251f-e81e-4271-ae45-1ba3552bacf8")
-	)
-	(wire
-		(pts
-			(xy 304.165 149.225) (xy 280.67 149.225)
+			(xy 304.8 147.32) (xy 281.94 147.32)
 		)
 		(stroke
 			(width 0)
@@ -1898,7 +1888,17 @@
 	)
 	(wire
 		(pts
-			(xy 304.165 168.275) (xy 304.165 175.26)
+			(xy 314.96 91.44) (xy 314.96 99.06)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "39071600-02fd-4406-8ad5-b5bdccf8e0e2")
+	)
+	(wire
+		(pts
+			(xy 304.8 165.1) (xy 304.8 172.72)
 		)
 		(stroke
 			(width 0)
@@ -1908,7 +1908,7 @@
 	)
 	(wire
 		(pts
-			(xy 306.705 132.715) (xy 310.515 132.715)
+			(xy 307.34 132.08) (xy 312.42 132.08)
 		)
 		(stroke
 			(width 0)
@@ -1918,17 +1918,7 @@
 	)
 	(wire
 		(pts
-			(xy 308.61 90.17) (xy 312.42 90.17)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "40554b7c-fa28-433a-8e4d-159ca1f8aefe")
-	)
-	(wire
-		(pts
-			(xy 272.415 74.295) (xy 285.115 74.295)
+			(xy 271.78 73.66) (xy 284.48 73.66)
 		)
 		(stroke
 			(width 0)
@@ -1938,7 +1928,17 @@
 	)
 	(wire
 		(pts
-			(xy 305.435 85.09) (xy 304.165 85.09)
+			(xy 307.34 71.12) (xy 307.34 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "47b86efc-ba85-4b25-b047-54c1e061c98d")
+	)
+	(wire
+		(pts
+			(xy 304.8 86.36) (xy 307.34 86.36)
 		)
 		(stroke
 			(width 0)
@@ -1948,7 +1948,7 @@
 	)
 	(wire
 		(pts
-			(xy 276.86 139.065) (xy 303.53 139.065)
+			(xy 276.86 139.7) (xy 304.8 139.7)
 		)
 		(stroke
 			(width 0)
@@ -1958,7 +1958,7 @@
 	)
 	(wire
 		(pts
-			(xy 267.97 159.385) (xy 280.67 159.385)
+			(xy 269.24 157.48) (xy 281.94 157.48)
 		)
 		(stroke
 			(width 0)
@@ -1968,7 +1968,7 @@
 	)
 	(wire
 		(pts
-			(xy 123.19 98.425) (xy 123.19 114.935)
+			(xy 124.46 99.06) (xy 124.46 114.3)
 		)
 		(stroke
 			(width 0)
@@ -1978,7 +1978,7 @@
 	)
 	(wire
 		(pts
-			(xy 267.97 182.88) (xy 267.97 159.385)
+			(xy 269.24 182.88) (xy 269.24 157.48)
 		)
 		(stroke
 			(width 0)
@@ -1988,17 +1988,7 @@
 	)
 	(wire
 		(pts
-			(xy 312.42 90.17) (xy 312.42 97.79)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5158fb04-e77f-44e5-8a3c-73c49db4e86d")
-	)
-	(wire
-		(pts
-			(xy 295.91 114.3) (xy 303.53 114.3)
+			(xy 297.18 114.3) (xy 304.8 114.3)
 		)
 		(stroke
 			(width 0)
@@ -2008,7 +1998,7 @@
 	)
 	(wire
 		(pts
-			(xy 308.61 75.565) (xy 308.61 64.135)
+			(xy 314.96 76.2) (xy 314.96 63.5)
 		)
 		(stroke
 			(width 0)
@@ -2018,7 +2008,7 @@
 	)
 	(wire
 		(pts
-			(xy 312.42 97.79) (xy 272.415 97.79)
+			(xy 314.96 99.06) (xy 271.78 99.06)
 		)
 		(stroke
 			(width 0)
@@ -2028,7 +2018,7 @@
 	)
 	(wire
 		(pts
-			(xy 123.19 114.935) (xy 123.19 132.08)
+			(xy 124.46 114.3) (xy 124.46 132.08)
 		)
 		(stroke
 			(width 0)
@@ -2038,7 +2028,7 @@
 	)
 	(wire
 		(pts
-			(xy 137.795 114.935) (xy 146.05 114.935)
+			(xy 137.16 114.3) (xy 147.32 114.3)
 		)
 		(stroke
 			(width 0)
@@ -2048,7 +2038,7 @@
 	)
 	(wire
 		(pts
-			(xy 293.37 156.845) (xy 300.99 156.845)
+			(xy 294.64 154.94) (xy 302.26 154.94)
 		)
 		(stroke
 			(width 0)
@@ -2058,17 +2048,7 @@
 	)
 	(wire
 		(pts
-			(xy 305.435 71.755) (xy 305.435 85.09)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "62ca223f-f6bf-4d2d-bcfc-6cc066a52c3d")
-	)
-	(wire
-		(pts
-			(xy 283.21 106.68) (xy 283.21 114.3)
+			(xy 284.48 106.68) (xy 284.48 114.3)
 		)
 		(stroke
 			(width 0)
@@ -2078,7 +2058,7 @@
 	)
 	(wire
 		(pts
-			(xy 278.765 71.755) (xy 285.115 71.755)
+			(xy 279.4 71.12) (xy 284.48 71.12)
 		)
 		(stroke
 			(width 0)
@@ -2088,7 +2068,7 @@
 	)
 	(wire
 		(pts
-			(xy 270.51 140.335) (xy 270.51 116.84)
+			(xy 271.78 142.24) (xy 271.78 116.84)
 		)
 		(stroke
 			(width 0)
@@ -2098,17 +2078,7 @@
 	)
 	(wire
 		(pts
-			(xy 331.47 79.375) (xy 331.47 78.105)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6c8efb3a-4755-4ea2-8b2e-d8d7e0fa437c")
-	)
-	(wire
-		(pts
-			(xy 123.19 77.47) (xy 123.19 83.185)
+			(xy 124.46 78.74) (xy 124.46 83.82)
 		)
 		(stroke
 			(width 0)
@@ -2118,7 +2088,7 @@
 	)
 	(wire
 		(pts
-			(xy 278.765 90.17) (xy 278.765 96.52)
+			(xy 279.4 91.44) (xy 279.4 96.52)
 		)
 		(stroke
 			(width 0)
@@ -2138,7 +2108,7 @@
 	)
 	(wire
 		(pts
-			(xy 278.765 96.52) (xy 305.435 96.52)
+			(xy 279.4 96.52) (xy 307.34 96.52)
 		)
 		(stroke
 			(width 0)
@@ -2148,7 +2118,7 @@
 	)
 	(wire
 		(pts
-			(xy 336.55 83.82) (xy 344.17 83.82)
+			(xy 337.82 83.82) (xy 345.44 83.82)
 		)
 		(stroke
 			(width 0)
@@ -2158,7 +2128,7 @@
 	)
 	(wire
 		(pts
-			(xy 304.165 175.26) (xy 307.975 175.26)
+			(xy 304.8 172.72) (xy 309.88 172.72)
 		)
 		(stroke
 			(width 0)
@@ -2178,7 +2148,7 @@
 	)
 	(wire
 		(pts
-			(xy 334.645 75.565) (xy 336.55 75.565)
+			(xy 335.28 76.2) (xy 337.82 76.2)
 		)
 		(stroke
 			(width 0)
@@ -2188,23 +2158,13 @@
 	)
 	(wire
 		(pts
-			(xy 335.28 118.745) (xy 337.185 118.745)
+			(xy 335.28 119.38) (xy 337.82 119.38)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "829943db-676e-403d-a7fe-a59236a95659")
-	)
-	(wire
-		(pts
-			(xy 308.61 83.185) (xy 308.61 90.17)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "85ba806c-8d95-4a2f-8d4c-41594a401ab9")
 	)
 	(wire
 		(pts
@@ -2218,7 +2178,7 @@
 	)
 	(wire
 		(pts
-			(xy 300.99 170.18) (xy 299.72 170.18)
+			(xy 302.26 167.64) (xy 299.72 167.64)
 		)
 		(stroke
 			(width 0)
@@ -2228,7 +2188,7 @@
 	)
 	(wire
 		(pts
-			(xy 300.99 170.18) (xy 300.99 181.61)
+			(xy 302.26 167.64) (xy 302.26 180.34)
 		)
 		(stroke
 			(width 0)
@@ -2238,7 +2198,7 @@
 	)
 	(wire
 		(pts
-			(xy 274.32 181.61) (xy 300.99 181.61)
+			(xy 274.32 180.34) (xy 302.26 180.34)
 		)
 		(stroke
 			(width 0)
@@ -2248,7 +2208,7 @@
 	)
 	(wire
 		(pts
-			(xy 285.115 64.135) (xy 285.115 71.755)
+			(xy 284.48 63.5) (xy 284.48 71.12)
 		)
 		(stroke
 			(width 0)
@@ -2258,7 +2218,7 @@
 	)
 	(wire
 		(pts
-			(xy 310.515 140.335) (xy 270.51 140.335)
+			(xy 312.42 142.24) (xy 271.78 142.24)
 		)
 		(stroke
 			(width 0)
@@ -2268,7 +2228,7 @@
 	)
 	(wire
 		(pts
-			(xy 310.515 132.715) (xy 310.515 140.335)
+			(xy 312.42 132.08) (xy 312.42 142.24)
 		)
 		(stroke
 			(width 0)
@@ -2278,7 +2238,7 @@
 	)
 	(wire
 		(pts
-			(xy 137.795 83.185) (xy 146.685 83.185)
+			(xy 137.16 83.82) (xy 147.32 83.82)
 		)
 		(stroke
 			(width 0)
@@ -2288,7 +2248,17 @@
 	)
 	(wire
 		(pts
-			(xy 334.645 164.465) (xy 339.725 164.465)
+			(xy 314.96 83.82) (xy 314.96 91.44)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "99033605-7830-4e8b-b5bf-685f1e959030")
+	)
+	(wire
+		(pts
+			(xy 335.28 165.1) (xy 340.36 165.1)
 		)
 		(stroke
 			(width 0)
@@ -2298,7 +2268,7 @@
 	)
 	(wire
 		(pts
-			(xy 304.165 175.26) (xy 299.72 175.26)
+			(xy 304.8 172.72) (xy 299.72 172.72)
 		)
 		(stroke
 			(width 0)
@@ -2308,7 +2278,7 @@
 	)
 	(wire
 		(pts
-			(xy 306.705 106.68) (xy 283.21 106.68)
+			(xy 307.34 106.68) (xy 284.48 106.68)
 		)
 		(stroke
 			(width 0)
@@ -2318,17 +2288,7 @@
 	)
 	(wire
 		(pts
-			(xy 334.645 165.735) (xy 334.645 164.465)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a9f402b4-8d3a-4b8c-b18a-1e34db79eeae")
-	)
-	(wire
-		(pts
-			(xy 337.185 127) (xy 344.805 127)
+			(xy 337.82 127) (xy 345.44 127)
 		)
 		(stroke
 			(width 0)
@@ -2338,7 +2298,7 @@
 	)
 	(wire
 		(pts
-			(xy 307.975 175.26) (xy 307.975 182.88)
+			(xy 309.88 172.72) (xy 309.88 182.88)
 		)
 		(stroke
 			(width 0)
@@ -2348,7 +2308,7 @@
 	)
 	(wire
 		(pts
-			(xy 306.705 118.11) (xy 306.705 106.68)
+			(xy 307.34 119.38) (xy 307.34 106.68)
 		)
 		(stroke
 			(width 0)
@@ -2358,17 +2318,7 @@
 	)
 	(wire
 		(pts
-			(xy 332.105 122.555) (xy 332.105 121.285)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "b8845f5a-840a-4044-9274-d53dd8d3c7bb")
-	)
-	(wire
-		(pts
-			(xy 278.765 77.47) (xy 278.765 71.755)
+			(xy 279.4 78.74) (xy 279.4 71.12)
 		)
 		(stroke
 			(width 0)
@@ -2378,17 +2328,7 @@
 	)
 	(wire
 		(pts
-			(xy 334.645 74.93) (xy 334.645 75.565)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c7512c41-45ef-4d5e-a293-0a3d55722e2c")
-	)
-	(wire
-		(pts
-			(xy 137.795 98.425) (xy 146.05 98.425)
+			(xy 137.16 99.06) (xy 147.32 99.06)
 		)
 		(stroke
 			(width 0)
@@ -2398,7 +2338,7 @@
 	)
 	(wire
 		(pts
-			(xy 339.725 170.18) (xy 347.345 170.18)
+			(xy 340.36 170.18) (xy 347.98 170.18)
 		)
 		(stroke
 			(width 0)
@@ -2408,7 +2348,7 @@
 	)
 	(wire
 		(pts
-			(xy 331.47 78.105) (xy 336.55 78.105)
+			(xy 332.74 78.74) (xy 337.82 78.74)
 		)
 		(stroke
 			(width 0)
@@ -2418,7 +2358,7 @@
 	)
 	(wire
 		(pts
-			(xy 270.51 116.84) (xy 283.21 116.84)
+			(xy 271.78 116.84) (xy 284.48 116.84)
 		)
 		(stroke
 			(width 0)
@@ -2428,7 +2368,7 @@
 	)
 	(wire
 		(pts
-			(xy 304.165 160.655) (xy 304.165 149.225)
+			(xy 304.8 157.48) (xy 304.8 147.32)
 		)
 		(stroke
 			(width 0)
@@ -2438,7 +2378,7 @@
 	)
 	(wire
 		(pts
-			(xy 272.415 97.79) (xy 272.415 74.295)
+			(xy 271.78 99.06) (xy 271.78 73.66)
 		)
 		(stroke
 			(width 0)
@@ -2448,7 +2388,7 @@
 	)
 	(wire
 		(pts
-			(xy 137.795 132.08) (xy 146.05 132.08)
+			(xy 137.16 132.08) (xy 147.32 132.08)
 		)
 		(stroke
 			(width 0)
@@ -2458,7 +2398,7 @@
 	)
 	(wire
 		(pts
-			(xy 274.32 175.26) (xy 274.32 181.61)
+			(xy 274.32 172.72) (xy 274.32 180.34)
 		)
 		(stroke
 			(width 0)
@@ -2468,7 +2408,7 @@
 	)
 	(wire
 		(pts
-			(xy 306.705 125.73) (xy 306.705 132.715)
+			(xy 307.34 127) (xy 307.34 132.08)
 		)
 		(stroke
 			(width 0)
@@ -2478,17 +2418,17 @@
 	)
 	(wire
 		(pts
-			(xy 297.815 71.755) (xy 305.435 71.755)
+			(xy 297.18 71.12) (xy 307.34 71.12)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "e9d8403f-d64b-4775-af30-ac79d693b58d")
+		(uuid "e6bb856d-63f6-4ee7-bcb4-55ef7078a84e")
 	)
 	(wire
 		(pts
-			(xy 308.61 90.17) (xy 304.165 90.17)
+			(xy 304.8 91.44) (xy 314.96 91.44)
 		)
 		(stroke
 			(width 0)
@@ -2498,7 +2438,7 @@
 	)
 	(wire
 		(pts
-			(xy 337.82 161.925) (xy 339.725 161.925)
+			(xy 337.82 162.56) (xy 340.36 162.56)
 		)
 		(stroke
 			(width 0)
@@ -2508,7 +2448,7 @@
 	)
 	(wire
 		(pts
-			(xy 308.61 64.135) (xy 285.115 64.135)
+			(xy 314.96 63.5) (xy 284.48 63.5)
 		)
 		(stroke
 			(width 0)
@@ -2518,17 +2458,7 @@
 	)
 	(wire
 		(pts
-			(xy 335.28 118.11) (xy 335.28 118.745)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ec4cfc31-d5bc-46be-9323-122cff7cd9d8")
-	)
-	(wire
-		(pts
-			(xy 303.53 127.635) (xy 303.53 139.065)
+			(xy 304.8 127) (xy 304.8 139.7)
 		)
 		(stroke
 			(width 0)
@@ -2538,7 +2468,7 @@
 	)
 	(wire
 		(pts
-			(xy 303.53 127.635) (xy 302.26 127.635)
+			(xy 304.8 127) (xy 302.26 127)
 		)
 		(stroke
 			(width 0)
@@ -2548,7 +2478,7 @@
 	)
 	(wire
 		(pts
-			(xy 276.86 120.015) (xy 276.86 114.3)
+			(xy 276.86 119.38) (xy 276.86 114.3)
 		)
 		(stroke
 			(width 0)
@@ -2558,7 +2488,7 @@
 	)
 	(wire
 		(pts
-			(xy 332.105 121.285) (xy 337.185 121.285)
+			(xy 332.74 121.92) (xy 337.82 121.92)
 		)
 		(stroke
 			(width 0)
@@ -2568,7 +2498,7 @@
 	)
 	(wire
 		(pts
-			(xy 337.185 123.825) (xy 337.185 127)
+			(xy 337.82 124.46) (xy 337.82 127)
 		)
 		(stroke
 			(width 0)
@@ -2578,7 +2508,7 @@
 	)
 	(wire
 		(pts
-			(xy 133.35 114.935) (xy 137.795 114.935)
+			(xy 134.62 114.3) (xy 137.16 114.3)
 		)
 		(stroke
 			(width 0)
@@ -2588,7 +2518,7 @@
 	)
 	(wire
 		(pts
-			(xy 276.86 132.715) (xy 276.86 139.065)
+			(xy 276.86 132.08) (xy 276.86 139.7)
 		)
 		(stroke
 			(width 0)
@@ -2620,7 +2550,7 @@
 	)
 	(hierarchical_label "BUMP1"
 		(shape output)
-		(at 146.685 83.185 0)
+		(at 147.32 83.82 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2631,7 +2561,7 @@
 	)
 	(hierarchical_label "BUMP2"
 		(shape output)
-		(at 146.05 98.425 0)
+		(at 147.32 99.06 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2642,7 +2572,7 @@
 	)
 	(hierarchical_label "BUMP4"
 		(shape output)
-		(at 146.05 132.08 0)
+		(at 147.32 132.08 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2653,7 +2583,7 @@
 	)
 	(hierarchical_label "Refl3"
 		(shape output)
-		(at 347.345 170.18 0)
+		(at 347.98 170.18 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2664,7 +2594,7 @@
 	)
 	(hierarchical_label "Refl2"
 		(shape output)
-		(at 344.805 127 0)
+		(at 345.44 127 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2675,7 +2605,7 @@
 	)
 	(hierarchical_label "BUMP3"
 		(shape output)
-		(at 146.05 114.935 0)
+		(at 147.32 114.3 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2686,7 +2616,7 @@
 	)
 	(hierarchical_label "Refl1"
 		(shape output)
-		(at 344.17 83.82 0)
+		(at 345.44 83.82 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2697,7 +2627,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 137.795 106.045 0)
+		(at 137.16 106.68 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2705,7 +2635,7 @@
 		(dnp no)
 		(uuid "03dfc4a1-18d1-4472-bb5f-0ed8e2aebd05")
 		(property "Reference" "#PWR0135"
-			(at 137.795 112.395 0)
+			(at 137.16 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2714,7 +2644,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 137.795 109.855 0)
+			(at 137.16 110.49 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2722,7 +2652,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 137.795 106.045 0)
+			(at 137.16 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2731,7 +2661,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 137.795 106.045 0)
+			(at 137.16 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2740,7 +2670,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 137.795 106.045 0)
+			(at 137.16 106.68 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2761,7 +2691,7 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_02x02_Odd_Even")
-		(at 285.75 156.845 0)
+		(at 287.02 154.94 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -2770,7 +2700,7 @@
 		(fields_autoplaced yes)
 		(uuid "08eee82b-fdf8-4831-bc76-1790835901e2")
 		(property "Reference" "J10"
-			(at 287.02 151.13 0)
+			(at 288.29 149.225 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2778,7 +2708,7 @@
 			)
 		)
 		(property "Value" "Refl_Mount"
-			(at 287.02 153.67 0)
+			(at 288.29 151.765 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2786,7 +2716,7 @@
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_2x02_P2.54mm_Vertical"
-			(at 285.75 156.845 0)
+			(at 287.02 154.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2795,7 +2725,7 @@
 			)
 		)
 		(property "Datasheet" "https://app.adam-tech.com/products/download/data_sheet/202065/ph2-xx-ua-data-sheet.pdf"
-			(at 285.75 156.845 0)
+			(at 287.02 154.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2804,7 +2734,7 @@
 			)
 		)
 		(property "Description" "CONN HEADER VERT 4POS 2.54MM"
-			(at 285.75 156.845 0)
+			(at 287.02 154.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2813,7 +2743,7 @@
 			)
 		)
 		(property "Mfr" ""
-			(at 285.75 156.845 0)
+			(at 287.02 154.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2822,7 +2752,7 @@
 			)
 		)
 		(property "Mfr P/N" ""
-			(at 285.75 156.845 0)
+			(at 287.02 154.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2831,7 +2761,7 @@
 			)
 		)
 		(property "Supplier 1" ""
-			(at 285.75 156.845 0)
+			(at 287.02 154.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2840,7 +2770,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" ""
-			(at 285.75 156.845 0)
+			(at 287.02 154.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2849,7 +2779,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 285.75 156.845 0)
+			(at 287.02 154.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2858,7 +2788,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 285.75 156.845 0)
+			(at 287.02 154.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2889,7 +2819,7 @@
 	)
 	(symbol
 		(lib_id "Device:R_US")
-		(at 306.705 121.92 180)
+		(at 307.34 123.19 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -2897,7 +2827,7 @@
 		(dnp yes)
 		(uuid "0be456e4-e206-4d4b-97b1-b76eddd47d86")
 		(property "Reference" "R45"
-			(at 309.88 120.65 0)
+			(at 310.515 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2905,7 +2835,7 @@
 			)
 		)
 		(property "Value" "10k"
-			(at 309.88 122.555 0)
+			(at 310.515 123.825 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2913,7 +2843,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 305.689 121.666 90)
+			(at 306.324 122.936 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2922,7 +2852,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
-			(at 306.705 121.92 0)
+			(at 307.34 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2931,7 +2861,7 @@
 			)
 		)
 		(property "Description" "RES 10K OHM 1% 1/8W 0805"
-			(at 306.705 121.92 0)
+			(at 307.34 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2940,7 +2870,7 @@
 			)
 		)
 		(property "Mfr" "Stackpole Electronics Inc"
-			(at 306.705 121.92 0)
+			(at 307.34 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2949,7 +2879,7 @@
 			)
 		)
 		(property "Mfr P/N" "RMCF0805FT10K0"
-			(at 306.705 121.92 0)
+			(at 307.34 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2958,7 +2888,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 306.705 121.92 0)
+			(at 307.34 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2967,7 +2897,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "RMCF0805FT10K0CT-ND"
-			(at 306.705 121.92 0)
+			(at 307.34 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2976,7 +2906,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 306.705 121.92 0)
+			(at 307.34 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2985,7 +2915,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 306.705 121.92 0)
+			(at 307.34 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3010,7 +2940,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 137.795 122.555 0)
+		(at 137.16 121.92 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -3018,7 +2948,7 @@
 		(dnp no)
 		(uuid "0f67cc10-ce2e-4aa4-8557-9e5f8720dfac")
 		(property "Reference" "#PWR0136"
-			(at 137.795 128.905 0)
+			(at 137.16 128.27 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3027,7 +2957,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 137.795 126.365 0)
+			(at 137.16 125.73 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3035,7 +2965,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 137.795 122.555 0)
+			(at 137.16 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3044,7 +2974,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 137.795 122.555 0)
+			(at 137.16 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3053,7 +2983,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 137.795 122.555 0)
+			(at 137.16 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3074,7 +3004,7 @@
 	)
 	(symbol
 		(lib_id "Switch:SW_SPST")
-		(at 128.27 114.935 0)
+		(at 129.54 114.3 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -3083,7 +3013,7 @@
 		(fields_autoplaced yes)
 		(uuid "12ca363a-389d-4798-83d5-233806fc4c5a")
 		(property "Reference" "SW9"
-			(at 128.27 108.585 0)
+			(at 129.54 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3091,7 +3021,7 @@
 			)
 		)
 		(property "Value" "SW_SPST"
-			(at 128.27 111.125 0)
+			(at 129.54 110.49 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3099,7 +3029,7 @@
 			)
 		)
 		(property "Footprint" "RobotLibrary:CONN_22232021_MOL"
-			(at 128.27 114.935 0)
+			(at 129.54 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3108,7 +3038,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.molex.com/webdocs/datasheets/pdf/en-us//0022232021_PCB_HEADERS.pdf"
-			(at 128.27 114.935 0)
+			(at 129.54 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3117,7 +3047,7 @@
 			)
 		)
 		(property "Description" "CONN HEADER VERT 2POS 2.54MM"
-			(at 128.27 114.935 0)
+			(at 129.54 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3126,7 +3056,7 @@
 			)
 		)
 		(property "Mfr" "Molex"
-			(at 128.27 114.935 0)
+			(at 129.54 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3135,7 +3065,7 @@
 			)
 		)
 		(property "Mfr P/N" "0022232021"
-			(at 128.27 114.935 0)
+			(at 129.54 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3144,7 +3074,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 128.27 114.935 0)
+			(at 129.54 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3153,7 +3083,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "900-0022232021-ND"
-			(at 128.27 114.935 0)
+			(at 129.54 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3162,7 +3092,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 128.27 114.935 0)
+			(at 129.54 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3171,7 +3101,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 128.27 114.935 0)
+			(at 129.54 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3196,7 +3126,7 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_02x02_Odd_Even")
-		(at 290.195 71.755 0)
+		(at 289.56 71.12 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -3205,7 +3135,7 @@
 		(fields_autoplaced yes)
 		(uuid "15ee8311-e97d-40e1-ab70-150c8f3c9604")
 		(property "Reference" "J12"
-			(at 291.465 66.04 0)
+			(at 290.83 65.405 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3213,7 +3143,7 @@
 			)
 		)
 		(property "Value" "Refl_Mount"
-			(at 291.465 68.58 0)
+			(at 290.83 67.945 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3221,7 +3151,7 @@
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_2x02_P2.54mm_Vertical"
-			(at 290.195 71.755 0)
+			(at 289.56 71.12 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3230,7 +3160,7 @@
 			)
 		)
 		(property "Datasheet" "https://app.adam-tech.com/products/download/data_sheet/202065/ph2-xx-ua-data-sheet.pdf"
-			(at 290.195 71.755 0)
+			(at 289.56 71.12 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3239,7 +3169,7 @@
 			)
 		)
 		(property "Description" "CONN HEADER VERT 4POS 2.54MM"
-			(at 290.195 71.755 0)
+			(at 289.56 71.12 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3248,7 +3178,7 @@
 			)
 		)
 		(property "Mfr" ""
-			(at 290.195 71.755 0)
+			(at 289.56 71.12 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3257,7 +3187,7 @@
 			)
 		)
 		(property "Mfr P/N" ""
-			(at 290.195 71.755 0)
+			(at 289.56 71.12 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3266,7 +3196,7 @@
 			)
 		)
 		(property "Supplier 1" ""
-			(at 290.195 71.755 0)
+			(at 289.56 71.12 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3275,7 +3205,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" ""
-			(at 290.195 71.755 0)
+			(at 289.56 71.12 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3284,7 +3214,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 290.195 71.755 0)
+			(at 289.56 71.12 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3293,7 +3223,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 290.195 71.755 0)
+			(at 289.56 71.12 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3324,7 +3254,7 @@
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 334.645 74.93 0)
+		(at 335.28 76.2 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -3333,7 +3263,7 @@
 		(fields_autoplaced yes)
 		(uuid "1b0828e5-5a5f-4f07-9c97-01b2a5091c82")
 		(property "Reference" "#PWR0142"
-			(at 334.645 78.74 0)
+			(at 335.28 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3342,7 +3272,7 @@
 			)
 		)
 		(property "Value" "+3.3V"
-			(at 334.645 69.85 0)
+			(at 335.28 71.12 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3350,7 +3280,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 334.645 74.93 0)
+			(at 335.28 76.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3359,7 +3289,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 334.645 74.93 0)
+			(at 335.28 76.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3368,7 +3298,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 334.645 74.93 0)
+			(at 335.28 76.2 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3389,7 +3319,7 @@
 	)
 	(symbol
 		(lib_id "Switch:SW_SPST")
-		(at 128.27 83.185 0)
+		(at 129.54 83.82 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -3398,7 +3328,7 @@
 		(fields_autoplaced yes)
 		(uuid "30cbe801-490b-499f-ab8f-a40554e305e7")
 		(property "Reference" "SW7"
-			(at 128.27 76.835 0)
+			(at 129.54 77.47 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3406,7 +3336,7 @@
 			)
 		)
 		(property "Value" "SW_SPST"
-			(at 128.27 79.375 0)
+			(at 129.54 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3414,7 +3344,7 @@
 			)
 		)
 		(property "Footprint" "RobotLibrary:CONN_22232021_MOL"
-			(at 128.27 83.185 0)
+			(at 129.54 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3423,7 +3353,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.molex.com/webdocs/datasheets/pdf/en-us//0022232021_PCB_HEADERS.pdf"
-			(at 128.27 83.185 0)
+			(at 129.54 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3432,7 +3362,7 @@
 			)
 		)
 		(property "Description" "CONN HEADER VERT 2POS 2.54MM"
-			(at 128.27 83.185 0)
+			(at 129.54 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3441,7 +3371,7 @@
 			)
 		)
 		(property "Mfr" "Molex"
-			(at 128.27 83.185 0)
+			(at 129.54 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3450,7 +3380,7 @@
 			)
 		)
 		(property "Mfr P/N" "0022232021"
-			(at 128.27 83.185 0)
+			(at 129.54 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3459,7 +3389,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 128.27 83.185 0)
+			(at 129.54 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3468,7 +3398,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "900-0022232021-ND"
-			(at 128.27 83.185 0)
+			(at 129.54 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3477,7 +3407,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 128.27 83.185 0)
+			(at 129.54 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3486,7 +3416,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 128.27 83.185 0)
+			(at 129.54 83.82 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3511,7 +3441,7 @@
 	)
 	(symbol
 		(lib_id "Device:R_US")
-		(at 137.795 86.995 0)
+		(at 137.16 87.63 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -3519,7 +3449,7 @@
 		(dnp no)
 		(uuid "3122c99e-4cd0-4984-b842-aa02926527a9")
 		(property "Reference" "R37"
-			(at 140.97 85.725 0)
+			(at 140.335 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3527,7 +3457,7 @@
 			)
 		)
 		(property "Value" "1k"
-			(at 140.97 87.63 0)
+			(at 140.335 88.265 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3535,7 +3465,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 138.811 87.249 90)
+			(at 138.176 87.884 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3544,7 +3474,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
-			(at 137.795 86.995 0)
+			(at 137.16 87.63 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3553,7 +3483,7 @@
 			)
 		)
 		(property "Description" "RES 1K OHM 1% 1/8W 0805"
-			(at 137.795 86.995 0)
+			(at 137.16 87.63 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3562,7 +3492,7 @@
 			)
 		)
 		(property "Mfr" "Stackpole Electronics Inc"
-			(at 137.795 86.995 0)
+			(at 137.16 87.63 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3571,7 +3501,7 @@
 			)
 		)
 		(property "Mfr P/N" "RMCF0805FT1K00"
-			(at 137.795 86.995 0)
+			(at 137.16 87.63 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3580,7 +3510,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 137.795 86.995 0)
+			(at 137.16 87.63 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3589,7 +3519,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "RMCF0805FT1K00CT-ND"
-			(at 137.795 86.995 0)
+			(at 137.16 87.63 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3598,7 +3528,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 137.795 86.995 0)
+			(at 137.16 87.63 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3607,7 +3537,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 137.795 86.995 0)
+			(at 137.16 87.63 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3632,7 +3562,7 @@
 	)
 	(symbol
 		(lib_id "Device:R_US")
-		(at 278.765 81.28 180)
+		(at 279.4 82.55 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -3640,7 +3570,7 @@
 		(dnp yes)
 		(uuid "31919d39-9f38-4005-a2aa-c763bc0a9d74")
 		(property "Reference" "R43"
-			(at 275.2725 80.3275 0)
+			(at 275.9075 81.5975 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3648,7 +3578,7 @@
 			)
 		)
 		(property "Value" "100R"
-			(at 275.2725 82.2325 0)
+			(at 275.9075 83.5025 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3656,7 +3586,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 277.749 81.026 90)
+			(at 278.384 82.296 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3665,7 +3595,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
-			(at 278.765 81.28 0)
+			(at 279.4 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3674,7 +3604,7 @@
 			)
 		)
 		(property "Description" "RES 100 OHM 1% 1/8W 0805"
-			(at 278.765 81.28 0)
+			(at 279.4 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3683,7 +3613,7 @@
 			)
 		)
 		(property "Mfr" "Stackpole Electronics Inc"
-			(at 278.765 81.28 0)
+			(at 279.4 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3692,7 +3622,7 @@
 			)
 		)
 		(property "Mfr P/N" "RMCF0805FT100R"
-			(at 278.765 81.28 0)
+			(at 279.4 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3701,7 +3631,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 278.765 81.28 0)
+			(at 279.4 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3710,7 +3640,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "RMCF0805FT100RCT-ND"
-			(at 278.765 81.28 0)
+			(at 279.4 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3719,7 +3649,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 278.765 81.28 0)
+			(at 279.4 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3728,7 +3658,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 278.765 81.28 0)
+			(at 279.4 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3753,7 +3683,7 @@
 	)
 	(symbol
 		(lib_id "Device:R_US")
-		(at 274.32 166.37 0)
+		(at 274.32 163.83 0)
 		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
@@ -3762,7 +3692,7 @@
 		(dnp yes)
 		(uuid "3379741b-9e88-4a85-9e6b-cdc6f3d0c48a")
 		(property "Reference" "R41"
-			(at 277.8125 165.4175 0)
+			(at 277.8125 162.8775 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3770,7 +3700,7 @@
 			)
 		)
 		(property "Value" "100R"
-			(at 277.8125 167.3225 0)
+			(at 277.8125 164.7825 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3778,7 +3708,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 275.336 166.116 90)
+			(at 275.336 163.576 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3787,7 +3717,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
-			(at 274.32 166.37 0)
+			(at 274.32 163.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3796,7 +3726,7 @@
 			)
 		)
 		(property "Description" "RES 100 OHM 1% 1/8W 0805"
-			(at 274.32 166.37 0)
+			(at 274.32 163.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3805,7 +3735,7 @@
 			)
 		)
 		(property "Mfr" "Stackpole Electronics Inc"
-			(at 274.32 166.37 0)
+			(at 274.32 163.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3814,7 +3744,7 @@
 			)
 		)
 		(property "Mfr P/N" "RMCF0805FT100R"
-			(at 274.32 166.37 0)
+			(at 274.32 163.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3823,7 +3753,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 274.32 166.37 0)
+			(at 274.32 163.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3832,7 +3762,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "RMCF0805FT100RCT-ND"
-			(at 274.32 166.37 0)
+			(at 274.32 163.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3841,7 +3771,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 274.32 166.37 0)
+			(at 274.32 163.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3850,7 +3780,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 274.32 166.37 0)
+			(at 274.32 163.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3875,7 +3805,7 @@
 	)
 	(symbol
 		(lib_id "RobotLibary:QRE1113GR")
-		(at 278.765 85.09 0)
+		(at 279.4 86.36 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -3884,7 +3814,7 @@
 		(fields_autoplaced yes)
 		(uuid "39b2f253-4201-45fc-a6cb-3d67965bdc7e")
 		(property "Reference" "K3"
-			(at 291.465 77.47 0)
+			(at 292.1 78.74 0)
 			(effects
 				(font
 					(size 1.524 1.524)
@@ -3892,7 +3822,7 @@
 			)
 		)
 		(property "Value" "QRE1113GR"
-			(at 291.465 80.01 0)
+			(at 292.1 81.28 0)
 			(effects
 				(font
 					(size 1.524 1.524)
@@ -3900,7 +3830,7 @@
 			)
 		)
 		(property "Footprint" "RobotLibrary:ARUSM-313_100CY_FAS-M"
-			(at 288.29 81.28 0)
+			(at 288.925 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3910,7 +3840,7 @@
 			)
 		)
 		(property "Datasheet" "QRE1113GR"
-			(at 290.195 78.74 0)
+			(at 290.83 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3920,7 +3850,7 @@
 			)
 		)
 		(property "Description" "SENSOR OPTO TRANS REFL SMD PHOTO"
-			(at 278.765 85.09 0)
+			(at 279.4 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3929,7 +3859,7 @@
 			)
 		)
 		(property "Mfr" "onsemi"
-			(at 278.765 85.09 0)
+			(at 279.4 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3938,7 +3868,7 @@
 			)
 		)
 		(property "Mfr P/N" "QRE1113GR"
-			(at 278.765 85.09 0)
+			(at 279.4 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3947,7 +3877,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 278.765 85.09 0)
+			(at 279.4 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3956,7 +3886,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "QRE1113GRCT-ND"
-			(at 278.765 85.09 0)
+			(at 279.4 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3965,7 +3895,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 278.765 85.09 0)
+			(at 279.4 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3974,7 +3904,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 278.765 85.09 0)
+			(at 279.4 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4005,7 +3935,7 @@
 	)
 	(symbol
 		(lib_id "Switch:SW_SPST")
-		(at 128.27 98.425 0)
+		(at 129.54 99.06 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -4014,7 +3944,7 @@
 		(fields_autoplaced yes)
 		(uuid "40cb7248-dda3-43c2-89f4-533c7dd2230e")
 		(property "Reference" "SW8"
-			(at 128.27 92.075 0)
+			(at 129.54 92.71 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4022,7 +3952,7 @@
 			)
 		)
 		(property "Value" "SW_SPST"
-			(at 128.27 94.615 0)
+			(at 129.54 95.25 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4030,7 +3960,7 @@
 			)
 		)
 		(property "Footprint" "RobotLibrary:CONN_22232021_MOL"
-			(at 128.27 98.425 0)
+			(at 129.54 99.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4039,7 +3969,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.molex.com/webdocs/datasheets/pdf/en-us//0022232021_PCB_HEADERS.pdf"
-			(at 128.27 98.425 0)
+			(at 129.54 99.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4048,7 +3978,7 @@
 			)
 		)
 		(property "Description" "CONN HEADER VERT 2POS 2.54MM"
-			(at 128.27 98.425 0)
+			(at 129.54 99.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4057,7 +3987,7 @@
 			)
 		)
 		(property "Mfr" "Molex"
-			(at 128.27 98.425 0)
+			(at 129.54 99.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4066,7 +3996,7 @@
 			)
 		)
 		(property "Mfr P/N" "0022232021"
-			(at 128.27 98.425 0)
+			(at 129.54 99.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4075,7 +4005,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 128.27 98.425 0)
+			(at 129.54 99.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4084,7 +4014,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "900-0022232021-ND"
-			(at 128.27 98.425 0)
+			(at 129.54 99.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4093,7 +4023,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 128.27 98.425 0)
+			(at 129.54 99.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4102,7 +4032,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 128.27 98.425 0)
+			(at 129.54 99.06 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4127,7 +4057,7 @@
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 337.82 161.29 0)
+		(at 337.82 162.56 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4136,7 +4066,7 @@
 		(fields_autoplaced yes)
 		(uuid "4567827d-f638-44d2-b08d-2892302effe7")
 		(property "Reference" "#PWR0145"
-			(at 337.82 165.1 0)
+			(at 337.82 166.37 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4145,7 +4075,7 @@
 			)
 		)
 		(property "Value" "+3.3V"
-			(at 337.82 156.21 0)
+			(at 337.82 157.48 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4153,7 +4083,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 337.82 161.29 0)
+			(at 337.82 162.56 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4162,7 +4092,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 337.82 161.29 0)
+			(at 337.82 162.56 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4171,7 +4101,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 337.82 161.29 0)
+			(at 337.82 162.56 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4192,7 +4122,7 @@
 	)
 	(symbol
 		(lib_id "Device:R_US")
-		(at 137.795 118.745 0)
+		(at 137.16 118.11 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -4200,7 +4130,7 @@
 		(dnp no)
 		(uuid "4f187e87-e247-4da2-b1d5-53cbc594bc27")
 		(property "Reference" "R39"
-			(at 140.97 117.475 0)
+			(at 140.335 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4208,7 +4138,7 @@
 			)
 		)
 		(property "Value" "1k"
-			(at 140.97 119.38 0)
+			(at 140.335 118.745 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4216,7 +4146,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 138.811 118.999 90)
+			(at 138.176 118.364 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4225,7 +4155,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
-			(at 137.795 118.745 0)
+			(at 137.16 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4234,7 +4164,7 @@
 			)
 		)
 		(property "Description" "RES 1K OHM 1% 1/8W 0805"
-			(at 137.795 118.745 0)
+			(at 137.16 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4243,7 +4173,7 @@
 			)
 		)
 		(property "Mfr" "Stackpole Electronics Inc"
-			(at 137.795 118.745 0)
+			(at 137.16 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4252,7 +4182,7 @@
 			)
 		)
 		(property "Mfr P/N" "RMCF0805FT1K00"
-			(at 137.795 118.745 0)
+			(at 137.16 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4261,7 +4191,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 137.795 118.745 0)
+			(at 137.16 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4270,7 +4200,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "RMCF0805FT1K00CT-ND"
-			(at 137.795 118.745 0)
+			(at 137.16 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4279,7 +4209,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 137.795 118.745 0)
+			(at 137.16 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4288,7 +4218,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 137.795 118.745 0)
+			(at 137.16 118.11 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4313,7 +4243,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 332.105 122.555 0)
+		(at 332.74 121.92 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4321,7 +4251,7 @@
 		(dnp no)
 		(uuid "4fa401b5-cd10-4745-b58b-1d220663a3c4")
 		(property "Reference" "#PWR0141"
-			(at 332.105 128.905 0)
+			(at 332.74 128.27 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4330,7 +4260,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 332.105 126.365 0)
+			(at 332.74 125.73 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4338,7 +4268,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 332.105 122.555 0)
+			(at 332.74 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4347,7 +4277,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 332.105 122.555 0)
+			(at 332.74 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4356,7 +4286,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 332.105 122.555 0)
+			(at 332.74 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4495,7 +4425,7 @@
 	)
 	(symbol
 		(lib_id "Device:R_US")
-		(at 304.165 164.465 180)
+		(at 304.8 161.29 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -4503,7 +4433,7 @@
 		(dnp yes)
 		(uuid "576f04cf-03b1-483e-9cf9-4b94d7725182")
 		(property "Reference" "R44"
-			(at 307.34 163.195 0)
+			(at 307.975 160.02 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4511,7 +4441,7 @@
 			)
 		)
 		(property "Value" "10k"
-			(at 307.34 165.1 0)
+			(at 307.975 161.925 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4519,7 +4449,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 303.149 164.211 90)
+			(at 303.784 161.036 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4528,7 +4458,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
-			(at 304.165 164.465 0)
+			(at 304.8 161.29 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4537,7 +4467,7 @@
 			)
 		)
 		(property "Description" "RES 10K OHM 1% 1/8W 0805"
-			(at 304.165 164.465 0)
+			(at 304.8 161.29 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4546,7 +4476,7 @@
 			)
 		)
 		(property "Mfr" "Stackpole Electronics Inc"
-			(at 304.165 164.465 0)
+			(at 304.8 161.29 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4555,7 +4485,7 @@
 			)
 		)
 		(property "Mfr P/N" "RMCF0805FT10K0"
-			(at 304.165 164.465 0)
+			(at 304.8 161.29 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4564,7 +4494,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 304.165 164.465 0)
+			(at 304.8 161.29 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4573,7 +4503,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "RMCF0805FT10K0CT-ND"
-			(at 304.165 164.465 0)
+			(at 304.8 161.29 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4582,7 +4512,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 304.165 164.465 0)
+			(at 304.8 161.29 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4591,7 +4521,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 304.165 164.465 0)
+			(at 304.8 161.29 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4734,7 +4664,7 @@
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 335.28 118.11 0)
+		(at 335.28 119.38 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4743,7 +4673,7 @@
 		(fields_autoplaced yes)
 		(uuid "69fc214b-e139-4279-b028-8b7c64089156")
 		(property "Reference" "#PWR0144"
-			(at 335.28 121.92 0)
+			(at 335.28 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4752,7 +4682,7 @@
 			)
 		)
 		(property "Value" "+3.3V"
-			(at 335.28 113.03 0)
+			(at 335.28 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4760,7 +4690,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 335.28 118.11 0)
+			(at 335.28 119.38 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4769,7 +4699,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 335.28 118.11 0)
+			(at 335.28 119.38 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4778,7 +4708,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 335.28 118.11 0)
+			(at 335.28 119.38 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4799,7 +4729,7 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x03")
-		(at 341.63 78.105 0)
+		(at 342.9 78.74 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -4808,7 +4738,7 @@
 		(fields_autoplaced yes)
 		(uuid "72803d00-faaf-472a-8585-8a6b6721bd16")
 		(property "Reference" "J13"
-			(at 344.17 76.835 0)
+			(at 345.44 77.47 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4817,7 +4747,7 @@
 			)
 		)
 		(property "Value" "Refl_PCB_Connect"
-			(at 344.17 79.375 0)
+			(at 345.44 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4826,7 +4756,7 @@
 			)
 		)
 		(property "Footprint" "RobotLibrary:CONN3_22232031_MOL"
-			(at 341.63 78.105 0)
+			(at 342.9 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4835,7 +4765,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.molex.com/pdm_docs/sd/022232031_sd.pdf"
-			(at 341.63 78.105 0)
+			(at 342.9 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4844,7 +4774,7 @@
 			)
 		)
 		(property "Description" "CONN HEADER VERT 3POS 2.54MM"
-			(at 341.63 78.105 0)
+			(at 342.9 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4853,7 +4783,7 @@
 			)
 		)
 		(property "Mfr" "Molex"
-			(at 341.63 78.105 0)
+			(at 342.9 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4862,7 +4792,7 @@
 			)
 		)
 		(property "Mfr P/N" "0022232031"
-			(at 341.63 78.105 0)
+			(at 342.9 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4871,7 +4801,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 341.63 78.105 0)
+			(at 342.9 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4880,7 +4810,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "WM4201-ND"
-			(at 341.63 78.105 0)
+			(at 342.9 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4889,7 +4819,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 341.63 78.105 0)
+			(at 342.9 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4898,7 +4828,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 341.63 78.105 0)
+			(at 342.9 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4926,7 +4856,7 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_02x02_Odd_Even")
-		(at 288.29 114.3 0)
+		(at 289.56 114.3 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -4935,7 +4865,7 @@
 		(fields_autoplaced yes)
 		(uuid "8a8b963f-3a24-4b1c-be3f-3a0e187a6296")
 		(property "Reference" "J11"
-			(at 289.56 108.585 0)
+			(at 290.83 108.585 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4943,7 +4873,7 @@
 			)
 		)
 		(property "Value" "Refl_Mount"
-			(at 289.56 111.125 0)
+			(at 290.83 111.125 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4951,7 +4881,7 @@
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_2x02_P2.54mm_Vertical"
-			(at 288.29 114.3 0)
+			(at 289.56 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4960,7 +4890,7 @@
 			)
 		)
 		(property "Datasheet" "https://app.adam-tech.com/products/download/data_sheet/202065/ph2-xx-ua-data-sheet.pdf"
-			(at 288.29 114.3 0)
+			(at 289.56 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4969,7 +4899,7 @@
 			)
 		)
 		(property "Description" "CONN HEADER VERT 4POS 2.54MM"
-			(at 288.29 114.3 0)
+			(at 289.56 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4978,7 +4908,7 @@
 			)
 		)
 		(property "Mfr" ""
-			(at 288.29 114.3 0)
+			(at 289.56 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4987,7 +4917,7 @@
 			)
 		)
 		(property "Mfr P/N" ""
-			(at 288.29 114.3 0)
+			(at 289.56 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4996,7 +4926,7 @@
 			)
 		)
 		(property "Supplier 1" ""
-			(at 288.29 114.3 0)
+			(at 289.56 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5005,7 +4935,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" ""
-			(at 288.29 114.3 0)
+			(at 289.56 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5014,7 +4944,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 288.29 114.3 0)
+			(at 289.56 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5023,7 +4953,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 288.29 114.3 0)
+			(at 289.56 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5119,7 +5049,7 @@
 	)
 	(symbol
 		(lib_id "RobotLibary:QRE1113GR")
-		(at 274.32 170.18 0)
+		(at 274.32 167.64 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -5128,7 +5058,7 @@
 		(fields_autoplaced yes)
 		(uuid "8e9c84cb-878d-4bde-8c4f-2e907a268122")
 		(property "Reference" "K1"
-			(at 287.02 162.56 0)
+			(at 287.02 160.02 0)
 			(effects
 				(font
 					(size 1.524 1.524)
@@ -5136,7 +5066,7 @@
 			)
 		)
 		(property "Value" "QRE1113GR"
-			(at 287.02 165.1 0)
+			(at 287.02 162.56 0)
 			(effects
 				(font
 					(size 1.524 1.524)
@@ -5144,7 +5074,7 @@
 			)
 		)
 		(property "Footprint" "RobotLibrary:ARUSM-313_100CY_FAS-M"
-			(at 283.845 166.37 0)
+			(at 283.845 163.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5154,7 +5084,7 @@
 			)
 		)
 		(property "Datasheet" "QRE1113GR"
-			(at 285.75 163.83 0)
+			(at 285.75 161.29 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5164,7 +5094,7 @@
 			)
 		)
 		(property "Description" "SENSOR OPTO TRANS REFL SMD PHOTO"
-			(at 274.32 170.18 0)
+			(at 274.32 167.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5173,7 +5103,7 @@
 			)
 		)
 		(property "Mfr" "onsemi"
-			(at 274.32 170.18 0)
+			(at 274.32 167.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5182,7 +5112,7 @@
 			)
 		)
 		(property "Mfr P/N" "QRE1113GR"
-			(at 274.32 170.18 0)
+			(at 274.32 167.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5191,7 +5121,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 274.32 170.18 0)
+			(at 274.32 167.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5200,7 +5130,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "QRE1113GRCT-ND"
-			(at 274.32 170.18 0)
+			(at 274.32 167.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5209,7 +5139,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 274.32 170.18 0)
+			(at 274.32 167.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5218,7 +5148,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 274.32 170.18 0)
+			(at 274.32 167.64 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5367,7 +5297,7 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x03")
-		(at 344.805 164.465 0)
+		(at 345.44 165.1 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -5376,7 +5306,7 @@
 		(fields_autoplaced yes)
 		(uuid "94401af2-3536-444d-9bcb-06bc97b30c14")
 		(property "Reference" "J15"
-			(at 347.345 163.195 0)
+			(at 347.98 163.83 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5385,7 +5315,7 @@
 			)
 		)
 		(property "Value" "Refl_PCB_Connect"
-			(at 347.345 165.735 0)
+			(at 347.98 166.37 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5394,7 +5324,7 @@
 			)
 		)
 		(property "Footprint" "RobotLibrary:CONN3_22232031_MOL"
-			(at 344.805 164.465 0)
+			(at 345.44 165.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5403,7 +5333,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.molex.com/pdm_docs/sd/022232031_sd.pdf"
-			(at 344.805 164.465 0)
+			(at 345.44 165.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5412,7 +5342,7 @@
 			)
 		)
 		(property "Description" "CONN HEADER VERT 3POS 2.54MM"
-			(at 344.805 164.465 0)
+			(at 345.44 165.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5421,7 +5351,7 @@
 			)
 		)
 		(property "Mfr" "Molex"
-			(at 344.805 164.465 0)
+			(at 345.44 165.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5430,7 +5360,7 @@
 			)
 		)
 		(property "Mfr P/N" "0022232031"
-			(at 344.805 164.465 0)
+			(at 345.44 165.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5439,7 +5369,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 344.805 164.465 0)
+			(at 345.44 165.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5448,7 +5378,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "WM4201-ND"
-			(at 344.805 164.465 0)
+			(at 345.44 165.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5457,7 +5387,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 344.805 164.465 0)
+			(at 345.44 165.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5466,7 +5396,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 344.805 164.465 0)
+			(at 345.44 165.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5494,7 +5424,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 331.47 79.375 0)
+		(at 332.74 78.74 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5502,7 +5432,7 @@
 		(dnp no)
 		(uuid "a2b7675c-037f-41d4-a2e6-e1cb3934bd08")
 		(property "Reference" "#PWR0140"
-			(at 331.47 85.725 0)
+			(at 332.74 85.09 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5511,7 +5441,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 331.47 83.185 0)
+			(at 332.74 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5519,7 +5449,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 331.47 79.375 0)
+			(at 332.74 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5528,7 +5458,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 331.47 79.375 0)
+			(at 332.74 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5537,7 +5467,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 331.47 79.375 0)
+			(at 332.74 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5558,7 +5488,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 137.795 90.805 0)
+		(at 137.16 91.44 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5566,7 +5496,7 @@
 		(dnp no)
 		(uuid "b19fa0b2-461c-4bdd-b6e7-888d93ae6c86")
 		(property "Reference" "#PWR0134"
-			(at 137.795 97.155 0)
+			(at 137.16 97.79 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5575,7 +5505,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 137.795 94.615 0)
+			(at 137.16 95.25 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5583,7 +5513,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 137.795 90.805 0)
+			(at 137.16 91.44 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5592,7 +5522,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 137.795 90.805 0)
+			(at 137.16 91.44 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5601,7 +5531,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 137.795 90.805 0)
+			(at 137.16 91.44 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5622,7 +5552,7 @@
 	)
 	(symbol
 		(lib_id "Switch:SW_SPST")
-		(at 128.27 132.08 0)
+		(at 129.54 132.08 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -5631,7 +5561,7 @@
 		(fields_autoplaced yes)
 		(uuid "b1fa7f98-21a1-4175-bb69-53806d7b34cf")
 		(property "Reference" "SW10"
-			(at 128.27 125.73 0)
+			(at 129.54 125.73 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5639,7 +5569,7 @@
 			)
 		)
 		(property "Value" "SW_SPST"
-			(at 128.27 128.27 0)
+			(at 129.54 128.27 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5647,7 +5577,7 @@
 			)
 		)
 		(property "Footprint" "RobotLibrary:CONN_22232021_MOL"
-			(at 128.27 132.08 0)
+			(at 129.54 132.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5656,7 +5586,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.molex.com/webdocs/datasheets/pdf/en-us//0022232021_PCB_HEADERS.pdf"
-			(at 128.27 132.08 0)
+			(at 129.54 132.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5665,7 +5595,7 @@
 			)
 		)
 		(property "Description" "CONN HEADER VERT 2POS 2.54MM"
-			(at 128.27 132.08 0)
+			(at 129.54 132.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5674,7 +5604,7 @@
 			)
 		)
 		(property "Mfr" "Molex"
-			(at 128.27 132.08 0)
+			(at 129.54 132.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5683,7 +5613,7 @@
 			)
 		)
 		(property "Mfr P/N" "0022232021"
-			(at 128.27 132.08 0)
+			(at 129.54 132.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5692,7 +5622,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 128.27 132.08 0)
+			(at 129.54 132.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5701,7 +5631,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "900-0022232021-ND"
-			(at 128.27 132.08 0)
+			(at 129.54 132.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5710,7 +5640,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 128.27 132.08 0)
+			(at 129.54 132.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5719,7 +5649,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 128.27 132.08 0)
+			(at 129.54 132.08 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5744,7 +5674,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 334.645 165.735 0)
+		(at 335.28 165.1 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5752,7 +5682,7 @@
 		(dnp no)
 		(uuid "c1679a8b-193e-44a2-aedb-57a12b6c2b05")
 		(property "Reference" "#PWR0143"
-			(at 334.645 172.085 0)
+			(at 335.28 171.45 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5761,7 +5691,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 334.645 169.545 0)
+			(at 335.28 168.91 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5769,7 +5699,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 334.645 165.735 0)
+			(at 335.28 165.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5778,7 +5708,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 334.645 165.735 0)
+			(at 335.28 165.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5787,7 +5717,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 334.645 165.735 0)
+			(at 335.28 165.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5808,7 +5738,7 @@
 	)
 	(symbol
 		(lib_id "power:+3.3V")
-		(at 123.19 77.47 0)
+		(at 124.46 78.74 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5817,7 +5747,7 @@
 		(fields_autoplaced yes)
 		(uuid "cf05a930-4d7a-45e3-b2e0-7dc911bb0bf7")
 		(property "Reference" "#PWR0133"
-			(at 123.19 81.28 0)
+			(at 124.46 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5826,7 +5756,7 @@
 			)
 		)
 		(property "Value" "+3.3V"
-			(at 123.19 72.39 0)
+			(at 124.46 73.66 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5834,7 +5764,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 123.19 77.47 0)
+			(at 124.46 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5843,7 +5773,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 123.19 77.47 0)
+			(at 124.46 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5852,7 +5782,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 123.19 77.47 0)
+			(at 124.46 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5873,7 +5803,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 137.795 139.7 0)
+		(at 137.16 139.7 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5881,7 +5811,7 @@
 		(dnp no)
 		(uuid "cfbf9988-ed33-416a-8da8-1579f13f51de")
 		(property "Reference" "#PWR0137"
-			(at 137.795 146.05 0)
+			(at 137.16 146.05 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5890,7 +5820,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 137.795 143.51 0)
+			(at 137.16 143.51 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5898,7 +5828,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 137.795 139.7 0)
+			(at 137.16 139.7 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5907,7 +5837,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 137.795 139.7 0)
+			(at 137.16 139.7 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5916,7 +5846,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 137.795 139.7 0)
+			(at 137.16 139.7 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5937,7 +5867,7 @@
 	)
 	(symbol
 		(lib_id "Device:R_US")
-		(at 137.795 102.235 0)
+		(at 137.16 102.87 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -5945,7 +5875,7 @@
 		(dnp no)
 		(uuid "d8b7d900-96db-4632-a39c-f57ca94b8ae3")
 		(property "Reference" "R38"
-			(at 140.97 100.965 0)
+			(at 140.335 101.6 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5953,7 +5883,7 @@
 			)
 		)
 		(property "Value" "1k"
-			(at 140.97 102.87 0)
+			(at 140.335 103.505 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5961,7 +5891,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 138.811 102.489 90)
+			(at 138.176 103.124 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5970,7 +5900,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
-			(at 137.795 102.235 0)
+			(at 137.16 102.87 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5979,7 +5909,7 @@
 			)
 		)
 		(property "Description" "RES 1K OHM 1% 1/8W 0805"
-			(at 137.795 102.235 0)
+			(at 137.16 102.87 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5988,7 +5918,7 @@
 			)
 		)
 		(property "Mfr" "Stackpole Electronics Inc"
-			(at 137.795 102.235 0)
+			(at 137.16 102.87 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5997,7 +5927,7 @@
 			)
 		)
 		(property "Mfr P/N" "RMCF0805FT1K00"
-			(at 137.795 102.235 0)
+			(at 137.16 102.87 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6006,7 +5936,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 137.795 102.235 0)
+			(at 137.16 102.87 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6015,7 +5945,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "RMCF0805FT1K00CT-ND"
-			(at 137.795 102.235 0)
+			(at 137.16 102.87 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6024,7 +5954,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 137.795 102.235 0)
+			(at 137.16 102.87 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6033,7 +5963,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 137.795 102.235 0)
+			(at 137.16 102.87 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6058,7 +5988,7 @@
 	)
 	(symbol
 		(lib_id "Device:R_US")
-		(at 137.795 135.89 0)
+		(at 137.16 135.89 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -6066,7 +5996,7 @@
 		(dnp no)
 		(uuid "dd4c3d5d-4084-44a4-b894-272166e9d549")
 		(property "Reference" "R40"
-			(at 140.97 134.62 0)
+			(at 140.335 134.62 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6074,7 +6004,7 @@
 			)
 		)
 		(property "Value" "1k"
-			(at 140.97 136.525 0)
+			(at 140.335 136.525 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6082,7 +6012,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 138.811 136.144 90)
+			(at 138.176 136.144 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6091,7 +6021,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
-			(at 137.795 135.89 0)
+			(at 137.16 135.89 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6100,7 +6030,7 @@
 			)
 		)
 		(property "Description" "RES 1K OHM 1% 1/8W 0805"
-			(at 137.795 135.89 0)
+			(at 137.16 135.89 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6109,7 +6039,7 @@
 			)
 		)
 		(property "Mfr" "Stackpole Electronics Inc"
-			(at 137.795 135.89 0)
+			(at 137.16 135.89 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6118,7 +6048,7 @@
 			)
 		)
 		(property "Mfr P/N" "RMCF0805FT1K00"
-			(at 137.795 135.89 0)
+			(at 137.16 135.89 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6127,7 +6057,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 137.795 135.89 0)
+			(at 137.16 135.89 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6136,7 +6066,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "RMCF0805FT1K00CT-ND"
-			(at 137.795 135.89 0)
+			(at 137.16 135.89 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6145,7 +6075,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 137.795 135.89 0)
+			(at 137.16 135.89 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6154,7 +6084,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 137.795 135.89 0)
+			(at 137.16 135.89 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6179,7 +6109,7 @@
 	)
 	(symbol
 		(lib_id "Device:R_US")
-		(at 308.61 79.375 180)
+		(at 314.96 80.01 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -6187,7 +6117,7 @@
 		(dnp yes)
 		(uuid "dd5e28f9-da94-46ff-ac27-ea904e2176ad")
 		(property "Reference" "R46"
-			(at 311.785 78.105 0)
+			(at 318.135 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6195,7 +6125,7 @@
 			)
 		)
 		(property "Value" "10k"
-			(at 311.785 80.01 0)
+			(at 318.135 80.645 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6203,7 +6133,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 307.594 79.121 90)
+			(at 313.944 79.756 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6212,7 +6142,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
-			(at 308.61 79.375 0)
+			(at 314.96 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6221,7 +6151,7 @@
 			)
 		)
 		(property "Description" "RES 10K OHM 1% 1/8W 0805"
-			(at 308.61 79.375 0)
+			(at 314.96 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6230,7 +6160,7 @@
 			)
 		)
 		(property "Mfr" "Stackpole Electronics Inc"
-			(at 308.61 79.375 0)
+			(at 314.96 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6239,7 +6169,7 @@
 			)
 		)
 		(property "Mfr P/N" "RMCF0805FT10K0"
-			(at 308.61 79.375 0)
+			(at 314.96 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6248,7 +6178,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 308.61 79.375 0)
+			(at 314.96 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6257,7 +6187,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "RMCF0805FT10K0CT-ND"
-			(at 308.61 79.375 0)
+			(at 314.96 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6266,7 +6196,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 308.61 79.375 0)
+			(at 314.96 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6275,7 +6205,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 308.61 79.375 0)
+			(at 314.96 80.01 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6365,7 +6295,7 @@
 	)
 	(symbol
 		(lib_id "Device:R_US")
-		(at 276.86 123.825 180)
+		(at 276.86 123.19 180)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -6373,7 +6303,7 @@
 		(dnp yes)
 		(uuid "f5978f9f-a65a-4898-beb7-7346ce8d503f")
 		(property "Reference" "R42"
-			(at 273.3675 122.8725 0)
+			(at 273.3675 122.2375 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6381,7 +6311,7 @@
 			)
 		)
 		(property "Value" "100R"
-			(at 273.3675 124.7775 0)
+			(at 273.3675 124.1425 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6389,7 +6319,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder"
-			(at 275.844 123.571 90)
+			(at 275.844 122.936 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6398,7 +6328,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.seielect.com/catalog/sei-rmcf_rmcp.pdf"
-			(at 276.86 123.825 0)
+			(at 276.86 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6407,7 +6337,7 @@
 			)
 		)
 		(property "Description" "RES 100 OHM 1% 1/8W 0805"
-			(at 276.86 123.825 0)
+			(at 276.86 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6416,7 +6346,7 @@
 			)
 		)
 		(property "Mfr" "Stackpole Electronics Inc"
-			(at 276.86 123.825 0)
+			(at 276.86 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6425,7 +6355,7 @@
 			)
 		)
 		(property "Mfr P/N" "RMCF0805FT100R"
-			(at 276.86 123.825 0)
+			(at 276.86 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6434,7 +6364,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 276.86 123.825 0)
+			(at 276.86 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6443,7 +6373,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "RMCF0805FT100RCT-ND"
-			(at 276.86 123.825 0)
+			(at 276.86 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6452,7 +6382,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 276.86 123.825 0)
+			(at 276.86 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6461,7 +6391,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 276.86 123.825 0)
+			(at 276.86 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6486,7 +6416,7 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x03")
-		(at 342.265 121.285 0)
+		(at 342.9 121.92 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -6495,7 +6425,7 @@
 		(fields_autoplaced yes)
 		(uuid "fa68a8f0-64b7-446c-afb9-528042e04feb")
 		(property "Reference" "J14"
-			(at 344.805 120.015 0)
+			(at 345.44 120.65 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6504,7 +6434,7 @@
 			)
 		)
 		(property "Value" "Refl_PCB_Connect"
-			(at 344.805 122.555 0)
+			(at 345.44 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6513,7 +6443,7 @@
 			)
 		)
 		(property "Footprint" "RobotLibrary:CONN3_22232031_MOL"
-			(at 342.265 121.285 0)
+			(at 342.9 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6522,7 +6452,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.molex.com/pdm_docs/sd/022232031_sd.pdf"
-			(at 342.265 121.285 0)
+			(at 342.9 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6531,7 +6461,7 @@
 			)
 		)
 		(property "Description" "CONN HEADER VERT 3POS 2.54MM"
-			(at 342.265 121.285 0)
+			(at 342.9 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6540,7 +6470,7 @@
 			)
 		)
 		(property "Mfr" "Molex"
-			(at 342.265 121.285 0)
+			(at 342.9 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6549,7 +6479,7 @@
 			)
 		)
 		(property "Mfr P/N" "0022232031"
-			(at 342.265 121.285 0)
+			(at 342.9 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6558,7 +6488,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 342.265 121.285 0)
+			(at 342.9 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6567,7 +6497,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "WM4201-ND"
-			(at 342.265 121.285 0)
+			(at 342.9 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6576,7 +6506,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 342.265 121.285 0)
+			(at 342.9 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6585,7 +6515,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 342.265 121.285 0)
+			(at 342.9 121.92 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6613,7 +6543,7 @@
 	)
 	(symbol
 		(lib_id "RobotLibary:QRE1113GR")
-		(at 276.86 127.635 0)
+		(at 276.86 127 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom no)
@@ -6622,7 +6552,7 @@
 		(fields_autoplaced yes)
 		(uuid "fc8e904d-0b03-4e31-a82a-4adafd004571")
 		(property "Reference" "K2"
-			(at 289.56 120.015 0)
+			(at 289.56 119.38 0)
 			(effects
 				(font
 					(size 1.524 1.524)
@@ -6630,7 +6560,7 @@
 			)
 		)
 		(property "Value" "QRE1113GR"
-			(at 289.56 122.555 0)
+			(at 289.56 121.92 0)
 			(effects
 				(font
 					(size 1.524 1.524)
@@ -6638,7 +6568,7 @@
 			)
 		)
 		(property "Footprint" "RobotLibrary:ARUSM-313_100CY_FAS-M"
-			(at 286.385 123.825 0)
+			(at 286.385 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6648,7 +6578,7 @@
 			)
 		)
 		(property "Datasheet" "QRE1113GR"
-			(at 288.29 121.285 0)
+			(at 288.29 120.65 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6658,7 +6588,7 @@
 			)
 		)
 		(property "Description" "SENSOR OPTO TRANS REFL SMD PHOTO"
-			(at 276.86 127.635 0)
+			(at 276.86 127 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6667,7 +6597,7 @@
 			)
 		)
 		(property "Mfr" "onsemi"
-			(at 276.86 127.635 0)
+			(at 276.86 127 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6676,7 +6606,7 @@
 			)
 		)
 		(property "Mfr P/N" "QRE1113GR"
-			(at 276.86 127.635 0)
+			(at 276.86 127 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6685,7 +6615,7 @@
 			)
 		)
 		(property "Supplier 1" "DigiKey"
-			(at 276.86 127.635 0)
+			(at 276.86 127 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6694,7 +6624,7 @@
 			)
 		)
 		(property "Supplier 1 P/N" "QRE1113GRCT-ND"
-			(at 276.86 127.635 0)
+			(at 276.86 127 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6703,7 +6633,7 @@
 			)
 		)
 		(property "Supplier 2" ""
-			(at 276.86 127.635 0)
+			(at 276.86 127 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6712,7 +6642,7 @@
 			)
 		)
 		(property "Supplier 2 P/N" ""
-			(at 276.86 127.635 0)
+			(at 276.86 127 0)
 			(effects
 				(font
 					(size 1.27 1.27)
