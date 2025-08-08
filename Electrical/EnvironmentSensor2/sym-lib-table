@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "MattsLibrary")(type "KiCad")(uri "${KIPRJMOD}/MattsLibrary.kicad_sym")(options "")(descr ""))
+)
