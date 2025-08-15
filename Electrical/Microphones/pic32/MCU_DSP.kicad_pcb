@@ -3818,6 +3818,17 @@
 			(uuid "21882fe9-d3cf-4c70-a9a1-5b6fcebe397c")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/TQFP48.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz -90 -0 -0)
+			)
+		)
 	)
 	(footprint "Connector_Molex:Molex_KK-254_AE-6410-06A_1x06_P2.54mm_Vertical"
 		(layer "F.Cu")
@@ -6114,6 +6125,17 @@
 			(uuid "6b454197-4630-48d1-b5ef-fdb0bb12ffd4")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/B3F-1020.STEP"
+			(offset
+				(xyz 3.25 -2.25 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz -90 -0 -0)
+			)
+		)
 	)
 	(footprint "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
 		(layer "F.Cu")

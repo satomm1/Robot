@@ -1195,6 +1195,17 @@
 			(uuid "38d3b447-2685-47cb-ab2e-a433f16945b2")
 		)
 		(embedded_fonts no)
+		(model "${KIPRJMOD}/3dmodels/022053061.stp"
+			(offset
+				(xyz 6.35 4.2 1.5)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz -0 -180 -0)
+			)
+		)
 	)
 	(footprint "MountingHole:MountingHole_3.2mm_M3"
 		(layer "F.Cu")

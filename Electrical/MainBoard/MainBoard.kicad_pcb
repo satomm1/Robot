@@ -799,7 +799,7 @@
 		(path "/d895d168-5c3b-4f65-b0f2-4d47b39f1a08/154126cc-56e1-4a90-a341-3aad595a3925")
 		(sheetname "/SPI_UART/")
 		(sheetfile "SPI_UART.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start -1.9 1.55)
 			(end -1.9 0.55)
@@ -2716,7 +2716,7 @@
 		(path "/f4129289-3c0d-4adc-b4a9-f79af269c84f/2accc654-57ec-4d5a-a73a-0ff64ed2c42e")
 		(sheetname "/Memory/")
 		(sheetfile "Memory.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.261252 0.735)
 			(end 0.261252 0.735)
@@ -3538,7 +3538,7 @@
 		(path "/d895d168-5c3b-4f65-b0f2-4d47b39f1a08/4e088f03-0b5a-4c39-a19a-eb16e7470532")
 		(sheetname "/SPI_UART/")
 		(sheetfile "SPI_UART.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start -1.9 1.55)
 			(end -1.9 0.55)
@@ -7989,7 +7989,7 @@
 		(path "/41ea0116-63b8-412b-88a7-1e6a491b97c5/98ad6a77-b932-4e72-963b-dbada053c113")
 		(sheetname "/Buttons/")
 		(sheetfile "Buttons.kicad_sch")
-		(attr smd exclude_from_bom)
+		(attr smd)
 		(fp_line
 			(start -0.227064 -0.735)
 			(end 0.227064 -0.735)
@@ -9860,7 +9860,7 @@
 		(path "/d895d168-5c3b-4f65-b0f2-4d47b39f1a08/da6c0bd4-28a3-4333-b68b-ee8ebafeb39a")
 		(sheetname "/SPI_UART/")
 		(sheetfile "SPI_UART.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start -1.9 1.55)
 			(end -1.9 0.55)
@@ -17229,7 +17229,7 @@
 		(path "/d895d168-5c3b-4f65-b0f2-4d47b39f1a08/12fef6df-510e-4e2c-ba05-e5e139f54212")
 		(sheetname "/SPI_UART/")
 		(sheetfile "SPI_UART.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start -1.9 1.55)
 			(end -0.9 1.55)
@@ -25203,7 +25203,7 @@
 		(path "/d895d168-5c3b-4f65-b0f2-4d47b39f1a08/759b76f7-7c75-47dc-9bc3-b6d2b20ecd70")
 		(sheetname "/SPI_UART/")
 		(sheetfile "SPI_UART.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start 5.36 1.26)
 			(end 5.36 -2.16)
@@ -37680,7 +37680,7 @@
 		(path "/f4129289-3c0d-4adc-b4a9-f79af269c84f/db163d1b-d614-4127-b2c1-c9b858861cf6")
 		(sheetname "/Memory/")
 		(sheetfile "Memory.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start 2.1209 -2.6289)
 			(end -2.1209 -2.6289)
@@ -39500,7 +39500,7 @@
 		(path "/41ea0116-63b8-412b-88a7-1e6a491b97c5/4122f8a9-1072-48da-b74f-6abccc0290ce")
 		(sheetname "/Buttons/")
 		(sheetfile "Buttons.kicad_sch")
-		(attr smd exclude_from_bom)
+		(attr smd)
 		(fp_line
 			(start -0.227064 -0.735)
 			(end 0.227064 -0.735)
@@ -40940,7 +40940,7 @@
 		(path "/41ea0116-63b8-412b-88a7-1e6a491b97c5/5544cf45-23a4-4078-a1b4-d22637e78f19")
 		(sheetname "/Buttons/")
 		(sheetfile "Buttons.kicad_sch")
-		(attr through_hole exclude_from_bom)
+		(attr through_hole)
 		(fp_line
 			(start 3.8608 3.3782)
 			(end 3.8608 -3.2258)
@@ -41270,7 +41270,7 @@
 		(path "/41ea0116-63b8-412b-88a7-1e6a491b97c5/8764d451-83a2-4b63-a83e-444116fc4289")
 		(sheetname "/Buttons/")
 		(sheetfile "Buttons.kicad_sch")
-		(attr through_hole exclude_from_bom)
+		(attr through_hole)
 		(fp_line
 			(start 3.8608 3.3782)
 			(end 3.8608 -3.2258)
@@ -50751,7 +50751,7 @@
 		(path "/f4129289-3c0d-4adc-b4a9-f79af269c84f/fc72841e-5794-49f7-b22d-74e47aa3977e")
 		(sheetname "/Memory/")
 		(sheetfile "Memory.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start -0.261252 -0.735)
 			(end 0.261252 -0.735)
@@ -53072,7 +53072,7 @@
 		(path "/3efd4746-229a-4377-9033-64e7155c364f/d4ed1fdc-3d5f-4d29-9063-d91756b1f2f8")
 		(sheetname "/GPS/")
 		(sheetfile "GPS.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start 7.86 -2.16)
 			(end -1.61 -2.16)
@@ -56110,7 +56110,7 @@
 		(path "/f4129289-3c0d-4adc-b4a9-f79af269c84f/181675c3-b7e9-4d80-8f5e-095be0afac62")
 		(sheetname "/Memory/")
 		(sheetfile "Memory.kicad_sch")
-		(attr smd)
+		(attr smd exclude_from_bom)
 		(fp_line
 			(start 7.1247 -7.8486)
 			(end 1.984441 -7.8486)
@@ -58376,7 +58376,7 @@
 		(path "/d895d168-5c3b-4f65-b0f2-4d47b39f1a08/6b0730c0-01f5-4297-85b9-1194731c8c2f")
 		(sheetname "/SPI_UART/")
 		(sheetfile "SPI_UART.kicad_sch")
-		(attr through_hole)
+		(attr through_hole exclude_from_bom)
 		(fp_line
 			(start -1.9 1.55)
 			(end -1.9 0.55)
@@ -62295,8 +62295,8 @@
 		(uuid "01f4c94a-49bd-4e12-bf8b-76a80b94d17c")
 	)
 	(gr_line
-		(start 263.3875 136.01125)
-		(end 263.3875 137.58875)
+		(start 263.642224 140.21125)
+		(end 263.642224 141.78875)
 		(stroke
 			(width 0.15)
 			(type default)
@@ -63677,7 +63677,7 @@
 			(justify left bottom)
 		)
 	)
-	(gr_text "I2C2"
+	(gr_text "Env. Sens"
 		(at 255.4 161.1 0)
 		(layer "F.SilkS")
 		(uuid "da8e3279-251a-49df-9881-45eaee9a1bc6")
@@ -63931,7 +63931,7 @@
 		)
 	)
 	(gr_text "0.05R"
-		(at 265 135.9 0)
+		(at 264.7 143.1 0)
 		(layer "B.SilkS")
 		(uuid "9ae9baf1-af2d-46b7-8c6d-3c8385ee6e7a")
 		(effects
