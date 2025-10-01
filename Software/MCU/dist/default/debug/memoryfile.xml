@@ -3,15 +3,15 @@
   <executable name="dist/default/debug/MCU.debug.elf">                 
     <memory name="program">                 
       <units>bytes</units>                 
-      <length>525440</length>                 
-      <used>75408</used>                     
-      <free>450032</free>                     
+      <length>2098304</length>                 
+      <used>79544</used>                     
+      <free>2018760</free>                     
     </memory>                              
     <memory name="data">              
       <units>bytes</units>                 
-      <length>131968</length>                 
-      <used>69328</used>                     
-      <free>62640</free>                     
+      <length>525184</length>                 
+      <used>69380</used>                     
+      <free>455804</free>                     
     </memory>                              
   </executable>                            
 </project>                                 

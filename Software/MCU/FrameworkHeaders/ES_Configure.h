@@ -26,23 +26,21 @@
 
 /****************************************************************************/
 // Define the Robot ID, this should be a unique 8 bit ID for each robot
-#define ROBOT_ID 1
+#define ROBOT_ID 3
 
 // Define the PCB Revision Number being used
-//#define PCB_REV 1
 #define PCB_REV 2
-//#define PCB_REV 3
 
 // Define which motor type is being used
-//#define MOTOR_TYPE 1  // The 350RPM motor with 374 pulses per rev
-#define MOTOR_TYPE 2  // The 122RPM motor with 1440 pulses per rev
+#define MOTOR_TYPE 1  // The 350RPM motor with 374 pulses per rev
+//#define MOTOR_TYPE 2  // The 122RPM motor with 1440 pulses per rev
 
 // Define if we want to log data for RL Motor control
 //#define RL_MOTOR_LOGGING
 
 // Set the distance between the wheels
-//#define WHEEL_BASE 0.258572 // Distance between wheels on the robot (m) (Centered Wheels)
-#define WHEEL_BASE 0.2713 // 122 RPM Car Setup
+#define WHEEL_BASE 0.258572 // Distance between wheels on the robot (m) (Centered Wheels)
+//#define WHEEL_BASE 0.2713 // 122 RPM Car Setup
 
 /****************************************************************************/
 // The maximum number of services sets an upper bound on the number of
@@ -306,7 +304,9 @@ typedef enum
   EV_WRITE_DISABLED,
   EV_WRITE_COMPLETE,
   EV_BEGIN_WRITE,
-  EV_PRINT_RL_DATA
+  EV_PRINT_RL_DATA,
+  EV_I2C_COMPLETE,
+  EV_I2C_ERROR
 }ES_EventType_t;
 
 /****************************************************************************/
@@ -354,8 +354,8 @@ typedef enum
 #define TIMER1_RESP_FUNC TIMER_UNUSED
 #define TIMER2_RESP_FUNC TIMER_UNUSED
 #define TIMER3_RESP_FUNC TIMER_UNUSED
-#define TIMER4_RESP_FUNC TIMER_UNUSED
-#define TIMER5_RESP_FUNC TIMER_UNUSED
+#define TIMER4_RESP_FUNC PostEnvironmentSensorSM
+#define TIMER5_RESP_FUNC PostEnvironmentSensorSM
 #define TIMER6_RESP_FUNC PostMotorSM
 #define TIMER7_RESP_FUNC PostEEPROMSM
 #define TIMER8_RESP_FUNC PostImuSM
@@ -384,5 +384,7 @@ typedef enum
 #define IMU_TIMER 8
 #define EEPROM_TIMER 7
 #define RL_TIMER 6
+#define ENV_TIMER 5
+#define ENV_WAIT_TIMER 4
 
 #endif /* ES_CONFIGURE_H */
