@@ -26,10 +26,10 @@
 
 /****************************************************************************/
 // Define the Robot ID, this should be a unique 8 bit ID for each robot
-#define ROBOT_ID 3
+#define ROBOT_ID 5
 
 // Define the PCB Revision Number being used
-#define PCB_REV 2
+#define PCB_REV 4
 
 // Define which motor type is being used
 #define MOTOR_TYPE 1  // The 350RPM motor with 374 pulses per rev

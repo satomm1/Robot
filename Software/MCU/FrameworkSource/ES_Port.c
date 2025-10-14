@@ -96,7 +96,8 @@
 
 #include <stdint.h>         // for exact size data types
 #include <stdbool.h>
-#include <proc/p32mz0512eff144.h>        // for the bool data type
+//#include <proc/p32mz0512eff144.h>        // for the bool data type
+#include <proc/p32mz2048efh144.h>        // for the bool data type
 
 #include "ES_Port.h"        // the header file for this module
 #include "ES_Types.h"       // framework type definitions

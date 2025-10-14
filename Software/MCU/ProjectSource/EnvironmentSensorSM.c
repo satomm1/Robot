@@ -222,7 +222,7 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
         GasIndexAlgorithm_init(&voc_params, GasIndexAlgorithm_ALGORITHM_TYPE_VOC);
         GasIndexAlgorithm_init(&nox_params, GasIndexAlgorithm_ALGORITHM_TYPE_NOX);
 
-        ES_Timer_InitTimer(ENV_TIMER, 1000);
+//        ES_Timer_InitTimer(ENV_TIMER, 1000);
       }
     }
     break;
@@ -251,7 +251,7 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
                 
                 CurrentState = SGP_Conditioning_Env; 
 #ifdef VERBOSE
-                DB_printf("In SGP_Conditioning_Env");
+                DB_printf("\r\nIn SGP_Conditioning_Env\r\n");
 #endif
                 ES_Timer_InitTimer(ENV_TIMER, 5000);
                 Condition_AirQuality(AirQuality_Buffer);
@@ -319,7 +319,7 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
                 if (ThisEvent.EventParam == ENV_TIMER) {
                     CurrentState = SGP_Meas_Env;
 #ifdef VERBOSE
-                    DB_printf("In SGP_Meas_Env");
+                    DB_printf("\r\nIn SGP_Meas_Env\r\n");
 #endif
                     Get_AirQuality(AirQuality_Buffer);
                 }
@@ -342,7 +342,7 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
                 if (ThisEvent.EventParam == ENV_TIMER) {
                     CurrentState = SHT_Meas_Env;
 #ifdef VERBOSE
-                    DB_printf("In SHT_Meas_Env");
+                    DB_printf("\r\nIn SHT_Meas_Env\r\n");
 #endif
                     PerformMeasurement_T_RH(true, T_RH_Buffer);
                 } else if (ThisEvent.EventParam == ENV_WAIT_TIMER) {
@@ -360,11 +360,17 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
                 bool nox_valid = crc8_valid_residue(&AirQuality_Buffer[3]);
                 
                 if (voc_valid) {
+#ifdef VERBOSE
+                    DB_printf("\r\nVOC is valid\r\n");
+#endif
                     voc_raw_value = (uint16_t)AirQuality_Buffer[0] << 8 | (uint16_t)AirQuality_Buffer[1];
                     GasIndexAlgorithm_process(&voc_params, voc_raw_value, &voc_index_value);
                 }
                 
                 if (nox_valid) {
+#ifdef VERBOSE
+                    DB_printf("NOX is valid\r\n");
+#endif
                     nox_raw_value = (uint16_t)AirQuality_Buffer[3] << 8 | (uint16_t)AirQuality_Buffer[4];
                     GasIndexAlgorithm_process(&nox_params, nox_raw_value, &nox_index_value);
                 }
@@ -397,7 +403,7 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
             if (ThisEvent.EventParam == ENV_TIMER) {
                 CurrentState = SHT_Read_Env;
 #ifdef VERBOSE
-                DB_printf("In SHT_Read_Env");
+                DB_printf("\r\nIn SHT_Read_Env\r\n");
 #endif
                 ReadMeasurement_T_RH(T_RH_Buffer);
             } else if (ThisEvent.EventParam == ENV_WAIT_TIMER) {
@@ -408,7 +414,7 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
         
         case EV_I2C_COMPLETE:
         {            
-            ES_Timer_InitTimer(ENV_TIMER, 150);
+            ES_Timer_InitTimer(ENV_TIMER, 10000);
         }
         break;
         
@@ -417,7 +423,7 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
             // Measurement failed, advance to next stage
             CurrentState = SHT_Read_Env;
 #ifdef VERBOSE
-            DB_printf("In SHT_Read_Env");
+            DB_printf("\r\nIn SHT_Read_Env (from error)\r\n");
 #endif
             ES_Timer_InitTimer(ENV_TIMER, 150);
         }
@@ -438,7 +444,7 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
             if (ThisEvent.EventParam == ENV_TIMER) {
                 CurrentState = SGP_Meas_Env; 
 #ifdef VERBOSE
-                DB_printf("In SGP_Meas_Env");
+                DB_printf("\r\nIn SGP_Meas_Env\r\n");
 #endif
                 Get_AirQuality(AirQuality_Buffer);
             }          
@@ -652,7 +658,9 @@ bool Get_AirQuality(uint8_t *buf) {
     // First check buffer exists and the i2c isn't busy
     if (buf == NULL) {
         return false;
+        DB_printf("Error: 1");
     } else if (i2c2_t.busy) {
+        DB_printf("Error: 2");
         return false;
     }
     
@@ -910,11 +918,12 @@ void __ISR(_I2C2_MASTER_VECTOR, IPL7SRS) HostHandler(void) {
             else if (i2c2_t.command_wait) {
                 // Start a timer for waiting
                 ES_Timer_InitTimer(ENV_WAIT_TIMER, i2c2_t.command_wait_time);
+                i2c2_t.stage = I2C_ST_RESTART;
             } else {
                 // Immediately continue with Repeated start
                 I2C2CONbits.RSEN = 1;
+                i2c2_t.stage = I2C_ST_RESTART;
             }
-            i2c2_t.stage = I2C_ST_RESTART;
             break;
 
         case I2C_ST_RESTART:
@@ -927,7 +936,7 @@ void __ISR(_I2C2_MASTER_VECTOR, IPL7SRS) HostHandler(void) {
 
         case I2C_ST_ADDR_R:
             if (I2C2STATbits.ACKSTAT) { 
-                DB_printf("ERROR\r\n");
+                DB_printf("Ack error (I2C_ST_ADDR_R\r\n");
                 i2c2_t.stage = I2C_ST_ERROR; 
                 break; 
             }
