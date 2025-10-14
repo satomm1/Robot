@@ -16,7 +16,8 @@
 // State definitions for use with the query function
 typedef enum
 {
-  InitPState_Env, Idle_Env_T_RH, T_RH_Meas, Idle_Env_Air, Air_Meas
+  InitPState_Env, Idle_Env, SGP_Conditioning_Env, SGP_Meas_Env, 
+          SHT_Meas_Env, SHT_Read_Env
 }EnvironmentSensorState_t;
 
 typedef enum {
@@ -33,9 +34,18 @@ typedef enum {
     I2C_ST_ERROR
 } I2C2_Stage;
 
+typedef enum {
+    Sensor, SerialNumber
+} EnvSensData_t;
+
+typedef enum {
+    Write, Read
+} I2CMessageType_t;
+
 typedef struct {
     volatile I2C2_Stage stage;
     volatile uint8_t dev7;
+    volatile I2CMessageType_t message_type;
     volatile bool command_wait;
     volatile uint32_t command_wait_time; // In ms
     volatile uint16_t command_len;
@@ -44,6 +54,7 @@ typedef struct {
     volatile uint8_t *buf;
     volatile uint16_t len;
     volatile uint16_t idx;
+    volatile EnvSensData_t datatype;
     volatile bool busy;
 } I2C2_Trans;
 

@@ -57,6 +57,7 @@
       <itemPath>ProjectHeaders/matt_circular_buffer.h</itemPath>
       <itemPath>ProjectHeaders/EnvironmentSensorSM.h</itemPath>
       <itemPath>ProjectHeaders/SDCardSM.h</itemPath>
+      <itemPath>ProjectHeaders/sensirion_gas_index_algorithm.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -81,6 +82,7 @@
       <itemPath>ProjectSource/matt_circular_buffer.c</itemPath>
       <itemPath>ProjectSource/EnvironmentSensorSM.c</itemPath>
       <itemPath>ProjectSource/SDCardSM.c</itemPath>
+      <itemPath>ProjectSource/sensirion_gas_index_algorithm.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

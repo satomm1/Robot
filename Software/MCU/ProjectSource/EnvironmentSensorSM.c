@@ -27,6 +27,8 @@
 #include "ES_Framework.h"
 #include <sys/attribs.h>
 #include "EnvironmentSensorSM.h"
+#include "dbprintf.h"
+#include "sensirion_gas_index_algorithm.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 #define SHT4x_ADD 0x44
@@ -37,15 +39,32 @@
 #define CRC8_POLY  0x31  // x^8 + x^5 + x^4 + 1
 #define CRC8_INIT  0xFF
 #define CRC8_XOROUT 0x00
+
+//#define TESTING
+#define PRODUCTION
+
+#define VERBOSE
 /*---------------------------- Module Functions ---------------------------*/
 /* prototypes for private functions for this machine.They should be functions
    relevant to the behavior of this state machine
 */
 bool I2C2_Busy(void);
-bool Get_T_RH(bool heat, uint8_t *buf);
+
+// Functions for temp/humidity sensor
+bool Get_SHT40_Serial_Num(uint8_t *buf);
+bool PerformMeasurement_T_RH(bool heat, uint8_t *buf);
+bool ReadMeasurement_T_RH(uint8_t *buf);
+
+// Functions for air quality sensor
+bool Get_SGP_Serial_Num(uint8_t *buf);
+bool Condition_AirQuality(uint8_t *buf);
 bool Get_AirQuality(uint8_t *buf);
-uint8_t crc8_poly31_ff(const uint8_t *data, uint16_t len);
-bool crc8_valid_residue(const uint8_t data[3]);
+bool SelfTest_AirQuality(uint8_t *buf);
+bool TurnHeaterOff_AirQuality(uint8_t *buf);
+
+// CRC Checksum functions
+uint8_t crc8_poly31_ff( uint8_t *data, uint16_t len);
+bool crc8_valid_residue( uint8_t data[3]);
 
 /*---------------------------- Module Variables ---------------------------*/
 // everybody needs a state variable, you may need others as well.
@@ -61,6 +80,20 @@ static volatile uint8_t commands[16];
 
 static uint8_t T_RH_Buffer[16];
 static uint8_t AirQuality_Buffer[16];
+
+// Gas sensor/index values
+static int32_t voc_raw_value; // read from sensor
+static int32_t voc_index_value; // computed from gas index algorithm
+static int32_t nox_raw_value; // read from sensor 
+static int32_t nox_index_value; // computed from gas index algorithm
+
+// Gas index algorithm parameters
+static GasIndexAlgorithmParams voc_params;
+static GasIndexAlgorithmParams nox_params;
+
+// Temperature and humidity values
+static float temperature;
+static float relative_humidity;
 
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
@@ -178,46 +211,57 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
     case InitPState_Env:
     {
       if (ThisEvent.EventType == ES_INIT)    
-      {
+      {         
         // now put the machine into the actual initial state
-        CurrentState = Idle_Env_T_RH;
+        CurrentState = Idle_Env;
         
         // Turn I2C2 On to allow I2C operations
         I2C2CONbits.ON = 1;
         
+        // Initialize the gas index algorithms
+        GasIndexAlgorithm_init(&voc_params, GasIndexAlgorithm_ALGORITHM_TYPE_VOC);
+        GasIndexAlgorithm_init(&nox_params, GasIndexAlgorithm_ALGORITHM_TYPE_NOX);
+
         ES_Timer_InitTimer(ENV_TIMER, 1000);
       }
     }
     break;
 
-    case Idle_Env_T_RH:   
+    case Idle_Env:   
     {
       switch (ThisEvent.EventType)
       {
         case ES_TIMEOUT: 
         {   
+#ifdef TESTING
             if (ThisEvent.EventParam == ENV_TIMER) {
-                CurrentState = T_RH_Meas; 
-                Get_T_RH(true, T_RH_Buffer);
-            }          
-        }
-        break;
-
-        default:
-          ;
-      }  
-    }
-    break;
-     
-    case T_RH_Meas:   
-    {
-      switch (ThisEvent.EventType)
-      {
-        case ES_TIMEOUT: 
-        {   
+//                Get_SHT40_Serial_Num(T_RH_Buffer);
+//                Get_SGP_Serial_Num(T_RH_Buffer);
+                
+                SelfTest_AirQuality(T_RH_Buffer);
+            }     
+            
             if (ThisEvent.EventParam == ENV_WAIT_TIMER) {
                 I2C2CONbits.RSEN = 1; // Time to perform the Repeated Start
             }
+#endif
+            
+#ifdef PRODUCTION
+            if (ThisEvent.EventParam == ENV_TIMER) {
+                
+                CurrentState = SGP_Conditioning_Env; 
+#ifdef VERBOSE
+                DB_printf("In SGP_Conditioning_Env");
+#endif
+                ES_Timer_InitTimer(ENV_TIMER, 5000);
+                Condition_AirQuality(AirQuality_Buffer);
+                
+            }     
+            
+            if (ThisEvent.EventParam == ENV_WAIT_TIMER) {
+                I2C2CONbits.RSEN = 1; // Time to perform the Repeated Start
+            }
+#endif
         }
         break;
         
@@ -225,15 +269,157 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
         {
             // TODO: Process the data
             
-            ES_Timer_InitTimer(ENV_TIMER, 1000);
-            CurrentState = Idle_Env_Air;
+            DB_printf("SHT40 Serial:\r\n %d\r\n", T_RH_Buffer[0]);
+            DB_printf("%d\r\n", T_RH_Buffer[1]);
+            DB_printf("%d\r\n", T_RH_Buffer[2]);
+            DB_printf("%d\r\n", T_RH_Buffer[3]);
+            DB_printf("%d\r\n", T_RH_Buffer[4]);
+            DB_printf("%d\r\n", T_RH_Buffer[5]);
+            DB_printf("%d\r\n", T_RH_Buffer[6]);
+            DB_printf("%d\r\n", T_RH_Buffer[7]);
+            DB_printf("%d\r\n", T_RH_Buffer[8]);
+                        
+            bool first_word_valid = crc8_valid_residue(&T_RH_Buffer[0]);
+            bool second_word_valid = crc8_valid_residue(&T_RH_Buffer[3]);
+            bool third_word_valid = crc8_valid_residue(&T_RH_Buffer[6]);
+            
+            if (first_word_valid) {
+                DB_printf("First word valid\r\n");
+            } else {
+                DB_printf("First word not valid\r\n");
+            }
+            
+            if (second_word_valid) {
+                DB_printf("Second word valid\r\n");
+            } else {
+                DB_printf("Second word not valid\r\n");
+            }
+            
+            if (third_word_valid) {
+                DB_printf("Third word valid\r\n");
+            } else {
+                DB_printf("Third word not valid\r\n");
+            }
+        }
+        break;
+
+
+        default:
+          ;
+      }  
+    }
+    break;
+    
+    case SGP_Conditioning_Env:
+    {
+        switch (ThisEvent.EventType) {
+        
+            case ES_TIMEOUT: 
+            {  
+                if (ThisEvent.EventParam == ENV_TIMER) {
+                    CurrentState = SGP_Meas_Env;
+#ifdef VERBOSE
+                    DB_printf("In SGP_Meas_Env");
+#endif
+                    Get_AirQuality(AirQuality_Buffer);
+                }
+            }
+            break;
+            
+            default:
+             ;
+        
+        }
+    }
+    break;
+    
+    case SGP_Meas_Env:
+    {
+        switch (ThisEvent.EventType) {
+        
+            case ES_TIMEOUT: 
+            {  
+                if (ThisEvent.EventParam == ENV_TIMER) {
+                    CurrentState = SHT_Meas_Env;
+#ifdef VERBOSE
+                    DB_printf("In SHT_Meas_Env");
+#endif
+                    PerformMeasurement_T_RH(true, T_RH_Buffer);
+                } else if (ThisEvent.EventParam == ENV_WAIT_TIMER) {
+                    I2C2CONbits.RSEN = 1; // Time to perform the Repeated Start
+                }
+            }
+            break;
+            
+            case EV_I2C_COMPLETE:
+            {
+                // Process the measurement data
+                
+                // Verify checksum
+                bool voc_valid = crc8_valid_residue(&AirQuality_Buffer[0]);
+                bool nox_valid = crc8_valid_residue(&AirQuality_Buffer[3]);
+                
+                if (voc_valid) {
+                    voc_raw_value = (uint16_t)AirQuality_Buffer[0] << 8 | (uint16_t)AirQuality_Buffer[1];
+                    GasIndexAlgorithm_process(&voc_params, voc_raw_value, &voc_index_value);
+                }
+                
+                if (nox_valid) {
+                    nox_raw_value = (uint16_t)AirQuality_Buffer[3] << 8 | (uint16_t)AirQuality_Buffer[4];
+                    GasIndexAlgorithm_process(&nox_params, nox_raw_value, &nox_index_value);
+                }
+                
+                // Timer to advance to temp/humidity measurement
+                ES_Timer_InitTimer(ENV_TIMER, 450);
+            }
+            break;
+            
+            case EV_I2C_ERROR:
+            {            
+                // Measurement failed, set timer to advance to next stage
+                ES_Timer_InitTimer(ENV_TIMER, 450);
+            }
+            break;
+            
+            default:
+             ;
+        
+        }
+    }    
+    break;
+    
+    case SHT_Meas_Env:   
+    {
+      switch (ThisEvent.EventType)
+      {
+        case ES_TIMEOUT: 
+        {   
+            if (ThisEvent.EventParam == ENV_TIMER) {
+                CurrentState = SHT_Read_Env;
+#ifdef VERBOSE
+                DB_printf("In SHT_Read_Env");
+#endif
+                ReadMeasurement_T_RH(T_RH_Buffer);
+            } else if (ThisEvent.EventParam == ENV_WAIT_TIMER) {
+                I2C2CONbits.RSEN = 1; // Time to perform the Repeated Start
+            }
+        }
+        break;
+        
+        case EV_I2C_COMPLETE:
+        {            
+            ES_Timer_InitTimer(ENV_TIMER, 150);
         }
         break;
         
         case EV_I2C_ERROR:
-        {
-            // We had an error: try getting the data again
-            Get_T_RH(true, T_RH_Buffer);
+        {            
+            // Measurement failed, advance to next stage
+            CurrentState = SHT_Read_Env;
+#ifdef VERBOSE
+            DB_printf("In SHT_Read_Env");
+#endif
+            ES_Timer_InitTimer(ENV_TIMER, 150);
         }
         break;
 
@@ -243,51 +429,33 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
     }
     break;
     
-    case Idle_Env_Air:   
+    case SHT_Read_Env:   
     {
       switch (ThisEvent.EventType)
       {
         case ES_TIMEOUT: 
         {   
             if (ThisEvent.EventParam == ENV_TIMER) {
-                CurrentState = Air_Meas; 
+                CurrentState = SGP_Meas_Env; 
+#ifdef VERBOSE
+                DB_printf("In SGP_Meas_Env");
+#endif
                 Get_AirQuality(AirQuality_Buffer);
             }          
         }
         break;
-
-        default:
-          ;
-      }  
-    }
-    break;
-     
-    case Air_Meas:   
-    {
-      switch (ThisEvent.EventType)
-      {
-        case ES_TIMEOUT: 
-        {   
-            if (ThisEvent.EventParam == ENV_WAIT_TIMER) {
-                I2C2CONbits.RSEN = 1; // Time to perform the Repeated Start
-            }
-          
-        }
-        break;
         
         case EV_I2C_COMPLETE:
-        {
-            // TODO: Process the data
+        {            
+            // TODO: Process temperature/humidity data
             
-            ES_Timer_InitTimer(ENV_TIMER, 1000);
-            CurrentState = Idle_Env_T_RH;
+            ES_Timer_InitTimer(ENV_TIMER, 350);
         }
         break;
         
         case EV_I2C_ERROR:
-        {
-            // We had an error: try getting the data again
-            Get_AirQuality(AirQuality_Buffer);
+        {                        
+            ES_Timer_InitTimer(ENV_TIMER, 350); // Timer to advance to next stage
         }
         break;
 
@@ -332,73 +500,314 @@ bool I2C2_Busy(void) {
     return i2c2_t.busy;
 }
 
-bool Get_T_RH(bool heat, uint8_t *buf) {
+bool Get_SHT40_Serial_Num(uint8_t *buf) {
+    if (buf == NULL) {
+        DB_printf("1\r\n");
+        return false;
+    } else if (i2c2_t.busy) {
+        DB_printf("2\r\n");
+        return false;
+    } else if (!I2C2STATbits.P) {
+//        DB_printf("3\r\n");
+//        return false;
+    }
+    
+    i2c2_t.dev7 = SHT4x_ADD;
+    
+    // Command length = 1 byte, change command depending on heat or no heat
+    i2c2_t.message_type = Write; 
+    i2c2_t.command_wait = true;
+    i2c2_t.command_len = 1;
+    commands[0] = 0x89;
+    i2c2_t.command_wait_time = 105;
+    i2c2_t.reg = commands;
+    i2c2_t.reg_idx = 0;
+    
+    i2c2_t.buf = buf;
+    i2c2_t.len = 6;
+    i2c2_t.idx = 0;
+    i2c2_t.busy = true;
+    i2c2_t.stage = I2C_ST_START;
+    i2c2_t.datatype = SerialNumber;
+    
+    DB_printf("Getting Serial\r\n");
+    
+    I2C2CONbits.SEN = 1;
+    return true; // Successfully started the transmission sequence
+}
+
+bool PerformMeasurement_T_RH(bool heat, uint8_t *buf) {
     // Check if I2C2 is busy or not ready yet
     if (buf == NULL) {
         return false;
     } else if (i2c2_t.busy) {
-        return false;
-    } else if (!I2C2STATbits.P) {
         return false;
     }
     
     i2c2_t.dev7 = SHT4x_ADD;
     
     // Command length = 1 byte, change command depending on heat or no heat
-    i2c2_t.command_wait = true;
+    i2c2_t.message_type = Write; 
+    i2c2_t.command_wait = false;
     i2c2_t.command_len = 1;
     if (heat) {
         commands[0] = 0x15;
-        i2c2_t.command_wait_time = 105;
     } else {
         commands[0] = 0xFD;
-        i2c2_t.command_wait_time = 50;
     }
     i2c2_t.reg = commands;
     i2c2_t.reg_idx = 0;
     
     i2c2_t.buf = buf;
-    i2c2_t.len = 6;
+    i2c2_t.len = 0;
     i2c2_t.idx = 0;
     i2c2_t.busy = true;
     i2c2_t.stage = I2C_ST_START;
+    i2c2_t.datatype = Sensor;
+    
+#ifdef VERBOSE
+    DB_printf("Starting SHT Measurement\r\n");
+#endif
+    
+    I2C2CONbits.SEN = 1;
+    return true; // Successfully started the transmission sequence
+}
+
+bool ReadMeasurement_T_RH(uint8_t *buf) {
+    // Start I2C Sequence for reading the temp/humidity from the SHT4x Sensor 
+    
+    // First check buffer exists and the i2c isn't busy
+    if (buf == NULL) {
+        DB_printf("1\r\n");
+        return false;
+    } else if (i2c2_t.busy) {
+        DB_printf("2\r\n");
+        return false;
+    } 
+    
+    i2c2_t.dev7 = SHT4x_ADD; // Address of device (7 bits)
+    i2c2_t.message_type = Read; // Perform a read action
+    i2c2_t.command_wait = false; // Wait after providing a command
+    i2c2_t.command_len = 0; // Number of bytes of command
+    i2c2_t.command_wait_time = 0;  // How long to wait after command
+    i2c2_t.reg_idx = 0; // Starting index for command
+    
+    i2c2_t.buf = buf; // Buffer for storing returned data from sensor 
+    i2c2_t.len = 6; // Length of data expected from sensor (in bytes)
+    i2c2_t.idx = 0; // Starting index for storing data in buffer
+    i2c2_t.busy = true; // Indicate the I2C is busy
+    i2c2_t.stage = I2C_ST_START; // Set in start stage
+    i2c2_t.datatype = Sensor; // Set data type we are expecting
+    
+#ifdef VERBOSE
+    DB_printf("Reading Measurement of SHT\r\n");
+#endif
+    
+    I2C2CONbits.SEN = 1;
+    return true; // Successfully started the transmission sequence
+}
+
+///////////////// AIR QUALITY FUNCTIONS (SGP 41 ) /////////////////////////////
+bool Get_SGP_Serial_Num(uint8_t *buf) {
+    // Start I2C Sequence for obtaining the serial # of the SGP41 Sensor 
+    
+    // First check buffer exists and the i2c isn't busy
+    if (buf == NULL) {
+        DB_printf("1\r\n");
+        return false;
+    } else if (i2c2_t.busy) {
+        DB_printf("2\r\n");
+        return false;
+    } 
+    
+    i2c2_t.dev7 = SGP41_ADD; // Address of device (7 bits)
+    i2c2_t.message_type = Write; // Perform a write action
+    i2c2_t.command_wait = true; // Wait after providing a command
+    i2c2_t.command_len = 2; // Number of bytes of command
+    commands[0] = 0x36; // Command to send
+    commands[1] = 0x82;
+    i2c2_t.command_wait_time = 105;  // How long to wait after command
+    i2c2_t.reg = commands; 
+    i2c2_t.reg_idx = 0; // Starting index for command
+    
+    i2c2_t.buf = buf; // Buffer for storing returned data from sensor 
+    i2c2_t.len = 9; // Length of data expected from sensor (in bytes)
+    i2c2_t.idx = 0; // Starting index for storing data in buffer
+    i2c2_t.busy = true; // Indicate the I2C is busy
+    i2c2_t.stage = I2C_ST_START; // Set in start stage
+    i2c2_t.datatype = SerialNumber; // Set data type we are expecting
+    
+#ifdef VERBOSE
+    DB_printf("Getting Serial of SGP\r\n");
+#endif
     
     I2C2CONbits.SEN = 1;
     return true; // Successfully started the transmission sequence
 }
 
 bool Get_AirQuality(uint8_t *buf) {
-    // Check if I2C2 is busy or not ready yet
+    // Starts the I2C Sequence for getting the raw VO2 and NOX data using the 
+    // sgp41_measure_raw_signals command
+    
+    // First check buffer exists and the i2c isn't busy
     if (buf == NULL) {
         return false;
     } else if (i2c2_t.busy) {
         return false;
-    } else if (!I2C2STATbits.P) {
-        return false;
     }
     
-    i2c2_t.dev7 = SGP41_ADD;
-    
-    // Command length = 1 byte, change command depending on heat or no heat
-    i2c2_t.command_wait = true;
-    i2c2_t.command_len = 2;
-    commands[0] = 0x26;
+    i2c2_t.dev7 = SGP41_ADD; // Address of device (7 bits)
+    i2c2_t.message_type = Write; // Perform a write action
+    i2c2_t.command_wait = true; // Wait after providing a command
+    i2c2_t.command_len = 8; // Number of bytes of command
+    commands[0] = 0x26; // Command to send
     commands[1] = 0x19;
-    i2c2_t.command_wait_time = 55;
+    commands[2] = 0x80;
+    commands[3] = 0x00;
+    commands[4] = 0xA2;
+    commands[5] = 0x66;
+    commands[6] = 0x66;
+    commands[7] = 0x93;    
+    i2c2_t.command_wait_time = 55; // How long to wait after command
     i2c2_t.reg = commands;
-    i2c2_t.reg_idx = 0;
+    i2c2_t.reg_idx = 0; // Starting index for command
     
-    i2c2_t.buf = buf;
-    i2c2_t.len = 6;
-    i2c2_t.idx = 0;
-    i2c2_t.busy = true;
-    i2c2_t.stage = I2C_ST_START;
+    i2c2_t.buf = buf; // Buffer for storing returned data from sensor 
+    i2c2_t.len = 6; // Length of data expected from sensor (in bytes)
+    i2c2_t.idx = 0; // Starting index for storing data in buffer
+    i2c2_t.busy = true; // Indicate the I2C is busy
+    i2c2_t.stage = I2C_ST_START; // Set in start stage
+    i2c2_t.datatype = Sensor; // Set data type we are expecting
+    
+#ifdef VERBOSE
+    DB_printf("Getting Raw Sensor Data from SGP\r\n");
+#endif
     
     I2C2CONbits.SEN = 1;
     return true; // Successfully started the transmission sequence
 }
 
-uint8_t crc8_poly31_ff(const uint8_t *data, uint16_t len) {
+bool Condition_AirQuality(uint8_t *buf){
+    // Starts the I2C Sequence for conditioning the sensor using the 
+    // sgp41_execute_conditioning command
+    
+    // First check buffer exists and the i2c isn't busy
+    if (buf == NULL) {
+        return false;
+    } else if (i2c2_t.busy) {
+        return false;
+    }
+    
+    i2c2_t.dev7 = SGP41_ADD; // Address of device (7 bits)
+    i2c2_t.message_type = Write; // Perform a write action
+    i2c2_t.command_wait = false; // Wait after providing a command
+    i2c2_t.command_len = 8; // Number of bytes of command
+    commands[0] = 0x26; // Command to send
+    commands[1] = 0x12;
+    commands[2] = 0x80;
+    commands[3] = 0x00;
+    commands[4] = 0xA2;
+    commands[5] = 0x66;
+    commands[6] = 0x66;
+    commands[7] = 0x93;    
+    i2c2_t.command_wait_time = 0; // How long to wait after command
+    i2c2_t.reg = commands;
+    i2c2_t.reg_idx = 0; // Starting index for command
+    
+    i2c2_t.buf = buf; // Buffer for storing returned data from sensor 
+    i2c2_t.len = 0; // Length of data expected from sensor (in bytes)
+    i2c2_t.idx = 0; // Starting index for storing data in buffer
+    i2c2_t.busy = true; // Indicate the I2C is busy
+    i2c2_t.stage = I2C_ST_START; // Set in start stage
+    i2c2_t.datatype = Sensor; // Set data type we are expecting
+    
+#ifdef VERBOSE
+    DB_printf("Conditioning the SGP\r\n");
+#endif
+    
+    I2C2CONbits.SEN = 1;
+    return true; // Successfully started the transmission sequence
+}
+            
+bool SelfTest_AirQuality(uint8_t *buf) {
+    // Starts the I2C Sequence for performing the self test using the 
+    // sgp41_execute_self_test
+    
+    // The 2 least significant bits of the 2nd returned byte should be 0 to 
+    // pass the self test
+    
+    // First check buffer exists and the i2c isn't busy
+    if (buf == NULL) {
+        return false;
+    } else if (i2c2_t.busy) {
+        return false;
+    }
+    
+    i2c2_t.dev7 = SGP41_ADD; // Address of device (7 bits)
+    i2c2_t.message_type = Write; // Perform a write action
+    i2c2_t.command_wait = true; // Wait after providing a command
+    i2c2_t.command_len = 2; // Number of bytes of command
+    commands[0] = 0x28; // Command to send
+    commands[1] = 0x0E;
+    i2c2_t.command_wait_time = 320; // How long to wait after command
+    i2c2_t.reg = commands;
+    i2c2_t.reg_idx = 0; // Starting index for command
+    
+    i2c2_t.buf = buf; // Buffer for storing returned data from sensor 
+    i2c2_t.len = 3; // Length of data expected from sensor (in bytes)
+    i2c2_t.idx = 0; // Starting index for storing data in buffer
+    i2c2_t.busy = true; // Indicate the I2C is busy
+    i2c2_t.stage = I2C_ST_START; // Set in start stage
+    i2c2_t.datatype = Sensor; // Set data type we are expecting
+    
+#ifdef VERBOSE
+    DB_printf("Performing self test on the SGP\r\n");
+#endif
+    
+    I2C2CONbits.SEN = 1;
+    return true; // Successfully started the transmission sequence
+}
+
+bool TurnHeaterOff_AirQuality(uint8_t *buf) {
+    // Starts the I2C Sequence for turning of the heater using the 
+    // sgp41_turn_heater_off command
+    
+    // First check buffer exists and the i2c isn't busy
+    if (buf == NULL) {
+        return false;
+    } else if (i2c2_t.busy) {
+        return false;
+    }
+    
+    i2c2_t.dev7 = SGP41_ADD; // Address of device (7 bits)
+    i2c2_t.message_type = Write; // Perform a write action
+    i2c2_t.command_wait = false; // Wait after providing a command
+    i2c2_t.command_len = 2; // Number of bytes of command
+    commands[0] = 0x36; // Command to send
+    commands[1] = 0x15;  
+    i2c2_t.command_wait_time = 0; // How long to wait after command
+    i2c2_t.reg = commands;
+    i2c2_t.reg_idx = 0; // Starting index for command
+    
+    i2c2_t.buf = buf; // Buffer for storing returned data from sensor 
+    i2c2_t.len = 0; // Length of data expected from sensor (in bytes)
+    i2c2_t.idx = 0; // Starting index for storing data in buffer
+    i2c2_t.busy = true; // Indicate the I2C is busy
+    i2c2_t.stage = I2C_ST_START; // Set in start stage
+    i2c2_t.datatype = Sensor; // Set data type we are expecting
+    
+#ifdef VERBOSE
+    DB_printf("Turning SGP Heater off\r\n");
+#endif
+    
+    I2C2CONbits.SEN = 1;
+    return true; // Successfully started the transmission sequence
+}
+
+
+///////////////////// CRC CHECKSUM FUNCTIONS //////////////////////////////////
+uint8_t crc8_poly31_ff( uint8_t *data, uint16_t len) {
+    // Creates a CRC Checksum on the provided data 
     uint8_t crc = CRC8_INIT;
     for (uint8_t i = 0; i < len; i++) {
         crc ^= data[i];              // combine next byte
@@ -413,7 +822,10 @@ uint8_t crc8_poly31_ff(const uint8_t *data, uint16_t len) {
     return (uint8_t)(crc ^ CRC8_XOROUT);
 }
 
-bool crc8_valid_residue(const uint8_t data[3]) {
+bool crc8_valid_residue( uint8_t data[3]) {
+    // Checks if the checksum is correct
+    // Input: uint8_t data[3]: first two values are data, thrid value is 
+    //                         the checksum for the previous two values
     return (crc8_poly31_ff(data, 3) == 0x00);
 }
 
@@ -447,17 +859,30 @@ void __ISR(_I2C2_MASTER_VECTOR, IPL7SRS) HostHandler(void) {
     
     switch (i2c2_t.stage) {
         case I2C_ST_START:
-            // Start complete --> send device addr (write)
-            I2C2TRN = (i2c2_t.dev7 << 1) | I2C_WRITE;
-            i2c2_t.stage = I2C_ST_ADDR_W;
+            
+            if (i2c2_t.message_type == Write) {
+                // Start complete --> send device addr (write)
+                I2C2TRN = (i2c2_t.dev7 << 1) | I2C_WRITE;
+                i2c2_t.stage = I2C_ST_ADDR_W;
+                DB_printf("In I2C_ST_START (write)\r\n");
+            } else {
+                // Start complete --> send device addr (read)
+                I2C2TRN = (i2c2_t.dev7 << 1) | I2C_READ;
+                i2c2_t.stage = I2C_ST_ADDR_R; // Skip the command writing
+                DB_printf("In I2C_ST_START (read)\r\n");
+            }
+            
             break;
 
         case I2C_ST_ADDR_W:
             // Address(W) completed; check ACK
             if (I2C2STATbits.ACKSTAT) { 
                 i2c2_t.stage = I2C_ST_ERROR; 
+                DB_printf("Ack Error\r\n");
                 break; 
             }
+            
+            DB_printf("In I2C_ST_ADDR_W\r\n");
             
             // No Error --- OK to continue
             // Send register address
@@ -475,7 +900,14 @@ void __ISR(_I2C2_MASTER_VECTOR, IPL7SRS) HostHandler(void) {
                 break; 
             }
             
-            if (i2c2_t.command_wait) {
+            DB_printf("In I2C_ST_REG\r\n");
+            
+            if (i2c2_t.len == 0) {
+                // Only command, not receiving any data
+                I2C2CONbits.PEN = 1;
+                i2c2_t.stage = I2C_ST_STOP;
+            }
+            else if (i2c2_t.command_wait) {
                 // Start a timer for waiting
                 ES_Timer_InitTimer(ENV_WAIT_TIMER, i2c2_t.command_wait_time);
             } else {
@@ -487,16 +919,20 @@ void __ISR(_I2C2_MASTER_VECTOR, IPL7SRS) HostHandler(void) {
 
         case I2C_ST_RESTART:
             // Restart complete --> send device addr (read)
+            DB_printf("In I2C_ST_RESTART\r\n");
+            
             I2C2TRN = (i2c2_t.dev7 << 1) | I2C_READ;
             i2c2_t.stage = I2C_ST_ADDR_R;
             break;
 
         case I2C_ST_ADDR_R:
             if (I2C2STATbits.ACKSTAT) { 
+                DB_printf("ERROR\r\n");
                 i2c2_t.stage = I2C_ST_ERROR; 
                 break; 
             }
             
+            DB_printf("In I2C_ST_ADDR_R\r\n");
             // Begin first receive
             I2C2CONbits.RCEN = 1;
             i2c2_t.stage = I2C_ST_RECV;
@@ -508,6 +944,8 @@ void __ISR(_I2C2_MASTER_VECTOR, IPL7SRS) HostHandler(void) {
                 // No byte yet, wait for next interrupt
                 break;
             }
+            
+            DB_printf("In I2C_ST_RECV\r\n");
             i2c2_t.buf[i2c2_t.idx++] = I2C2RCV;
 
             // Prepare ACK/NACK
@@ -533,6 +971,7 @@ void __ISR(_I2C2_MASTER_VECTOR, IPL7SRS) HostHandler(void) {
             break;
 
         case I2C_ST_STOP:
+            DB_printf("In I2C_ST_STOP\r\n");
             // Stop complete
             i2c2_t.stage = I2C_ST_DONE;
             // fallthrough
