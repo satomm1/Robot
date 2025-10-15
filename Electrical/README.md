@@ -24,7 +24,7 @@ After populating the board, we need to make several connections from the board t
 
 2. Connecting to the Jetson
 
-    - The jetson is connected via a 6 position female molex connector on the PCB, and dupont connectors on the Jetson header. Only the first five positions on the PCB need to be connected (SCK, SS, SDO, SDI, GND) and must be matched to the corresponding SPI pins on the Jetson header. For example, if using SPI1 on the jetson:
+    - The jetson is connected via a 6 position female molex connector on the PCB, and dupont connectors on the Jetson header. Only the first five positions on the PCB need to be connected (SCK, SS, SDO, SDI, GND) and must be matched to the corresponding SPI pins on the Jetson header. For example, if using SPI1 (SPI3) on the jetson:
 
         | Jetson Pin Name       | Jetson GPIO | PCB Pin Name |
         |-----------------------|-------------|--------------|
@@ -33,6 +33,8 @@ After populating the board, we need to make several connections from the board t
         | SPI1_din (SPI3_din)   | 21 (22)     | SDO          |
         | SPI1_dout (SPI3_dout) | 19 (37)     | SDI          |
         | GND                   | 25 (20)     | GND          |
+
+    - **Note:** If using twisted pair wire, **DO NOT** twist the SDO and SDI wires together. This will lead to unintended crosstalk that can significantly degrade the ability of the Jetson to communicate with the PCB.
 
 3. Connecting to the power supply
     
