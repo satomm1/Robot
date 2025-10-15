@@ -369,6 +369,7 @@ sudo docker load < your_image.tar.gz
     export ROS_IP=<Your Robot IP Here>                                
     export ROS_MASTER_URI=http://$ROS_IP:11311
     export ROBOT_ID=<Robot ID Here (Integer)>
+    export MCU_SPI=<SPI used for MCU comms (either 1 or 3)>
     export CYCLONEDDS_HOME="/home/cyclonedds/install"
     ```
     Source the bashrc file:
