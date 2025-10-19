@@ -24,13 +24,16 @@ We use an 8 GB Nvidia Jetson Orin Nano Developer Kit for high level control of t
         - We need to manullay conifgure the 40 pin header
         - Select options to activate SPI1 and I2S
     - Reboot the Jetson for the new pin functions to take effect
-    - Call `sudo modprobe spidev`
 
-6) If you have issues with `dev/ttyUSB0`, you may need to call `sudo apt remove brltty`
+6) Load the spidev module automatically on start up:
+	- Edit the file: `sudo nano /etc/modules-load.d/spidev.conf`
+ 	- write: `spidev` in the file, and save the file. Reboot the Jetson to take effect.
 
-7) Connect the corresponding SPI pins on the header to the SPI pins on the MCU control board. The corresponding pins are listed in the [Electrical README](../Electrical/README.md).
+7) If you have issues with `dev/ttyUSB0`, you may need to call `sudo apt remove brltty`
 
-8) Connect the corresponding I2S pins on the header to the I2S pins on the microphone control board. The corresponding pins are listed in the [Microphone README](../Electrical/Microphones/README.md).
+8) Connect the corresponding SPI pins on the header to the SPI pins on the MCU control board. The corresponding pins are listed in the [Electrical README](../Electrical/README.md).
+
+9) Connect the corresponding I2S pins on the header to the I2S pins on the microphone control board. The corresponding pins are listed in the [Microphone README](../Electrical/Microphones/README.md).
 
 ## WiFi Roaming Setup Instructions
 Configuring the WiFi driver to roam is not straightforward. But, roaming will allow us to switch access points when connection is poor, rather than waiting for complete loss of connection to switch access points. 
@@ -366,6 +369,7 @@ sudo docker load < your_image.tar.gz
     export ROS_IP=<Your Robot IP Here>                                
     export ROS_MASTER_URI=http://$ROS_IP:11311
     export ROBOT_ID=<Robot ID Here (Integer)>
+    export MCU_SPI=<SPI used for MCU comms (either 1 or 3)>
     export CYCLONEDDS_HOME="/home/cyclonedds/install"
     ```
     Source the bashrc file:
