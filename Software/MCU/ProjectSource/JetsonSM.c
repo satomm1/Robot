@@ -521,14 +521,19 @@ void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
     } else {
         TempData = SPI2BUF;
         if (TempData == 55) {
+            bool too_late = false;
             while (!SPI2STATbits.SPIRBE) {
+                too_late = true;
                 TempData = SPI2BUF;
             }
 
-            for (uint8_t ii = 0; ii < 16; ii++) {
-                SPI2BUF = MessageToSend[ii];
+            if (!too_late){
+                for (uint8_t ii = 0; ii < 16; ii++) {
+                    SPI2BUF = MessageToSend[ii];
+                }
+                InMessage = true; // Now we are accepting message bytes
             }
-            InMessage = true; // Now we are accepting message bytes
+            
         }
     }
     
