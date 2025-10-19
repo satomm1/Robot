@@ -2,27 +2,16 @@
  Module
    EnvironmentSensorSM.c
 
- Revision
-   1.0.1
-
  Description
-   This is a template file for implementing flat state machines under the
-   Gen2 Events and Services Framework.
+   This is a file for implementing reading from the Sensiron SGP-41 and SHT-40
+   sensors (for air quality and temperature/humidity, respectively). The sensor 
+   communicate via an I2C bus. The VOC and NOX measurements are processed by 
+   Sensiron provided algorithms to output an air quality index. 
 
  Notes
 
- History
- When           Who     What/Why
- -------------- ---     --------
- 01/15/12 11:12 jec      revisions for Gen2 framework
- 11/07/11 11:26 jec      made the queue static
- 10/30/11 17:59 jec      fixed references to CurrentEvent in RunTemplateSM()
- 10/23/11 18:20 jec      began conversion from SMTemplate.c (02/20/07 rev)
 ****************************************************************************/
 /*----------------------------- Include Files -----------------------------*/
-/* include header files for this state machine as well as any machines at the
-   next lower level in the hierarchy that are sub-machines to this machine
-*/
 #include "ES_Configure.h"
 #include "ES_Framework.h"
 #include <sys/attribs.h>
@@ -39,6 +28,8 @@
 #define CRC8_POLY  0x31  // x^8 + x^5 + x^4 + 1
 #define CRC8_INIT  0xFF
 #define CRC8_XOROUT 0x00
+
+#define TWO_SIXTEEN 1U << 16 - 1
 
 //#define TESTING
 #define PRODUCTION
@@ -92,7 +83,9 @@ static GasIndexAlgorithmParams voc_params;
 static GasIndexAlgorithmParams nox_params;
 
 // Temperature and humidity values
+static uint32_t temperature_raw_value;
 static float temperature;
+static uint32_t humidity_raw_value;
 static float relative_humidity;
 
 /*------------------------------ Module Code ------------------------------*/
@@ -222,7 +215,7 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
         GasIndexAlgorithm_init(&voc_params, GasIndexAlgorithm_ALGORITHM_TYPE_VOC);
         GasIndexAlgorithm_init(&nox_params, GasIndexAlgorithm_ALGORITHM_TYPE_NOX);
 
-//        ES_Timer_InitTimer(ENV_TIMER, 1000);
+        ES_Timer_InitTimer(ENV_TIMER, 1000);
       }
     }
     break;
@@ -236,9 +229,9 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
 #ifdef TESTING
             if (ThisEvent.EventParam == ENV_TIMER) {
 //                Get_SHT40_Serial_Num(T_RH_Buffer);
-//                Get_SGP_Serial_Num(T_RH_Buffer);
+                Get_SGP_Serial_Num(T_RH_Buffer);
                 
-                SelfTest_AirQuality(T_RH_Buffer);
+//                SelfTest_AirQuality(T_RH_Buffer);
             }     
             
             if (ThisEvent.EventParam == ENV_WAIT_TIMER) {
@@ -344,7 +337,7 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
 #ifdef VERBOSE
                     DB_printf("\r\nIn SHT_Meas_Env\r\n");
 #endif
-                    PerformMeasurement_T_RH(true, T_RH_Buffer);
+                    PerformMeasurement_T_RH(false, T_RH_Buffer);
                 } else if (ThisEvent.EventParam == ENV_WAIT_TIMER) {
                     I2C2CONbits.RSEN = 1; // Time to perform the Repeated Start
                 }
@@ -405,6 +398,8 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
 #ifdef VERBOSE
                 DB_printf("\r\nIn SHT_Read_Env\r\n");
 #endif
+
+//                Get_SHT40_Serial_Num(T_RH_Buffer);
                 ReadMeasurement_T_RH(T_RH_Buffer);
             } else if (ThisEvent.EventParam == ENV_WAIT_TIMER) {
                 I2C2CONbits.RSEN = 1; // Time to perform the Repeated Start
@@ -414,7 +409,7 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
         
         case EV_I2C_COMPLETE:
         {            
-            ES_Timer_InitTimer(ENV_TIMER, 10000);
+            ES_Timer_InitTimer(ENV_TIMER, 2000);
         }
         break;
         
@@ -447,13 +442,34 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
                 DB_printf("\r\nIn SGP_Meas_Env\r\n");
 #endif
                 Get_AirQuality(AirQuality_Buffer);
+            } else if (ThisEvent.EventParam == ENV_WAIT_TIMER) {
+                I2C2CONbits.RSEN = 1; // Time to perform the Repeated Start
             }          
         }
         break;
         
         case EV_I2C_COMPLETE:
         {            
-            // TODO: Process temperature/humidity data
+            // First check that data is valid by checking checksum
+            bool temp_valid = crc8_valid_residue(&T_RH_Buffer[0]);
+            bool rh_valid = crc8_valid_residue(&T_RH_Buffer[3]);
+            
+            // Next convert raw values to actual temperature/humidity
+            if (temp_valid) {
+#ifdef VERBOSE
+                DB_printf("\r\nTemperature is valid\r\n");
+#endif
+                temperature_raw_value = (uint16_t)T_RH_Buffer[0] << 8 | (uint16_t)T_RH_Buffer[1];
+                temperature = -49 + 315 * temperature_raw_value / TWO_SIXTEEN; // in Fahrenheit
+            }
+            
+            if (rh_valid) {
+#ifdef VERBOSE
+                DB_printf("\r\nHumidity is valid\r\n");
+#endif
+                humidity_raw_value = (uint16_t)T_RH_Buffer[3] << 8 | (uint16_t)T_RH_Buffer[4];
+                relative_humidity = -6 + 125 * humidity_raw_value / TWO_SIXTEEN;
+            }
             
             ES_Timer_InitTimer(ENV_TIMER, 350);
         }
@@ -498,6 +514,95 @@ EnvironmentSensorState_t QueryEnvironmentSensorSM(void)
 {
   return CurrentState;
 }
+
+float GetTemperature(void) {
+    return temperature;
+}
+
+float GetHumidity(void) {
+    return relative_humidity;
+}
+
+int32_t GetVOCIndex(void) {
+    return voc_index_value;
+}
+
+int32_t GetNOXIndex(void) {
+    return nox_index_value;
+}
+
+/****************************************************************************
+ Function
+     WriteTempHumidityToSPI
+
+ Parameters
+     uint8_t *Message2Send: the SPI buffer address to write the temperature
+                            and humidity data to
+
+ Returns
+     None
+
+ Description
+     Writes the current temperature and humidity data to the specified SPI buffer
+****************************************************************************/
+void WriteTempHumidityToSPI(uint8_t *Message2Send) {
+    Message2Send[0] = 6; // 6 indicates we are temp/rh data (byte 1)
+    
+    // The temperature and humidity data are both floats. The floats can be sent 
+    // as 4 chunks of 8 bits.
+
+    // Now write the temperature data (bytes 2-5)
+    uint32_t temp_as_int = *((uint32_t*)&temperature);
+    for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+      Message2Send[j+1] = (temp_as_int >> (24-8*j)) & 0xFF;
+    }
+
+    // Now write the humidity data (bytes 6-9)
+    uint32_t rh_as_int = *((uint32_t*)&relative_humidity);
+    for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
+      Message2Send[j+5] = (rh_as_int >> (24-8*j)) & 0xFF;
+    }
+    
+    for (uint8_t j = 0; j < 7; j++) {
+        Message2Send[j+9] = 0; // Fill rest of buffer with 0's
+    }
+}
+
+/****************************************************************************
+ Function
+     WriteAirQualityToSPI
+
+ Parameters
+     uint8_t *Message2Send: the SPI buffer address to write the air quality
+                            data to
+
+ Returns
+     None
+
+ Description
+     Writes the current VOC and NOX data to the specified SPI buffer
+****************************************************************************/
+void WriteAirQualityToSPI(uint8_t *Message2Send) {
+    Message2Send[0] = 5; // 6 indicates we are air quality data (byte 1)
+    
+    // The air quality indices data are both int32_t's. The floats can be sent 
+    // as 4 chunks of 8 bits.
+
+    // Now write the VOC data (bytes 2-5)
+    for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the int32
+        Message2Send[j+1] = (voc_index_value >> (24-8*j)) & 0xFF; 
+    }
+
+    // Now write the NOX data (bytes 6-9)
+    for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the uint32
+      Message2Send[j+5] = (nox_index_value >> (24-8*j)) & 0xFF;
+    }
+    
+    for (uint8_t j = 0; j < 7; j++) {
+        Message2Send[j+9] = 0; // Fill rest of buffer with 0's
+    }
+}
+
 
 /***************************************************************************
  private functions
@@ -936,7 +1041,7 @@ void __ISR(_I2C2_MASTER_VECTOR, IPL7SRS) HostHandler(void) {
 
         case I2C_ST_ADDR_R:
             if (I2C2STATbits.ACKSTAT) { 
-                DB_printf("Ack error (I2C_ST_ADDR_R\r\n");
+                DB_printf("Ack error (I2C_ST_ADDR_R)\r\n");
                 i2c2_t.stage = I2C_ST_ERROR; 
                 break; 
             }

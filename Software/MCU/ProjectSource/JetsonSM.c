@@ -32,6 +32,7 @@
 #include "MotorSM.h"
 #include "IMU_SM.h"
 #include "ReflectService.h"
+#include "EnvironmentSensorSM.h"
 #include "dbprintf.h"
 
 /*----------------------------- Module Defines ----------------------------*/
@@ -374,6 +375,22 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
                     {
                         // Write the velocity as determined by dead reckoning
                         WriteDeadReckoningVelocityToSPI(MessageToSend);
+                        CurrentMessage = 4;
+                    }
+                    break;
+                    
+                    case 4:
+                    {
+                        // Write the temperature and humidity
+                        WriteTempHumidityToSPI(MessageToSend); 
+                        CurrentMessage = 5;
+                    }
+                    break;
+                    
+                    case 5:
+                    {
+                        // Write the VOC and NOX index values
+                        WriteAirQualityToSPI(MessageToSend);
                         CurrentMessage = 0;
                     }
                     break;

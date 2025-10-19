@@ -64,5 +64,14 @@ bool InitEnvironmentSensorSM(uint8_t Priority);
 bool PostEnvironmentSensorSM(ES_Event_t ThisEvent);
 ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent);
 EnvironmentSensorState_t QueryEnvironmentSensorSM(void);
+
+float GetTemperature(void);
+float GetHumidity(void);
+int32_t GetVOCIndex(void);
+int32_t GetNOXIndex(void);
+
+void WriteTempHumidityToSPI(uint8_t *Message2Send);
+void WriteAirQualityToSPI(uint8_t *Message2Send);
+
 #endif /* EnvironmentSensor_FSM_H */
 
