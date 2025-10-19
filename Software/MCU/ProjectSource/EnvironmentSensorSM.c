@@ -29,7 +29,7 @@
 #define CRC8_INIT  0xFF
 #define CRC8_XOROUT 0x00
 
-#define TWO_SIXTEEN 1U << 16 - 1
+#define TWO_SIXTEEN 65535U
 
 //#define TESTING
 #define PRODUCTION
@@ -49,7 +49,7 @@ bool ReadMeasurement_T_RH(uint8_t *buf);
 // Functions for air quality sensor
 bool Get_SGP_Serial_Num(uint8_t *buf);
 bool Condition_AirQuality(uint8_t *buf);
-bool Get_AirQuality(uint8_t *buf);
+bool Get_AirQuality(uint8_t *buf, bool use_measured_t_rh);
 bool SelfTest_AirQuality(uint8_t *buf);
 bool TurnHeaterOff_AirQuality(uint8_t *buf);
 
@@ -84,9 +84,9 @@ static GasIndexAlgorithmParams nox_params;
 
 // Temperature and humidity values
 static uint32_t temperature_raw_value;
-static float temperature;
+static float temperature = 70;
 static uint32_t humidity_raw_value;
-static float relative_humidity;
+static float relative_humidity = 50;
 
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
@@ -246,7 +246,7 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
 #ifdef VERBOSE
                 DB_printf("\r\nIn SGP_Conditioning_Env\r\n");
 #endif
-                ES_Timer_InitTimer(ENV_TIMER, 5000);
+                ES_Timer_InitTimer(ENV_TIMER, 9500);
                 Condition_AirQuality(AirQuality_Buffer);
                 
             }     
@@ -314,7 +314,7 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
 #ifdef VERBOSE
                     DB_printf("\r\nIn SGP_Meas_Env\r\n");
 #endif
-                    Get_AirQuality(AirQuality_Buffer);
+                    Get_AirQuality(AirQuality_Buffer, true);
                 }
             }
             break;
@@ -358,6 +358,10 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
 #endif
                     voc_raw_value = (uint16_t)AirQuality_Buffer[0] << 8 | (uint16_t)AirQuality_Buffer[1];
                     GasIndexAlgorithm_process(&voc_params, voc_raw_value, &voc_index_value);
+#ifdef VERBOSE
+                    DB_printf("VOC Raw Value:%d\r\n", voc_raw_value);
+                    DB_printf("VOC Index:%d\r\n", voc_index_value);
+#endif
                 }
                 
                 if (nox_valid) {
@@ -366,6 +370,10 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
 #endif
                     nox_raw_value = (uint16_t)AirQuality_Buffer[3] << 8 | (uint16_t)AirQuality_Buffer[4];
                     GasIndexAlgorithm_process(&nox_params, nox_raw_value, &nox_index_value);
+#ifdef VERBOSE
+                    DB_printf("NOX Raw Value:%d\r\n", nox_raw_value);
+                    DB_printf("NOX Index:%d\r\n", nox_index_value);
+#endif
                 }
                 
                 // Timer to advance to temp/humidity measurement
@@ -398,8 +406,6 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
 #ifdef VERBOSE
                 DB_printf("\r\nIn SHT_Read_Env\r\n");
 #endif
-
-//                Get_SHT40_Serial_Num(T_RH_Buffer);
                 ReadMeasurement_T_RH(T_RH_Buffer);
             } else if (ThisEvent.EventParam == ENV_WAIT_TIMER) {
                 I2C2CONbits.RSEN = 1; // Time to perform the Repeated Start
@@ -409,7 +415,7 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
         
         case EV_I2C_COMPLETE:
         {            
-            ES_Timer_InitTimer(ENV_TIMER, 2000);
+            ES_Timer_InitTimer(ENV_TIMER, 150);
         }
         break;
         
@@ -441,7 +447,7 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
 #ifdef VERBOSE
                 DB_printf("\r\nIn SGP_Meas_Env\r\n");
 #endif
-                Get_AirQuality(AirQuality_Buffer);
+                Get_AirQuality(AirQuality_Buffer, true);
             } else if (ThisEvent.EventParam == ENV_WAIT_TIMER) {
                 I2C2CONbits.RSEN = 1; // Time to perform the Repeated Start
             }          
@@ -460,7 +466,12 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
                 DB_printf("\r\nTemperature is valid\r\n");
 #endif
                 temperature_raw_value = (uint16_t)T_RH_Buffer[0] << 8 | (uint16_t)T_RH_Buffer[1];
-                temperature = -49 + 315 * temperature_raw_value / TWO_SIXTEEN; // in Fahrenheit
+                temperature = -49 + 315 * ((float)temperature_raw_value) / TWO_SIXTEEN; // in Fahrenheit
+                
+#ifdef VERBOSE
+                DB_printf("The temperature raw value is: %d\r\n", temperature_raw_value);
+                DB_printf("The temperature is: %d\r\n\r\n", (uint16_t)temperature);
+#endif
             }
             
             if (rh_valid) {
@@ -468,7 +479,11 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
                 DB_printf("\r\nHumidity is valid\r\n");
 #endif
                 humidity_raw_value = (uint16_t)T_RH_Buffer[3] << 8 | (uint16_t)T_RH_Buffer[4];
-                relative_humidity = -6 + 125 * humidity_raw_value / TWO_SIXTEEN;
+                relative_humidity = -6 + 125 * ((float)humidity_raw_value) / TWO_SIXTEEN;
+#ifdef VERBOSE
+                DB_printf("The relative humidity raw value is: %d\r\n", humidity_raw_value);
+                DB_printf("The relative humidity is: %d\r\n\r\n", (uint16_t)relative_humidity);
+#endif
             }
             
             ES_Timer_InitTimer(ENV_TIMER, 350);
@@ -517,6 +532,10 @@ EnvironmentSensorState_t QueryEnvironmentSensorSM(void)
 
 float GetTemperature(void) {
     return temperature;
+}
+
+float GetTemperatureCelsius(void) {
+    return (temperature-32)*5/9;
 }
 
 float GetHumidity(void) {
@@ -756,7 +775,7 @@ bool Get_SGP_Serial_Num(uint8_t *buf) {
     return true; // Successfully started the transmission sequence
 }
 
-bool Get_AirQuality(uint8_t *buf) {
+bool Get_AirQuality(uint8_t *buf, bool use_measured_t_rh) {
     // Starts the I2C Sequence for getting the raw VO2 and NOX data using the 
     // sgp41_measure_raw_signals command
     
@@ -775,12 +794,47 @@ bool Get_AirQuality(uint8_t *buf) {
     i2c2_t.command_len = 8; // Number of bytes of command
     commands[0] = 0x26; // Command to send
     commands[1] = 0x19;
-    commands[2] = 0x80;
-    commands[3] = 0x00;
-    commands[4] = 0xA2;
-    commands[5] = 0x66;
-    commands[6] = 0x66;
-    commands[7] = 0x93;    
+    if (use_measured_t_rh) {
+        uint8_t checksum_buf [2]; // buffer to get checksum values
+        
+        // Get relative humidity values and checksum
+        uint16_t rh = (uint16_t)(GetHumidity()*65535/100);
+        checksum_buf[0] = (uint8_t)(rh >> 8); // MSB
+        checksum_buf[1] = (uint8_t)(rh & 0xFF); // LSB
+        uint8_t rh_checksum = crc8_poly31_ff(checksum_buf, 2);
+        
+#ifdef VERBOSE
+        DB_printf("rh_value: %d\r\n", rh);
+#endif
+        
+        // Store 2 byte word and checksum in commands buffer
+        commands[2] = checksum_buf[0];
+        commands[3] = checksum_buf[1];
+        commands[4] = rh_checksum;
+        
+        // Get temperature values and checksum
+        uint16_t temp_c = (uint16_t)((GetTemperatureCelsius() + 45)*65535/175);
+        checksum_buf[0] = (uint8_t)(temp_c >> 8); // MSB
+        checksum_buf[1] = (uint8_t)(temp_c & 0xFF); // LSB
+        uint8_t temp_c_checksum = crc8_poly31_ff(checksum_buf, 2);
+        
+#ifdef VERBOSE
+        DB_printf("temp_value: %d\r\n", temp_c);
+#endif
+        
+        // Store 2 byte word and checksum in commands buffer
+        commands[5] = checksum_buf[0];
+        commands[6] = checksum_buf[1];
+        commands[7] = temp_c_checksum;   
+    } else {
+        // Use default values (corresponds to 25C, 50% RH)
+        commands[2] = 0x80;
+        commands[3] = 0x00;
+        commands[4] = 0xA2;
+        commands[5] = 0x66;
+        commands[6] = 0x66;
+        commands[7] = 0x93;    
+    }
     i2c2_t.command_wait_time = 55; // How long to wait after command
     i2c2_t.reg = commands;
     i2c2_t.reg_idx = 0; // Starting index for command

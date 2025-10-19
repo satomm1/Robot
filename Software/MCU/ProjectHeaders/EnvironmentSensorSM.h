@@ -66,6 +66,7 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent);
 EnvironmentSensorState_t QueryEnvironmentSensorSM(void);
 
 float GetTemperature(void);
+float GetTemperatureCelsius(void);
 float GetHumidity(void);
 int32_t GetVOCIndex(void);
 int32_t GetNOXIndex(void);
