@@ -18,6 +18,7 @@
 #include "EnvironmentSensorSM.h"
 #include "dbprintf.h"
 #include "sensirion_gas_index_algorithm.h"
+#include "LEDService.h"
 
 /*----------------------------- Module Defines ----------------------------*/
 #define SHT4x_ADD 0x44
@@ -34,7 +35,7 @@
 //#define TESTING
 #define PRODUCTION
 
-#define VERBOSE
+//#define VERBOSE
 /*---------------------------- Module Functions ---------------------------*/
 /* prototypes for private functions for this machine.They should be functions
    relevant to the behavior of this state machine
@@ -57,6 +58,8 @@ bool TurnHeaterOff_AirQuality(uint8_t *buf);
 uint8_t crc8_poly31_ff( uint8_t *data, uint16_t len);
 bool crc8_valid_residue( uint8_t data[3]);
 
+void i2c_error_handling(void);
+
 /*---------------------------- Module Variables ---------------------------*/
 // everybody needs a state variable, you may need others as well.
 // type of state variable should match htat of enum in header file
@@ -69,14 +72,16 @@ static uint8_t MyPriority;
 static volatile I2C2_Trans i2c2_t = { .stage = I2C_ST_IDLE };
 static volatile uint8_t commands[16];
 
+static bool tried_conditioning = false;
+
 static uint8_t T_RH_Buffer[16];
 static uint8_t AirQuality_Buffer[16];
 
 // Gas sensor/index values
 static int32_t voc_raw_value; // read from sensor
-static int32_t voc_index_value; // computed from gas index algorithm
+static int32_t voc_index_value = 0; // computed from gas index algorithm
 static int32_t nox_raw_value; // read from sensor 
-static int32_t nox_index_value; // computed from gas index algorithm
+static int32_t nox_index_value = 0; // computed from gas index algorithm
 
 // Gas index algorithm parameters
 static GasIndexAlgorithmParams voc_params;
@@ -316,6 +321,31 @@ ES_Event_t RunEnvironmentSensorSM(ES_Event_t ThisEvent)
 #endif
                     Get_AirQuality(AirQuality_Buffer, true);
                 }
+            }
+            break;
+            
+            case EV_I2C_ERROR:
+            {
+                DB_printf("EV_I2C_ERROR\r\n\r\n");
+                if (!tried_conditioning) {
+                    tried_conditioning = true;
+                    
+                    // The SGP is not working, try again
+                    ES_Timer_InitTimer(ENV_TIMER, 9500);
+                    Condition_AirQuality(AirQuality_Buffer);
+                } else {
+                    // We already tried conditioning again, don't try again
+                    ES_Timer_StopTimer(ENV_TIMER);
+                    temperature = 0;
+                    relative_humidity = 0;
+                    
+                    CurrentState = Idle_Env;
+                    
+                    // Turn the LED 1 on to indicate error
+                    ES_Event_t led_event = {EV_LED_ON, 1};
+                    PostLEDService(led_event);
+                }
+                
             }
             break;
             
@@ -782,9 +812,7 @@ bool Get_AirQuality(uint8_t *buf, bool use_measured_t_rh) {
     // First check buffer exists and the i2c isn't busy
     if (buf == NULL) {
         return false;
-        DB_printf("Error: 1");
     } else if (i2c2_t.busy) {
-        DB_printf("Error: 2");
         return false;
     }
     
@@ -1029,14 +1057,18 @@ void __ISR(_I2C2_MASTER_VECTOR, IPL7SRS) HostHandler(void) {
             
             if (i2c2_t.message_type == Write) {
                 // Start complete --> send device addr (write)
-                I2C2TRN = (i2c2_t.dev7 << 1) | I2C_WRITE;
                 i2c2_t.stage = I2C_ST_ADDR_W;
+                I2C2TRN = (i2c2_t.dev7 << 1) | I2C_WRITE;
+#ifdef VERBOSE
                 DB_printf("In I2C_ST_START (write)\r\n");
+#endif
             } else {
                 // Start complete --> send device addr (read)
-                I2C2TRN = (i2c2_t.dev7 << 1) | I2C_READ;
                 i2c2_t.stage = I2C_ST_ADDR_R; // Skip the command writing
+                I2C2TRN = (i2c2_t.dev7 << 1) | I2C_READ;
+#ifdef VERBOSE
                 DB_printf("In I2C_ST_START (read)\r\n");
+#endif
             }
             
             break;
@@ -1044,12 +1076,17 @@ void __ISR(_I2C2_MASTER_VECTOR, IPL7SRS) HostHandler(void) {
         case I2C_ST_ADDR_W:
             // Address(W) completed; check ACK
             if (I2C2STATbits.ACKSTAT) { 
-                i2c2_t.stage = I2C_ST_ERROR; 
+                i2c2_t.stage = I2C_ST_ERROR;
+#ifdef VERBOSE
                 DB_printf("Ack Error\r\n");
+#endif
+                I2C2CONbits.PEN = 1;
                 break; 
             }
             
+#ifdef VERBOSE
             DB_printf("In I2C_ST_ADDR_W\r\n");
+#endif
             
             // No Error --- OK to continue
             // Send register address
@@ -1067,7 +1104,9 @@ void __ISR(_I2C2_MASTER_VECTOR, IPL7SRS) HostHandler(void) {
                 break; 
             }
             
+#ifdef VERBOSE
             DB_printf("In I2C_ST_REG\r\n");
+#endif
             
             if (i2c2_t.len == 0) {
                 // Only command, not receiving any data
@@ -1087,7 +1126,10 @@ void __ISR(_I2C2_MASTER_VECTOR, IPL7SRS) HostHandler(void) {
 
         case I2C_ST_RESTART:
             // Restart complete --> send device addr (read)
+            
+#ifdef VERBOSE
             DB_printf("In I2C_ST_RESTART\r\n");
+#endif
             
             I2C2TRN = (i2c2_t.dev7 << 1) | I2C_READ;
             i2c2_t.stage = I2C_ST_ADDR_R;
@@ -1095,12 +1137,14 @@ void __ISR(_I2C2_MASTER_VECTOR, IPL7SRS) HostHandler(void) {
 
         case I2C_ST_ADDR_R:
             if (I2C2STATbits.ACKSTAT) { 
-                DB_printf("Ack error (I2C_ST_ADDR_R)\r\n");
                 i2c2_t.stage = I2C_ST_ERROR; 
                 break; 
             }
-            
+
+#ifdef VERBOSE            
             DB_printf("In I2C_ST_ADDR_R\r\n");
+#endif 
+            
             // Begin first receive
             I2C2CONbits.RCEN = 1;
             i2c2_t.stage = I2C_ST_RECV;
@@ -1113,7 +1157,10 @@ void __ISR(_I2C2_MASTER_VECTOR, IPL7SRS) HostHandler(void) {
                 break;
             }
             
+#ifdef VERBOSE
             DB_printf("In I2C_ST_RECV\r\n");
+#endif
+            
             i2c2_t.buf[i2c2_t.idx++] = I2C2RCV;
 
             // Prepare ACK/NACK
@@ -1139,7 +1186,11 @@ void __ISR(_I2C2_MASTER_VECTOR, IPL7SRS) HostHandler(void) {
             break;
 
         case I2C_ST_STOP:
+            
+#ifdef VERBOSE
             DB_printf("In I2C_ST_STOP\r\n");
+#endif
+            
             // Stop complete
             i2c2_t.stage = I2C_ST_DONE;
             // fallthrough
@@ -1176,4 +1227,19 @@ void __ISR(_I2C2_MASTER_VECTOR, IPL7SRS) HostHandler(void) {
             break;
 
     }
+}
+
+// Perform necessary actions when we have an i2c error
+void i2c_error_handling(void) {
+    if (!I2C2CONbits.PEN) {
+        I2C2CONbits.PEN = 1;
+    }
+    i2c2_t.busy = false;
+
+    ES_Event_t new_event = {EV_I2C_ERROR, 0};
+    PostEnvironmentSensorSM(new_event);
+
+    i2c2_t.stage = I2C_ST_IDLE;
+    
+    DB_printf("%d\r\n", I2C2STAT);
 }

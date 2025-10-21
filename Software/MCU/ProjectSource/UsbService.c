@@ -29,6 +29,8 @@
 #include "EEPROMSM.h"
 #include "matt_circular_buffer.h"
 #include "IMU_SM.h"
+#include "EnvironmentSensorSM.h"
+
 /*----------------------------- Module Defines ----------------------------*/
 // these times assume a 10.000mS/tick timing
 #define ONE_SEC 1000
@@ -305,6 +307,11 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
       if ('0' == ThisEvent.EventParam) {
           ES_Event_t NewEvent = {EV_PRINT_RL_DATA,0};
           PostMotorSM(NewEvent);
+      }
+      
+      if ('x' == ThisEvent.EventParam) {
+          DB_printf("Temp: %d, RH: %d%%\r\n", (uint32_t)GetTemperature(), (uint32_t)GetHumidity());
+          DB_printf("VOC Index: %d, NOX Index: %d\r\n", GetVOCIndex(), GetNOXIndex());
       }
       
       if ('y' == ThisEvent.EventParam)
