@@ -688,12 +688,20 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
     RightPrevTime = MyTimer.FullTime; // update our last time variable 
     
     // Update number of rotations for dead reckoning
-    if (ChannelB) {
-        RightRotations -= 1;
+    if (PCB_REV <= 2){
+        if (ChannelB) {
+            RightRotations -= 1;
+        } else {
+            RightRotations += 1;
+        }
     } else {
-        RightRotations += 1;
+        if (ChannelB) {
+            RightRotations += 1;
+        } else {
+            RightRotations -= 1;
+        }
     }
-    
+        
     // restart Timer5 (timer to indicate if right motor is stopped)
     T5CONCLR = _T5CON_ON_MASK;     
     TMR5 = 0;     
@@ -731,11 +739,19 @@ void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
     LeftPrevTime = MyTimer.FullTime; // update our last time variable 
     
     // Update number of rotations for dead reckoning
-    if (ChannelB) {
-        LeftRotations += 1;
+    if (PCB_REV <= 2){
+        if (ChannelB) {
+            LeftRotations += 1;
+        } else {
+            LeftRotations -= 1;
+        }  
     } else {
-        LeftRotations -= 1;
-    }   
+        if (ChannelB) {
+            LeftRotations -= 1;
+        } else {
+            LeftRotations += 1;
+        }   
+    } 
     
     // restart Timer4 (timer to indicate if left motor is stopped)
     T4CONCLR = _T4CON_ON_MASK;     
