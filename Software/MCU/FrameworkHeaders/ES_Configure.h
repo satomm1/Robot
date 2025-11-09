@@ -35,6 +35,9 @@
 #define MOTOR_TYPE 1  // The 350RPM motor with 374 pulses per rev
 //#define MOTOR_TYPE 2  // The 122RPM motor with 1440 pulses per rev
 
+//#define WHEEL_RADIUS 0.036 // 72 mm wheels
+#define WHEEL_RADIUS 0.040 // 80 mm wheels
+
 // Define if we want to log data for RL Motor control
 //#define RL_MOTOR_LOGGING
 
