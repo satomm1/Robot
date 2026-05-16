@@ -30,7 +30,7 @@
 #define IC_PERIOD 65535 // Input capture period
 #define OC_PERIOD 200  // 312   // Output compare period (312 ~ 10 kHz, 200==15.625 kHz)
 #define NO_SPEED_PERIOD 65535 // Period to indicate motor not spinning
-#define DEAD_RECKONING_PERIOD 3906// 1953 // 3906 // 7812 // Chosen so that we update at 50 Hz rate
+#define DEAD_RECKONING_PERIOD 7812 // Chosen so that we update at 50 Hz rate (50 mHZ / 256 prescaler / 7812 * 2 = 50 Hz)
 #define Kp 0.2 // Proportional constant for PID law
 #define Ki 0.01 // Integral constant for PID law
 #define Kd 0.0 // Derivative constant for PID law
@@ -45,7 +45,7 @@
 
 #define SPEED_CONVERSION_FACTOR ((1.6e7*60)/ENCODER_RESOLUTION)
 
-#define DEAD_RECKONING_TIME 0.00999936 //0.00499968 //0.00999936 //0.01999872 // Time between dead reckoning updates in seconds (depends on DEAD_RECKONING_PERIOD)
+#define DEAD_RECKONING_TIME (256.0f  * DEAD_RECKONING_PERIOD / 2.0f / 50000000.0f) // Time between dead reckoning updates in seconds (depends on DEAD_RECKONING_PERIOD)
 #define DEAD_RECKONING_RATIO (2.0f * (float)M_PI / ENCODER_RESOLUTION / DEAD_RECKONING_TIME * WHEEL_RADIUS) // This number times change in encoder clicks is linear velocity in m/second
 
 #define V_MAX 1 // max 1 m/sec
@@ -125,7 +125,7 @@ static uint8_t MyPriority;
 bool InitMotorSM(uint8_t Priority)
 {
   ES_Event_t ThisEvent;
-  
+    
   // Initialize the circular buffer
   circular_buffer_init(&cb, circ_buff_array, circ_buff_size);
   circular_buffer_init(&cb_record, recording_array, 200);
@@ -1014,7 +1014,7 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     static float pitch;
     
     IFS1CLR = _IFS1_T7IF_MASK; // clear the interrupt flag 
-    
+        
     // Get the current roll/pitch of the mobile robot
     GetAngles(&roll, &pitch);
     if (fabsf(pitch) < 2.5) {
