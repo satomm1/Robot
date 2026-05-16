@@ -132,8 +132,8 @@ bool InitEEPROMSM(uint8_t Priority)
   SPI5CONbits.DISSDO = 0; // SDO5 controlled by the module
   SPI5CONbits.MODE32 = 0;
   SPI5CONbits.MODE16 = 0; // 8 bit mode
-  SPI5CONbits.SMP = 1; // Data sampled at middle
-  SPI5CONbits.CKE = 0; // Output data changes on transition from idle clock to active clock
+  SPI5CONbits.SMP = 0; // Data sampled at middle
+  SPI5CONbits.CKE = 0; // Serial output data changes on transition from idle clock state to active clock state
   SPI5CONbits.CKP = 1; // Idle clock state is high
   SPI5CONbits.MSTEN = 1; // Host mode
   SPI5CONbits.DISSDI = 0; // SDI pin controlled by the module
