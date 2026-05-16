@@ -39,6 +39,7 @@
 /* prototypes for private functions for this machine.They should be functions
    relevant to the behavior of this state machine
 */
+static void EEPROM_PushReadWriteHeader(uint32_t address, uint8_t read_or_write);
 
 /*---------------------------- Module Variables ---------------------------*/
 // everybody needs a state variable, you may need others as well.
@@ -460,19 +461,10 @@ void ReadByteEEPROM(uint32_t address) {
     SPI5CONbits.STXISEL = 0b00; // Interrupt is generated when the last transfer is shifted out of SPISR and transmit operations are complete
     IFS5CLR = _IFS5_SPI5TXIF_MASK;
     
-    // Get relevant address bytes
-    uint8_t address_byte1 = (address >> 16) & 0xFF;
-    uint8_t address_byte2 = (address >> 8) & 0xFF;
-    uint8_t address_byte3 = (address >> 0) & 0xFF;
-    
     DB_printf("Reading Address: %d\r\n", address);
     
-    // LATFbits.LATF12 = 0;
-    SPI5BUF = READ;
-    SPI5BUF = address_byte1;
-    SPI5BUF = address_byte2;
-    SPI5BUF = address_byte3;
-    SPI5BUF = 0x0F; // For retrieving data
+    EEPROM_PushReadWriteHeader(address, READ);
+    SPI5BUF = 0x0F; // Dummy byte to clock out data
     
     IEC5SET = _IEC5_SPI5TXIE_MASK; // Enable interrupt
 }
@@ -537,21 +529,9 @@ void __ISR(_SPI5_TX_VECTOR, IPL7SRS) SPI5TXHandler(void)
     } else if (transferring) {  // Here we finish sending outstanding bytes
         
         if (!sent_instr_address) {
-           // Get relevant address bytes
-           uint8_t address_byte3 = (CurrentAddress >> 0) & 0xFF;
-           uint8_t address_byte2 = (CurrentAddress >> 8) & 0xFF;
-           uint8_t address_byte1 = (CurrentAddress >> 16) & 0xFF;
-
            DB_printf("Writing to address: %d\r\n", CurrentAddress);
-
-           // LATFbits.LATF12 = 0;
-           // Send Write Sequence
-           SPI5BUF = 2; // Write Instruction
-           SPI5BUF = address_byte1; // Write Address
-           SPI5BUF = address_byte2;
-           SPI5BUF = address_byte3;
-           
-           sent_instr_address = true; // We have now sent address and instruction bits
+           EEPROM_PushReadWriteHeader(CurrentAddress, WRITE);
+           sent_instr_address = true;
         }
         
         // Send bytes as long as we still have bytes to send and TX buffer not full
@@ -594,22 +574,12 @@ void __ISR(_SPI5_TX_VECTOR, IPL7SRS) SPI5TXHandler(void)
         if (!sent_instr_address) {
             sent_instr_address = true;
             tx_index = 0;
-            
-            // Send instruction and address
-            uint8_t address_byte3 = (ReadAddress >> 0) & 0xFF;
-            uint8_t address_byte2 = (ReadAddress >> 8) & 0xFF;
-            uint8_t address_byte1 = (ReadAddress >> 16) & 0xFF;
-            
             DB_printf("Reading starting at address: %d\r\n", ReadAddress);
-            
-            SPI5BUF = READ;
-            SPI5BUF = address_byte3;
-            SPI5BUF = address_byte2;
-            SPI5BUF = address_byte1;
+            EEPROM_PushReadWriteHeader(ReadAddress, READ);
         }
         
-        
-        
+        // Keep adding transfer bytes for each additional byte we want to read
+        // and if the buffer is not yet full
         while ((tx_index < num_bytes_to_read) && !SPI5STATbits.SPITBF) {
             SPI5BUF = 0x0F; // Write a byte for each byte we want to read.
             tx_index += 1;
@@ -680,4 +650,34 @@ void __ISR(_SPI5_RX_VECTOR, IPL7SRS) SPI5RXHandler(void) {
     }
     
     IFS5CLR = _IFS5_SPI5RXIF_MASK; // clear the interrupt flag 
+}
+
+
+/****************************************************************************
+ Function
+     EEPROM_PushReadWriteHeader
+
+ Parameters
+     address       24-bit EEPROM array address (upper 8 bits of uint32 ignored)
+     read_or_write READ or WRITE opcode; any other value defaults to READ
+
+ Returns
+     None
+
+ Description
+     Queues opcode plus three address bytes (MSB first) on SPI5 TX.
+     Caller supplies any payload or read dummy bytes after this header.
+****************************************************************************/
+static void EEPROM_PushReadWriteHeader(uint32_t address, uint8_t read_or_write)
+{
+  uint8_t opcode = read_or_write;
+
+  if (opcode != READ && opcode != WRITE) {
+    opcode = READ;
+  }
+
+  SPI5BUF = opcode;
+  SPI5BUF = (uint8_t)(address >> 16);
+  SPI5BUF = (uint8_t)(address >> 8);
+  SPI5BUF = (uint8_t)(address);
 }
