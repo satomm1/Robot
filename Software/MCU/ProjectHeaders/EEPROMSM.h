@@ -29,10 +29,12 @@ EEPROMState_t QueryEEPROMSM(void);
 void WriteEnable(void);
 void WriteDisable(void);
 void WriteByteEEPROM(uint8_t data);
+void WriteByteAtAddressEEPROM(uint8_t data, uint32_t address);
 void WriteMultiBytesEEPROM(uint8_t *data, uint16_t N);
 void ReadByteEEPROM(uint32_t address);
 void ReadMultiBytesEEPROM(uint32_t address, uint16_t N);
 void ReadStatusEEPROM(void);
+
 
 #endif /* FSMEEPROM_H */
 

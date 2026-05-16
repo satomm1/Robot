@@ -425,6 +425,15 @@ void WriteByteEEPROM(uint8_t data) {
     }
 }
 
+void WriteByteAtAddressEEPROM(uint8_t data, uint32_t address) {
+    if (CurrentState == EEPROMWriting) {
+        return; // Write in progress, don't do anything
+    }
+    
+    CurrentAddress = address;
+    WriteByteEEPROM(data);
+}
+
 void WriteMultiBytesEEPROM(uint8_t *data, uint16_t N) {
     
     if (N > 256) {
