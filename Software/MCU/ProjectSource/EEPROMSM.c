@@ -34,6 +34,8 @@
 #define READ 0b00000011
 #define WRITE 0b00000010
 #define RDSR 0b00000101
+#define MAX_BYTES 131072
+#define MAX_PAGES 512
 
 /*---------------------------- Module Functions ---------------------------*/
 /* prototypes for private functions for this machine.They should be functions
