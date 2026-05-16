@@ -47,7 +47,7 @@
 
 /*---------------------------- Module Variables ---------------------------*/
 // everybody needs a state variable, you may need others as well.
-// type of state variable should match htat of enum in header file
+// type of state variable should match that of enum in header file
 static JetsonState_t CurrentState;
 
 // with the introduction of Gen2, we need a module level Priority var as well
@@ -95,12 +95,12 @@ bool InitJetsonSM(uint8_t Priority)
   SDI2R = 0b0001; // Map SDI2 -> RG7
   
   // Initialize SPI2
-  SPI2CON = 0; // Reset SPI1CON settings
+  SPI2CON = 0; // Reset SPI2CON settings
   SPI2CONbits.FRMEN = 0; // Disable framed SPI support
-  SPI2CONbits.FRMPOL = 0; // SS1 is active low
+  SPI2CONbits.FRMPOL = 0; // SS2 is active low
   SPI2CONbits.MCLKSEL = 0; // Use PBCLK2 for the Baud Rate Generator (50 MHz)
   SPI2CONbits.ENHBUF = 1; // Enhance buffer enabled
-  SPI2CONbits.DISSDO = 0; // SDO1 is used by the module
+  SPI2CONbits.DISSDO = 0; // SDO2 is used by the module
   SPI2CONbits.MODE32 = 0; // 8 bit mode
   SPI2CONbits.MODE16 = 0; // 8 bit mode
   SPI2CONbits.SMP = 0; // Data sampled at middle of data output time
@@ -302,7 +302,7 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
         {
             // Didn't receive confirmation in time
             CurrentState = RobotInactive;
-            DB_printf("Moving to RobotInactive");
+            DB_printf("Moving to RobotInactive\r\n");
         }
         break;
             
@@ -480,9 +480,6 @@ JetsonState_t QueryJetsonSM(void)
 ****************************************************************************/
 void __ISR(_SPI2_TX_VECTOR, IPL7SRS) SPI2TXHandler(void)
 {
-    // Static for speed
-    static ES_Event_t TransferEvent = {EV_JETSON_TRANSFER_COMPLETE, 0};
-    
     // Turn the interrupt off
     IEC4CLR = _IEC4_SPI2TXIE_MASK;
     // Clear the interrupt 
