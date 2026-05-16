@@ -34,7 +34,7 @@
 #define Kp 0.2 // Proportional constant for PID law
 #define Ki 0.01 // Integral constant for PID law
 #define Kd 0.0 // Derivative constant for PID law
-#define CONTROL_PERIOD 10000 // Control update period --- (1000 == 6250 Hz, 30000 == 208 Hz)
+#define CONTROL_PERIOD 12500 // Control update period --- (1000 == 6250*2 Hz, 12500 == 500*2 Hz 30000 == 208*2 Hz)
 
 #if (MOTOR_TYPE==1)
 #define ENCODER_RESOLUTION 374 // Number of pulses per revolution
