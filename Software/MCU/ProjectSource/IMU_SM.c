@@ -70,9 +70,15 @@ static bool IntStatusReading = false;
 static bool FifoReading = false;
 static uint8_t rx_data[16];
 
+#if PCB_REV == 1
+static volatile __SPI4CONbits_t * pSPICON;
+static volatile __SPI4CON2bits_t * pSPICON2;
+static volatile __SPI4STATbits_t * pSPISTAT;
+#elif PCB_REV >= 2
 static volatile __SPI1CONbits_t * pSPICON;
 static volatile __SPI1CON2bits_t * pSPICON2;
 static volatile __SPI1STATbits_t * pSPISTAT;
+#endif
 static volatile uint32_t * pSPIBRG;
 static volatile uint32_t * pSPIBUF;
 
@@ -106,7 +112,7 @@ bool InitImuSM(uint8_t Priority)
 {
   ES_Event_t ThisEvent;
   
-  if (PCB_REV == 1) {
+#if PCB_REV == 1
     // Set SPI4 Pins to correct input or output setting
     TRISACLR = _TRISA_TRISA15_MASK;
     TRISDCLR = _TRISD_TRISD9_MASK | _TRISD_TRISD10_MASK; // Set SCK4, SS4, SDO4 to output
@@ -114,19 +120,19 @@ bool InitImuSM(uint8_t Priority)
       
     // Map SPI4 Pins to correct function
     // RD10 is mapped to CLK4 by default
-    RPD9R = 0b1000; // Map RD4 -> SS4
+    RPD9R = 0b1000; // Map RD9 -> SS4
     RPA15R = 0b1000; // Map RA15 -> SDO4
-    SDI4R = 0b0011; // Map SDI3 -> RD11
-      
-    pSPICON = (__SPI1CONbits_t *)&SPI4CON;
-    pSPICON2 = (__SPI1CON2bits_t *)&SPI4CON2;
+    SDI4R = 0b0011; // Map SDI4 -> RD11
+       
+    pSPICON = (__SPI4CONbits_t *)&SPI4CON;
+    pSPICON2 = (__SPI4CON2bits_t *)&SPI4CON2;
     pSPIBRG = &SPI4BRG;
     pSPIBUF = &SPI4BUF;
-    pSPISTAT = (__SPI1STATbits_t *)&SPI4STAT;
+    pSPISTAT = (__SPI4STATbits_t *)&SPI4STAT;
     
     SPI4CON = 0;
     SPI4CON2 = 0;
-  } else if (PCB_REV >= 2) {
+#elif PCB_REV >= 2
 //     Set interrupt pins to inputs
     TRISDSET = _TRISD_TRISD12_MASK | _TRISD_TRISD13_MASK;
 
@@ -150,7 +156,7 @@ bool InitImuSM(uint8_t Priority)
     
     SPI1CON = 0;
     SPI1CON2 = 0;
-  }
+#endif
      
   // Initialize SPIxCON
   pSPICON->FRMEN = 0; // Disable framed SPI support

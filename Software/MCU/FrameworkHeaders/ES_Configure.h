@@ -38,6 +38,9 @@
 //#define WHEEL_RADIUS 0.036 // 72 mm wheels
 #define WHEEL_RADIUS 0.040 // 80 mm wheels
 
+#define CAR false
+//#define CAR true
+
 // Define if we want to log data for RL Motor control
 //#define RL_MOTOR_LOGGING
 

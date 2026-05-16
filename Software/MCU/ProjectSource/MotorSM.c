@@ -43,14 +43,14 @@
 #define ENCODER_RESOLUTION 360
 #endif
 
-#define GEAR_RATIO 34 // Gear reduction ratio
 #define SPEED_CONVERSION_FACTOR ((1.6e7*60)/ENCODER_RESOLUTION)
 
 #define DEAD_RECKONING_TIME 0.00999936 //0.00499968 //0.00999936 //0.01999872 // Time between dead reckoning updates in seconds (depends on DEAD_RECKONING_PERIOD)
-#define DEAD_RECKONING_RATIO 2*3.14159 / ENCODER_RESOLUTION / DEAD_RECKONING_TIME * WHEEL_RADIUS // This number times change in encoder clicks is linear velocity in m/second
+#define DEAD_RECKONING_RATIO (2.0f * (float)M_PI / ENCODER_RESOLUTION / DEAD_RECKONING_TIME * WHEEL_RADIUS) // This number times change in encoder clicks is linear velocity in m/second
 
 #define V_MAX 1 // max 1 m/sec
 #define w_MAX 3 // max 2 rad/sec
+#define V_WHEEL_CAP (V_MAX + 0.5f * w_MAX * WHEEL_BASE) // Max allowable measured velocity for each wheel
 
 #define BUFF_SIZE 65
 /*---------------------------- Module Functions ---------------------------*/
@@ -582,25 +582,33 @@ void MultiplyDesiredSpeed(float Factor) {
 ****************************************************************************/
 void WritePositionToSPI(uint8_t *Message2Send) {
   
+  // Get single instance of these values so don't have interleaving of SPI  
+  float x_snap, y_snap, theta_snap;
+  __builtin_disable_interrupts();
+  x_snap = x;
+  y_snap = y;
+  theta_snap = theta;
+  __builtin_enable_interrupts();
+  
   Message2Send[0] = 8; // 8 indicates we are position data (byte 1)
     
   // The x/y/theta data are all floats. The floats can be sent as 4 chunks of 
   // 8 bits.
   
   // Now write the x data (bytes 2-5)
-  uint32_t x_as_int = *((uint32_t*)&x);
+  uint32_t x_as_int = *((uint32_t*)&x_snap);
   for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
     Message2Send[j+1] = (x_as_int >> (24-8*j)) & 0xFF;
   }
   
   // Now write the y data (bytes 6-9)
-  uint32_t y_as_int = *((uint32_t*)&y);
+  uint32_t y_as_int = *((uint32_t*)&y_snap);
   for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
     Message2Send[j+5] = (y_as_int >> (24-8*j)) & 0xFF;
   }
   
   // Now write the theta data (bytes 10-13)
-  uint32_t theta_as_int = *((uint32_t*)&theta);
+  uint32_t theta_as_int = *((uint32_t*)&theta_snap);
   for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
     Message2Send[j+9] = (theta_as_int >> (24-8*j)) & 0xFF;
   }
@@ -612,18 +620,25 @@ void WritePositionToSPI(uint8_t *Message2Send) {
 
 void WriteDeadReckoningVelocityToSPI(uint8_t *Message2Send) {
     
+    // Get single instance of these values so don't have interleaving of SPI  
+    float V_snap, w_snap;
+    __builtin_disable_interrupts();
+    V_snap = V_current;
+    w_snap = w_current;
+    __builtin_enable_interrupts();
+    
     Message2Send[0] = 7; // 7 indcates the message type (byte 1)
     
     // the V/w data are floats. The floats can be sent as 4 chunks of 8 bits
     
     // Write V (bytes 2-5)
-    uint32_t V_as_int = *((uint32_t*)&V_current);
+    uint32_t V_as_int = *((uint32_t*)&V_snap);
     for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
         Message2Send[j+1] = (V_as_int >> (24-8*j)) & 0xFF;
     }
     
     // Write w (bytes 6-9)
-    uint32_t w_as_int = *((uint32_t*)&w_current);
+    uint32_t w_as_int = *((uint32_t*)&w_snap);
     for (uint8_t j=0; j<4; j++) { // iterate through the 4, 8-bit chunks of the float
         Message2Send[j+5] = (w_as_int >> (24-8*j)) & 0xFF;
     }
@@ -797,7 +812,7 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     static float ActualRightRPM = 0;
     
     IFS0CLR = _IFS0_T1IF_MASK; // Clear the timer interrupt
-    
+        
     // If desired is static:
     if (DesiredLeftRPM == 0 && DesiredRightRPM == 0) {
         // Turn control timer off
@@ -830,12 +845,12 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     LeftError = DesiredLeftRPM - ActualLeftRPM;
     RightError = DesiredRightRPM - ActualRightRPM;
     
-    if (abs(ActualLeftRPM) > 500) {
+    if (fabsf(ActualLeftRPM) > 500) {
         // The RPM Readings are likely in error, use previous error instead
         LeftError = LeftPrevError;
     }
     
-    if (abs(ActualRightRPM) > 500) {
+    if (fabsf(ActualRightRPM) > 500) {
         // The RPM Readings are likely in error, use previous error instead
         RightError = RightPrevError;
     }
@@ -1002,7 +1017,7 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     
     // Get the current roll/pitch of the mobile robot
     GetAngles(&roll, &pitch);
-    if (abs(pitch) < 2.5) {
+    if (fabsf(pitch) < 2.5) {
         pitch = 0;
     }
     
@@ -1018,16 +1033,13 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     LeftPrevRotations = CurLeftRotations;
     RightPrevRotations = CurRightRotations;
     
-    // Calculate the instantaneous linear/angular velocity of robot
-    V = (V_l + V_r) / 2; 
-    omega = (V_r - V_l) / WHEEL_BASE;
+    // Cap the current wheel velocities (in case of slipping or encoder errors)
+    V_l = fmaxf(fminf(V_l, V_WHEEL_CAP), -V_WHEEL_CAP);
+    V_r = fmaxf(fminf(V_r, V_WHEEL_CAP), -V_WHEEL_CAP);
     
-    // Don't use too large of velocities in case of slipping
-    if (abs(V) > V_MAX || abs(V) > abs(V_desired*1.5)) {
-        V = V_desired;
-    } else if (abs(omega) > w_MAX || abs(omega) > abs(w_desired*1.5)) {
-        omega = w_desired;
-    }
+    // Calculate the instantaneous linear/angular velocity of robot
+    V = (V_l + V_r) * 0.5f; 
+    omega = (V_r - V_l) / WHEEL_BASE;
     
     V_current = V; // used to store current velocity
     w_current = omega; // used to store current angular velocity
@@ -1037,8 +1049,12 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     theta = theta + omega * DEAD_RECKONING_TIME;
     theta = fmod(theta + M_PI, 2*M_PI) - M_PI;
     
-    pitch *= 0.0174533; // Convert pitch to radians
-    effective_V = V * cosf(pitch); // Get effective velocity for pitch
+    if (CAR) {
+        pitch *= 0.0174533; // Convert pitch to radians
+        effective_V = V * cosf(pitch); // Get effective velocity for pitch
+    } else {
+        effective_V = V;
+    }
     
     if (omega < 0.01 && omega > -0.01) {
         // No account for pitch
