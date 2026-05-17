@@ -68,6 +68,7 @@ static float Gyro_deg_s[3]; // Holds the angular velocity in deg/s
 
 static bool IntStatusReading = false;
 static bool FifoReading = false;
+static volatile bool SpiTransferBusy = false;
 static uint8_t rx_data[16];
 
 #if PCB_REV == 1
@@ -858,7 +859,9 @@ void __ISR(_SPI4_RX_VECTOR, IPL7SRS) SPI4RXHandler(void)
             
             // Do a Mahony Filter Update
             MahonyUpdate(imu_data[0], imu_data[1], imu_data[2], imu_data[3],
-                            imu_data[4], imu_data[5], DT);       
+                            imu_data[4], imu_data[5], DT);
+
+            SpiTransferBusy = false;
         }
     }
     IFS5CLR = _IFS5_SPI4RXIF_MASK; // clear the interrupt flag 
@@ -898,7 +901,9 @@ void __ISR(_SPI1_RX_VECTOR, IPL7SRS) SPI1RXHandler(void)
             
             // Do a Mahony Filter Update
             MahonyUpdate(imu_data[0], imu_data[1], imu_data[2], imu_data[3],
-                            imu_data[4], imu_data[5], DT);       
+                            imu_data[4], imu_data[5], DT);
+
+            SpiTransferBusy = false;
         }
     }
     IFS3CLR = _IFS3_SPI1RXIF_MASK; // clear the interrupt flag 
@@ -915,7 +920,13 @@ void __ISR(_TIMER_6_VECTOR, IPL7SRS) T6Handler(void)
 {
     // Clear the interrupt flag
     IFS0CLR = _IFS0_T6IF_MASK;
-    
+
+    if (SpiTransferBusy || pSPISTAT->SPIBUSY) {
+        return;
+    }
+
+    SpiTransferBusy = true;
+
     // Get the current accel/gyroscope readings
     __builtin_disable_interrupts();
     *pSPIBUF = READ | 0x03; // Accel x address
