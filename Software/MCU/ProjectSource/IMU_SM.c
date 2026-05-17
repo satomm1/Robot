@@ -455,7 +455,7 @@ void WriteImuToSPI(uint8_t *Message2Send)
   }
   
   for (uint8_t j = 0; j < 7; j++) {
-    Message2Send[j+13] = 0; // Fill rest of buffer with 0's
+    Message2Send[j+9] = 0; // Fill rest of buffer with 0's
   }
 }
 
