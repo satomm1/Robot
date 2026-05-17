@@ -27,10 +27,12 @@
 #define READ  0b10000000
 #define WRITE 0b00000000
 #define FIFO_PACKET_SIZE 16
-#define ACCEL_SENSITIVITY 4096 // LSB/g
-#define GYRO_SENSITIVITY 131 // LSB/(deg/s)
-#define ACCEL_MAX 8  // 8g
-#define GYRO_MAX 250 // deg/sec
+/* Must match ACC_CONF / GYR_CONF written in InitIMU (±4g, ±250 dps) */
+#define ACCEL_RANGE_G       4
+#define GYRO_RANGE_DPS      250
+#define ACCEL_LSB_PER_G     8192.0f   /* LSB/g at ±4g */
+#define GYRO_LSB_PER_DPS    131.2f    /* LSB/(deg/s) at ±250 dps */
+#define GRAVITY_MPS2        9.80665f
 
 #define TWO_KP 2 * 5
 #define TWO_KI 2*0
@@ -47,6 +49,8 @@ void WriteIMU2(uint8_t Address, AccelGyroData_t data);
 void WriteIMU2Transfer(uint8_t Address, AccelGyroData_t data1, AccelGyroData_t data2);
 void PrintImuData(void);
 void MahonyUpdate(float ax, float ay, float az, float gx, float gy, float gz, float dt);;
+static float RawAccelToMps2(int16_t raw);
+static float RawGyroToDegPerS(int16_t raw);
 
 /*---------------------------- Module Variables ---------------------------*/
 // everybody needs a state variable, you may need others as well.
@@ -385,51 +389,12 @@ ImuState_t QueryImuSM(void)
 
 void GetIMUData(float *ImuResults)
 {
-    static int16_t signed_data; // Static for speed
-    
-    if (Accel[0].FullData & 0x8000) {
-        signed_data = -((~Accel[0].FullData & 0xFFFF) + 1);
-    } else {
-        signed_data = Accel[0].FullData;
-    }
-    ImuResults[0] = (float)signed_data / 8.19 * 9.81 / 1000;
-
-    if (Accel[1].FullData & 0x8000) {
-        signed_data = -((~Accel[1].FullData & 0xFFFF) + 1);
-    } else {
-        signed_data = Accel[1].FullData;
-    }
-    ImuResults[1] = (float)signed_data / 8.19 * 9.81 / 1000;
-    
-    if (Accel[2].FullData & 0x8000) {
-        signed_data = -((~Accel[2].FullData & 0xFFFF) + 1);
-    } else {
-        signed_data = Accel[2].FullData;
-    }
-    ImuResults[2] = (float)signed_data / 8.19 * 9.81 / 1000;
-
-    if (Gyro[0].FullData & 0x8000) {
-        signed_data = -((~Gyro[0].FullData & 0xFFFF) + 1);
-    } else {
-        signed_data = Gyro[0].FullData;
-    }
-    ImuResults[3] = (float)signed_data / 131.2;
-    
-    if (Gyro[1].FullData & 0x8000) {
-        signed_data = -((~Gyro[1].FullData & 0xFFFF) + 1);
-    } else {
-        signed_data = Gyro[1].FullData;
-    }
-    ImuResults[4] = (float)signed_data / 131.2;
-
-    if (Gyro[2].FullData & 0x8000) {
-        signed_data = -((~Gyro[2].FullData & 0xFFFF) + 1);
-    } else {
-        signed_data = Gyro[2].FullData;
-    }
-    ImuResults[5] = (float)signed_data / 131.2;
-    
-    return;
+    ImuResults[0] = RawAccelToMps2((int16_t)Accel[0].FullData);
+    ImuResults[1] = RawAccelToMps2((int16_t)Accel[1].FullData);
+    ImuResults[2] = RawAccelToMps2((int16_t)Accel[2].FullData);
+    ImuResults[3] = RawGyroToDegPerS((int16_t)Gyro[0].FullData);
+    ImuResults[4] = RawGyroToDegPerS((int16_t)Gyro[1].FullData);
+    ImuResults[5] = RawGyroToDegPerS((int16_t)Gyro[2].FullData);
 }
 
 void WriteImuToSPI(uint8_t *Message2Send)
@@ -516,11 +481,11 @@ bool InitIMU(void)
     // Setup the accelerometer/gyro settings for the IMU, do a burst write since 
     // addresses are consecutive:
     // Accel
-    data2send.DataStruct.LowerByte = 0b00011001; // cutoff = acc_odr/2, acc_range = +/- 4g, 8.19 LSB/mg, Sample Rate = 200 Hz
+    data2send.DataStruct.LowerByte = 0b00011001; // cutoff = acc_odr/2, acc_range = +/- ACCEL_RANGE_G g, Sample Rate = 200 Hz
     data2send.DataStruct.UpperByte = 0b01000010; // Normal mode, averaging of 4 samples
 
     // Gyro
-    data2send2.DataStruct.LowerByte = 0b00011001; // cutoff = gyr_odr/2, gyr_range = +/- 250 deg/s, 131.2 LSB/deg/s, Sample Rate = 200 Hz
+    data2send2.DataStruct.LowerByte = 0b00011001; // cutoff = gyr_odr/2, gyr_range = +/- GYRO_RANGE_DPS deg/s, Sample Rate = 200 Hz
     data2send2.DataStruct.UpperByte = 0b01000010; // Normal mode, averaging of 4 samples
     WriteIMU2Transfer(0x20, data2send, data2send2);
 
@@ -691,56 +656,30 @@ uint16_t ReadIMU16(uint8_t Address)
     return data.FullData;
 }
 
+static float RawAccelToMps2(int16_t raw)
+{
+    return (float)raw * GRAVITY_MPS2 / ACCEL_LSB_PER_G;
+}
+
+static float RawGyroToDegPerS(int16_t raw)
+{
+    return (float)raw / GYRO_LSB_PER_DPS;
+}
+
 void PrintImuData(void)
 {
-    int16_t signed_data;
-    if (Accel[0].FullData & 0x8000) {
-        signed_data = -((~Accel[0].FullData & 0xFFFF) + 1);
-    } else {
-        signed_data = Accel[0].FullData;
-    }
-    float x_accel = (float)signed_data / 8.19 * 9.81 / 1000;
-    DB_printf("Accel x: %d m/s^2\r\n", (int16_t)x_accel);
-
-    if (Accel[1].FullData & 0x8000) {
-        signed_data = -((~Accel[1].FullData & 0xFFFF) + 1);
-    } else {
-        signed_data = Accel[1].FullData;
-    }
-    float y_accel = (float)signed_data / 8.19 * 9.81 / 1000;
-    DB_printf("Accel y: %d m/s^2\r\n", (int16_t)y_accel);
-
-    if (Accel[2].FullData & 0x8000) {
-        signed_data = -((~Accel[2].FullData & 0xFFFF) + 1);
-    } else {
-        signed_data = Accel[2].FullData;
-    }
-    float z_accel = (float)signed_data / 8.19 * 9.81 / 1000;
-    DB_printf("Accel z: %d m/s^2\r\n", (int16_t)z_accel);
-
-    if (Gyro[0].FullData & 0x8000) {
-        signed_data = -((~Gyro[0].FullData & 0xFFFF) + 1);
-    } else {
-        signed_data = Gyro[0].FullData;
-    }
-    float x_vel = (float)signed_data / 131.2;
-    DB_printf("Vel x: %d deg/sec\r\n", (int16_t)x_vel);
-    
-    if (Gyro[1].FullData & 0x8000) {
-        signed_data = -((~Gyro[1].FullData & 0xFFFF) + 1);
-    } else {
-        signed_data = Gyro[1].FullData;
-    }
-    float y_vel = (float)signed_data / 131.2;
-    DB_printf("Vel y: %d deg/sec\r\n", (int16_t)y_vel);
-
-    if (Gyro[2].FullData & 0x8000) {
-        signed_data = -((~Gyro[2].FullData & 0xFFFF) + 1);
-    } else {
-        signed_data = Gyro[2].FullData;
-    }
-    float z_vel = (float)signed_data / 131.2;
-    DB_printf("Vel z: %d deg/sec\r\n\r\n", (int16_t)z_vel);
+    DB_printf("Accel x: %d m/s^2\r\n",
+              (int16_t)RawAccelToMps2((int16_t)Accel[0].FullData));
+    DB_printf("Accel y: %d m/s^2\r\n",
+              (int16_t)RawAccelToMps2((int16_t)Accel[1].FullData));
+    DB_printf("Accel z: %d m/s^2\r\n",
+              (int16_t)RawAccelToMps2((int16_t)Accel[2].FullData));
+    DB_printf("Vel x: %d deg/sec\r\n",
+              (int16_t)RawGyroToDegPerS((int16_t)Gyro[0].FullData));
+    DB_printf("Vel y: %d deg/sec\r\n",
+              (int16_t)RawGyroToDegPerS((int16_t)Gyro[1].FullData));
+    DB_printf("Vel z: %d deg/sec\r\n\r\n",
+              (int16_t)RawGyroToDegPerS((int16_t)Gyro[2].FullData));
 }
 
 /**
