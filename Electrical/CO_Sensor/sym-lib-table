@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "CO_Sensor_library")(type "KiCad")(uri "${KIPRJMOD}/CO_Sensor_library.kicad_sym")(options "")(descr ""))
+)
