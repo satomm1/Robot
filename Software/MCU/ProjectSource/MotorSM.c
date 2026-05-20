@@ -1132,13 +1132,20 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     V = (V_l + V_r) * 0.5f; 
     omega = (V_r - V_l) / WHEEL_BASE;
     
-    V_current = V; // used to store current velocity
-    w_current = omega; // used to store current angular velocity
+    w_current = omega;
     
     // Calculate the update in theta and ensure theta stays within [-pi, pi]
     prev_theta = theta;
     theta = theta + omega * DEAD_RECKONING_TIME;
     theta = fmod(theta + M_PI, 2*M_PI) - M_PI;
+    
+    if (IsPivotControlMode()) {
+        // Spin-in-place: update heading only; wheel slip often adds false V
+        V_current = 0.0f;
+        return;
+    }
+    
+    V_current = V;
     
     if (CAR) {
         pitch *= 0.0174533; // Convert pitch to radians
