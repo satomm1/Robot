@@ -31,9 +31,16 @@
 #define OC_PERIOD 200  // 312   // Output compare period (312 ~ 10 kHz, 200==15.625 kHz)
 #define NO_SPEED_PERIOD 65535 // Period to indicate motor not spinning
 #define DEAD_RECKONING_PERIOD 7812 // Chosen so that we update at 50 Hz rate (50 mHZ / 256 prescaler / 7812 * 2 = 50 Hz)
-#define Kp 0.2 // Proportional constant for PID law
-#define Ki 0.01 // Integral constant for PID law
-#define Kd 0.0 // Derivative constant for PID law
+#define Kp_DRIVE 0.2f // Proportional gain for driving (V != 0 or low w)
+#define Ki_DRIVE 0.01f // Integral gain for driving
+#define Kd_DRIVE 0.0f // Derivative gain for driving
+#define Kp_PIVOT 0.2f // Proportional gain for spin-in-place (higher P helps stiction)
+#define Ki_PIVOT 0.01f // Integral gain for pivot (lower I reduces low-speed hunting)
+#define Kd_PIVOT 0.0f // Derivative gain for pivot
+#define V_PIVOT_THRESH 0.05f // |V_desired| below this with |w_desired| above W_PIVOT_THRESH => pivot gains
+#define W_PIVOT_THRESH 0.05f // |w_desired| above this with low V => pivot gains
+#define PIVOT_RPM_FILTER_ALPHA 0.5f // EMA on measured RPM in pivot (higher = smoother, slower)
+#define PIVOT_DUTY_SLEW_MAX 0.5f // Max change in PI duty (%) per control tick in pivot (~500 Hz)
 #define CONTROL_PERIOD 12500 // Control update period --- (1000 == 6250*2 Hz, 12500 == 500*2 Hz 30000 == 208*2 Hz)
 
 #if (MOTOR_TYPE==1)
@@ -58,6 +65,8 @@
    relevant to the behavior of this state machine
 */
 static void Store_RL_Data(void);
+static bool IsPivotControlMode(void);
+static float SlewDuty(float Target, float Prev, float MaxDelta);
 
 /*---------------------------- Module Variables ---------------------------*/
 // everybody needs a state variable, you may need others as well.
@@ -675,6 +684,24 @@ void PrintBufferSize(void) {
  private functions
  ***************************************************************************/
 
+static bool IsPivotControlMode(void)
+{
+    return (fabsf(V_desired) < V_PIVOT_THRESH) && (fabsf(w_desired) > W_PIVOT_THRESH);
+}
+
+static float SlewDuty(float Target, float Prev, float MaxDelta)
+{
+    float Delta = Target - Prev;
+
+    if (Delta > MaxDelta) {
+        return Prev + MaxDelta;
+    }
+    if (Delta < -MaxDelta) {
+        return Prev - MaxDelta;
+    }
+    return Target;
+}
+
 ////////////////////// Interrupt Service Routines //////////////////////
 
 /****************************************************************************
@@ -810,6 +837,17 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     // Initialize variables used throughout the ISR (Static for speed)
     static float ActualLeftRPM = 0;
     static float ActualRightRPM = 0;
+    static float FilteredLeftRPM = 0;
+    static float FilteredRightRPM = 0;
+    static float LeftMeasuredRPM = 0;
+    static float RightMeasuredRPM = 0;
+    static float PrevLeftPiDuty = 0;
+    static float PrevRightPiDuty = 0;
+    static bool PrevPivotMode = false;
+    static float KpActive = Kp_DRIVE;
+    static float KiActive = Ki_DRIVE;
+    static float KdActive = Kd_DRIVE;
+    bool PivotMode;
     
     IFS0CLR = _IFS0_T1IF_MASK; // Clear the timer interrupt
         
@@ -834,16 +872,62 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
         LeftPrevError = 0;
         RightPrevError = 0;
         
+        FilteredLeftRPM = 0;
+        FilteredRightRPM = 0;
+        PrevLeftPiDuty = 0;
+        PrevRightPiDuty = 0;
+        PrevPivotMode = false;
         return;
     }
     
-    // Calculate Current RPM based on Pulse Lengths from encoders
+    // Calculate current RPM based on pulse lengths from encoders
     ActualLeftRPM = SPEED_CONVERSION_FACTOR / LeftPulseLength;
     ActualRightRPM = SPEED_CONVERSION_FACTOR / RightPulseLength;
+    
+    PivotMode = IsPivotControlMode();
+    if (PivotMode) {
+        KpActive = Kp_PIVOT;
+        KiActive = Ki_PIVOT;
+        KdActive = Kd_PIVOT;
+    } else {
+        KpActive = Kp_DRIVE;
+        KiActive = Ki_DRIVE;
+        KdActive = Kd_DRIVE;
+    }
+    
+    if (PivotMode != PrevPivotMode) {
+        LeftErrorSum = 0.0f;
+        RightErrorSum = 0.0f;
+        LeftPrevError = 0.0f;
+        RightPrevError = 0.0f;
+        if (PivotMode) {
+            FilteredLeftRPM = ActualLeftRPM;
+            FilteredRightRPM = ActualRightRPM;
+            PrevLeftPiDuty = 0.0f;
+            PrevRightPiDuty = 0.0f;
+        }
+        PrevPivotMode = PivotMode;
+    }
+    
+    if (PivotMode) {
+        if (fabsf(ActualLeftRPM) <= 500.0f) {
+            FilteredLeftRPM = PIVOT_RPM_FILTER_ALPHA * FilteredLeftRPM
+                    + (1.0f - PIVOT_RPM_FILTER_ALPHA) * ActualLeftRPM;
+        }
+        if (fabsf(ActualRightRPM) <= 500.0f) {
+            FilteredRightRPM = PIVOT_RPM_FILTER_ALPHA * FilteredRightRPM
+                    + (1.0f - PIVOT_RPM_FILTER_ALPHA) * ActualRightRPM;
+        }
+        LeftMeasuredRPM = FilteredLeftRPM;
+        RightMeasuredRPM = FilteredRightRPM;
+    } else {
+        LeftMeasuredRPM = ActualLeftRPM;
+        RightMeasuredRPM = ActualRightRPM;
+    }
 
     // Calculate error from desired RPM
-    LeftError = DesiredLeftRPM - ActualLeftRPM;
-    RightError = DesiredRightRPM - ActualRightRPM;
+    LeftError = DesiredLeftRPM - LeftMeasuredRPM;
+    RightError = DesiredRightRPM - RightMeasuredRPM;
     
     if (fabsf(ActualLeftRPM) > 500) {
         // The RPM Readings are likely in error, use previous error instead
@@ -884,9 +968,9 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     LeftPrevError = LeftError;
     RightPrevError = RightError;
     
-    // Calculate according to PI Law
-    LeftDutyCycle = Kp*LeftError + Ki*LeftErrorSum + Kd*LeftErrorDiff; 
-    RightDutyCycle = Kp*RightError + Ki*RightErrorSum + Kd*RightErrorDiff;
+    // Calculate according to PI Law (gains scheduled for pivot vs drive)
+    LeftDutyCycle = KpActive*LeftError + KiActive*LeftErrorSum + KdActive*LeftErrorDiff; 
+    RightDutyCycle = KpActive*RightError + KiActive*RightErrorSum + KdActive*RightErrorDiff;
     
     // Anti-Windup
     if (LeftDutyCycle > 100) {
@@ -903,6 +987,13 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     } else if (RightDutyCycle < 0) {
         RightDutyCycle = 0;
         RightErrorSum -= RightError;
+    }
+    
+    if (PivotMode) {
+        LeftDutyCycle = SlewDuty(LeftDutyCycle, PrevLeftPiDuty, PIVOT_DUTY_SLEW_MAX);
+        RightDutyCycle = SlewDuty(RightDutyCycle, PrevRightPiDuty, PIVOT_DUTY_SLEW_MAX);
+        PrevLeftPiDuty = LeftDutyCycle;
+        PrevRightPiDuty = RightDutyCycle;
     }
         
     // Lastly, Set the duty cycle of the motors by updating Output Compare
