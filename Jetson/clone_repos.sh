@@ -15,6 +15,12 @@ repositories=(
     "https://github.com/satomm1/slam_gmapping.git"
 )
 
+files=(
+    "https://raw.githubusercontent.com/satomm1/Robot/main/Jetson/robot_env.sh"
+    "https://raw.githubusercontent.com/satomm1/Robot/main/Jetson/startup_script.py"
+)
+
+
 for repo in "${repositories[@]}"; do
     # Extract the repository name from the URL
     repo_name=$(basename "$repo" .git)
@@ -25,5 +31,18 @@ for repo in "${repositories[@]}"; do
     else
         echo "Cloning $repo..."
         git clone -b noetic "$repo"
+    fi
+done
+
+for file in "${files[@]}"; do
+    # Extract the filename from the URL
+    filename=$(basename "$file")
+
+    # Check if the file already exists
+    if [ -f "$filename" ]; then
+        echo "File $filename already exists. Skipping download."
+    else
+        echo "Downloading $file..."
+        wget "$file"
     fi
 done
