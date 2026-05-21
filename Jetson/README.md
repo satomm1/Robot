@@ -365,7 +365,7 @@ sudo docker load < your_image.tar.gz
     ```
     nano /workspace/catkin_ws/src/robot_env.sh
     ```
-    Please update the file with the Jetson IP address, Robot ID, MCU SPI number, and camera type.
+    Please update the file with the Jetson IP address, Robot ID, MCU SPI number, camera type, and robot height.
 
 8) Make sure our ROS environment and robot environment settings are sourced via the `bashrc` file:
     ```

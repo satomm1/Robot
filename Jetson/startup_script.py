@@ -37,11 +37,25 @@ class LaunchServer(BaseHTTPRequestHandler):
 
         elif self.path == "/start":
             if launch_process is None or launch_process.poll() is not None:
+                env_cmd = (
+                    "source /opt/ros/noetic/setup.bash && "
+                    "source /workspace/catkin_ws/devel/setup.bash && "
+                    "source /workspace/catkin_ws/src/robot_env.sh && "
+                    "printf '%s' \"$ROBOT_HEIGHT\""
+                )
+                robot_height = subprocess.run(
+                    env_cmd,
+                    shell=True,
+                    executable="/bin/bash",
+                    capture_output=True,
+                    text=True,
+                ).stdout.strip().lower()
+                launch_file = "tall.launch" if robot_height == "tall" else "short.launch"
                 cmd = (
                     "source /opt/ros/noetic/setup.bash && "
                     "source /workspace/catkin_ws/devel/setup.bash && "
                     "source /workspace/catkin_ws/src/robot_env.sh && "
-                    "roslaunch mattbot_bringup short.launch"
+                    f"roslaunch mattbot_bringup {launch_file}"
                 )
                 launch_process = subprocess.Popen(
                     cmd, shell=True, executable="/bin/bash"
