@@ -329,7 +329,7 @@ sudo docker load < your_image.tar.gz
 	cd src
     ```
 
-5) Now, clone the following repositories and switch to the noetic branch. To make cloning easier, I have provided a script to automatically clone all the relevant repositories. Copy the `clone_repos.sh` script to your Jetson, make it executable, and then run the script:
+5) Now, clone the following repositories and switch to the noetic branch. To make cloning easier, I have provided a script to automatically clone all the relevant repositories and a few useful files. Copy the `clone_repos.sh` script to your Jetson, make it executable, and then run the script:
     ```
 	nano clone_repos.sh
 	(copy clone_repos.sh code here)
@@ -338,7 +338,7 @@ sudo docker load < your_image.tar.gz
 	. clone_repos.sh
     ```
 
-    The script will clone the following repositories from https://github.com/satomm1/
+    The script will clone the following repositories/files from https://github.com/satomm1/
     
     - mattbot_record
     - mattbot_bringup          
@@ -351,6 +351,8 @@ sudo docker load < your_image.tar.gz
     - rplidar_ros
     - twist_mux
     - slam_gmapping
+    - robot_env.sh (From this repo)
+    - startup_script.py (from this repo)
 
 6) Navigate back to the `catkin_ws` directory and build the packages:
     ```
@@ -359,19 +361,20 @@ sudo docker load < your_image.tar.gz
 	source devel/setup.bash
     ```
 
-7) Add important information to the `bashrc` file:
+7) Add important information to the `robot_env.sh` file:
+    ```
+    nano /workspace/catkin_ws/src/robot_env.sh
+    ```
+    Please update the file with the Jetson IP address, Robot ID, MCU SPI number, and camera type.
+
+8) Make sure our ROS environment and robot environment settings are sourced via the `bashrc` file:
     ```
 	nano ~/.bashrc
     ```
     Append the following:
     ```
     source /workspace/catkin_ws/devel/setup.bash
-    export ROS_IP=<Your Robot IP Here>                                
-    export ROS_MASTER_URI=http://$ROS_IP:11311
-    export ROBOT_ID=<Robot ID Here (Integer)>
-    export MCU_SPI=<SPI used for MCU comms (either 1 or 3)>
-    export CAMERA_TYPE=<camera type, i.e. astra_pro_plus, astra, astra_pro>
-    export CYCLONEDDS_HOME="/home/cyclonedds/install"
+    source /workspace/catkin_ws/src/robot_env.sh
     ```
     Source the bashrc file:
     ```

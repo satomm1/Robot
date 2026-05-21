@@ -1,5 +1,7 @@
 # Please replace with your values below
-export CAMERA_TYPE=astra_pro_plus
-export ROS_IP=192.168.50.11  # IP Address of this Jetson Device
-export ROS_MASTER_URI=http://192.168.50.11:11311  # http://<IP Address of this Jetson Device>:11311
-export ROBOT_ID=6  # Select a unique ID for this robot (Align with MCU Robot ID)
+export ROS_IP=<Your Robot IP Here>  # IP Address of this Jetson Device                        
+export ROS_MASTER_URI=http://$ROS_IP:11311
+export ROBOT_ID=<Robot ID Here (Integer)>  # Select a unique ID for this robot (Align with MCU Robot ID)
+export MCU_SPI=<SPI used for MCU comms (either 1 or 3)>
+export CAMERA_TYPE=astra_pro_plus  # camera type, i.e. <astra_pro_plus, astra, astra_pro>
+export CYCLONEDDS_HOME="/home/cyclonedds/install"
