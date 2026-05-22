@@ -16,7 +16,7 @@
 // State definitions for use with the query function
 typedef enum
 {
-  InitPState_IMU, IMUReset, IMUWait, IMURun, IMUInitFailed
+  InitPState_IMU, IMUReset, IMUWait, IMURun, IMURecovering, IMUInitFailed
 }ImuState_t;
 
 typedef struct

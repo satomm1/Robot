@@ -19,6 +19,7 @@
 #include "ES_Configure.h"
 #include "ES_Framework.h"
 #include "IMU_SM.h"
+#include "LEDService.h"
 #include <sys/attribs.h>
 #include "dbprintf.h"
 #include <math.h>
@@ -43,6 +44,13 @@
 #define IMU_RESET_DELAY_MS      500u
 #define IMU_DEBUG_PRINT_MS      1000u
 #define IMU_INIT_MAX_ATTEMPTS   5u
+#define IMU_RECOVERY_MAX_ATTEMPTS 3u
+
+/* T6 period ~10 ms (PR6=1953, prescale 256 @ 50 MHz PBCLK3) */
+#define IMU_TRANSFER_STALE_TICKS  3u   /* ~30 ms stuck in SpiTransferBusy */
+
+/* LEDService EventParam for EV_LED_ON / EV_LED_OFF (see LEDService.c) */
+#define IMU_FAULT_LED             2u   /* LATH4 IMU init/recovery failed */
 
 /* Must match ACC_CONF / GYR_CONF written in InitIMU (±4g, ±250 dps) */
 #define ACCEL_RANGE_G           4
@@ -70,6 +78,13 @@ static void ImuSpiFlushRx(void);
 static void ImuSpiPushTxByte(uint8_t byte);
 static void ImuSpiStartSampleBurst(void);
 static void ImuSpiParseBurstFrame(void);
+static void ImuStopSampling(void);
+static void ImuBusRecover(void);
+static void ImuMahonyReset(void);
+static void ImuRequestRecovery(void);
+static void ImuEnterRecovery(void);
+static void ImuPostLed(ES_EventType_t event_type, uint8_t led);
+static void ImuEnterInitFailed(void);
 static float RawAccelToMps2(int16_t raw);
 static float RawGyroToDegPerS(int16_t raw);
 
@@ -85,8 +100,12 @@ static AccelGyroData_t Accel[3];
 static AccelGyroData_t Gyro[3];
 
 static volatile bool SpiTransferBusy = false;
+static volatile uint8_t ImuAllowRecovery = 0;
+static volatile bool ImuRecoveryPosted = false;
 static uint8_t ImuSpiRxCount = 0;
 static uint8_t ImuInitAttempts = 0;
+static uint8_t ImuRecoveryAttempts = 0;
+static uint8_t ImuTransferStaleTicks = 0;
 static uint8_t rx_data[IMU_BURST_RX_BYTES];
 
 #if PCB_REV == 1
@@ -339,7 +358,7 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
                 } else {
                     DB_printf("IMU init failed after %u attempts; giving up\r\n",
                               (unsigned)IMU_INIT_MAX_ATTEMPTS);
-                    CurrentState = IMUInitFailed;
+                    ImuEnterInitFailed();
                 }
             }
         }
@@ -362,17 +381,48 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
       {
         case ES_TIMEOUT:
         {
-            T6CONbits.ON = 1; // Turn T6 on
-            if (PCB_REV == 1){
+            T6CONbits.ON = 1;
+            if (PCB_REV == 1) {
                 IEC5SET = _IEC5_SPI4RXIE_MASK;
-            } else if (PCB_REV >= 2){
-                IEC3SET = _IEC3_SPI1RXIE_MASK; // Enable the RX interrupt
+            } else if (PCB_REV >= 2) {
+                IEC3SET = _IEC3_SPI1RXIE_MASK;
             }
-//            ES_Timer_InitTimer(IMU_TIMER, 1000); // Init timer
             CurrentState = IMURun;
-            
-            LATHbits.LATH4 = 1;
+            ImuAllowRecovery = 1;
+            ImuRecoveryPosted = false;
+            ImuTransferStaleTicks = 0;
         }
+      }
+    }
+    break;
+
+    case IMURecovering:
+    {
+      switch (ThisEvent.EventType)
+      {
+        case ES_TIMEOUT:
+        {
+            if (InitIMU()) {
+                ImuRecoveryAttempts = 0;
+                CurrentState = IMUWait;
+                ES_Timer_InitTimer(IMU_TIMER, IMU_RESET_DELAY_MS);
+            } else {
+                ImuRecoveryAttempts += 1;
+                if (ImuRecoveryAttempts < IMU_RECOVERY_MAX_ATTEMPTS) {
+                    ImuBusRecover();
+                    ResetIMU();
+                    ES_Timer_InitTimer(IMU_TIMER, IMU_RESET_DELAY_MS);
+                } else {
+                    DB_printf("IMU recovery failed after %u attempts\r\n",
+                              (unsigned)IMU_RECOVERY_MAX_ATTEMPTS);
+                    ImuEnterInitFailed();
+                }
+            }
+        }
+        break;
+
+        default:
+          ;
       }
     }
     break;
@@ -381,12 +431,16 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
     {
       switch (ThisEvent.EventType)
       {
-               
+        case EV_IMU_RECOVERY:
+        {
+            ImuRecoveryPosted = false;
+            ImuEnterRecovery();
+        }
+        break;
+
         case ES_TIMEOUT:
         {
-            // Periodically print out gyro values.
             PrintImuData();
-            
             ES_Timer_InitTimer(IMU_TIMER, IMU_DEBUG_PRINT_MS);
         }
         break;
@@ -744,6 +798,134 @@ static void ImuSpiParseBurstFrame(void)
 }
 
 /**
+ * ImuStopSampling
+ *
+ * Halts periodic IMU SPI traffic during recovery or fault handling: stops T6,
+ * disables SPI RX interrupts, waits for the current transfer to finish, flushes
+ * the RX FIFO, and clears SpiTransferBusy and the transfer-timeout counter.
+ */
+static void ImuStopSampling(void)
+{
+    T6CONbits.ON = 0;
+    if (PCB_REV == 1) {
+        IEC5CLR = _IEC5_SPI4RXIE_MASK;
+    } else if (PCB_REV >= 2) {
+        IEC3CLR = _IEC3_SPI1RXIE_MASK;
+    }
+    while (pSPISTAT->SPIBUSY) {
+        ;
+    }
+    ImuSpiFlushRx();
+    SpiTransferBusy = false;
+    ImuTransferStaleTicks = 0;
+    ImuAllowRecovery = 0;
+}
+
+/**
+ * ImuBusRecover
+ *
+ * Resynchronizes the PIC32 SPI peripheral after overflow or framing errors:
+ * drains RX, toggles the module off/on, and clears SPIROV. Call with sampling
+ * already stopped (ImuStopSampling).
+ */
+static void ImuBusRecover(void)
+{
+    while (pSPISTAT->SPIBUSY) {
+        ;
+    }
+    ImuSpiFlushRx();
+    pSPICON->ON = 0;
+    pSPISTAT->SPIROV = 0;
+    pSPICON->ON = 1;
+}
+
+/**
+ * ImuMahonyReset
+ *
+ * Reinitializes the Mahony AHRS quaternion and integral error state after
+ * recovery so attitude does not integrate through invalid samples.
+ */
+static void ImuMahonyReset(void)
+{
+    q0 = 1.0f;
+    q1 = 0.0f;
+    q2 = 0.0f;
+    q3 = 0.0f;
+    integralFBx = 0.0f;
+    integralFBy = 0.0f;
+    integralFBz = 0.0f;
+}
+
+/**
+ * ImuRequestRecovery
+ *
+ * Posts EV_IMU_RECOVERY to this state machine (safe to call from ISR). Only
+ * acts while ImuAllowRecovery is set (IMURun) and coalesces duplicate requests
+ * via ImuRecoveryPosted so RunImuSM performs blocking re-init, not the ISR.
+ */
+static void ImuRequestRecovery(void)
+{
+    ES_Event_t ev;
+
+    if (!ImuAllowRecovery || ImuRecoveryPosted) {
+        return;
+    }
+    ImuRecoveryPosted = true;
+    ev.EventType = EV_IMU_RECOVERY;
+    ev.EventParam = 0;
+    (void)PostImuSM(ev);
+}
+
+/**
+ * ImuEnterRecovery
+ *
+ * Full runtime recovery entry: stop sampling, reset the filter, bus recover,
+ * soft-reset the BMI323, then enter IMURecovering and wait for InitIMU on
+ * ES_TIMEOUT (same post-reset path as boot).
+ */
+static void ImuEnterRecovery(void)
+{
+    if (CurrentState != IMURun) {
+        return;
+    }
+    DB_printf("IMU recovery started\r\n");
+    ImuStopSampling();
+    ImuMahonyReset();
+    ImuRecoveryAttempts = 0;
+    CurrentState = IMURecovering;
+    ImuBusRecover();
+    ResetIMU();
+    ES_Timer_InitTimer(IMU_TIMER, IMU_RESET_DELAY_MS);
+}
+
+/**
+ * ImuPostLed
+ *
+ * Posts EV_LED_ON or EV_LED_OFF to LEDService; EventParam is the LED number.
+ */
+static void ImuPostLed(ES_EventType_t event_type, uint8_t led)
+{
+    ES_Event_t ev;
+
+    ev.EventType = event_type;
+    ev.EventParam = led;
+    (void)PostLEDService(ev);
+}
+
+/**
+ * ImuEnterInitFailed
+ *
+ * Terminal fault state after boot init or mid-run recovery is exhausted.
+ * Stops sampling, turns off IMU_RUN_LED, and turns on IMU_FAULT_LED.
+ */
+static void ImuEnterInitFailed(void)
+{
+    ImuStopSampling();
+    CurrentState = IMUInitFailed;
+    ImuPostLed(EV_LED_ON, IMU_FAULT_LED);
+}
+
+/**
  * ImuSpiStartSampleBurst
  *
  * Starts a 14-byte SPI read from DATA_0 (0x03): read address, dummy byte,
@@ -757,6 +939,7 @@ static void ImuSpiStartSampleBurst(void)
 
     ImuSpiFlushRx();
     SpiTransferBusy = true;
+    ImuTransferStaleTicks = 0;
     ImuSpiRxCount = 0;
 
     ImuSpiPushTxByte(IMU_SPI_READ_FLAG | IMU_REG_DATA_0);
@@ -886,6 +1069,7 @@ void __ISR(IMU_SPI_RX_ISR_VECTOR, IPL7SRS) ImuSpiRxIsr(void)
     if (pSPISTAT->SPIROV) {
         ImuSpiFlushRx();
         SpiTransferBusy = false;
+        ImuRequestRecovery();
         ImuSpiClearRxIf();
         return;
     }
@@ -917,11 +1101,23 @@ void __ISR(_TIMER_6_VECTOR, IPL7SRS) T6Handler(void)
     if (pSPISTAT->SPIROV) {
         ImuSpiFlushRx();
         SpiTransferBusy = false;
-    }
-
-    if (SpiTransferBusy || pSPISTAT->SPIBUSY) {
+        ImuRequestRecovery();
         return;
     }
 
+    if (SpiTransferBusy || pSPISTAT->SPIBUSY) {
+        if (SpiTransferBusy) {
+            ImuTransferStaleTicks += 1;
+            if (ImuTransferStaleTicks >= IMU_TRANSFER_STALE_TICKS) {
+                ImuTransferStaleTicks = 0;
+                SpiTransferBusy = false;
+                ImuSpiFlushRx();
+                ImuRequestRecovery();
+            }
+        }
+        return;
+    }
+
+    ImuTransferStaleTicks = 0;
     ImuSpiStartSampleBurst();
 }
