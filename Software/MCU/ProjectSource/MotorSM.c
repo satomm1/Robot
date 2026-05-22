@@ -1106,10 +1106,14 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     
     IFS1CLR = _IFS1_T7IF_MASK; // clear the interrupt flag 
         
-    // Get the current roll/pitch of the mobile robot
-    GetAngles(&roll, &pitch);
-    if (fabsf(pitch) < 2.5) {
-        pitch = 0;
+    // Pitch correction only when IMU is actively sampling (encoder odometry always runs)
+    roll = 0.0f;
+    pitch = 0.0f;
+    if (QueryImuSM() == IMURun) {
+        GetAngles(&roll, &pitch);
+        if (fabsf(pitch) < 2.5f) {
+            pitch = 0.0f;
+        }
     }
     
     // First thing we do is grab current number of rotations so this doesn't change mid function

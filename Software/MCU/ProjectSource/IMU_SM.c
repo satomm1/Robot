@@ -241,16 +241,17 @@ bool InitImuSM(uint8_t Priority)
   // Setup Interrupts
   INTCONbits.MVEC = 1; // Use multivector mode
   PRISSbits.PRI7SS = 0b0111; // Priority 7 interrupt use shadow set 7
+  PRISSbits.PRI5SS = 0b0101; // IPL5SRS handlers use shadow set 5 (below motor IPL6/7)
   
-  // Set interrupt priorities
+  // IMU SPI + sample timer at IPL5 — below motor control (7) and odometry T7 (6)
   if (PCB_REV == 1) {
-    IPC41bits.SPI4TXIP = 7; // SPI4TX
-    IPC41bits.SPI4RXIP = 7; // SPI4RX
+    IPC41bits.SPI4TXIP = 5;
+    IPC41bits.SPI4RXIP = 5;
   } else if (PCB_REV >= 2) {
-    IPC27bits.SPI1TXIP = 7; // SPI1TX
-    IPC27bits.SPI1RXIP = 7; // SPI1RX
+    IPC27bits.SPI1TXIP = 5;
+    IPC27bits.SPI1RXIP = 5;
   }
-  IPC7bits.T6IP = 7; // T6
+  IPC7bits.T6IP = 5;
   
   // Disable the RX/TX interrupt
   if (PCB_REV == 1) {
@@ -517,17 +518,35 @@ void WriteImuToSPI(uint8_t *Message2Send)
 /** 
  * GetAngles
  * 
- * Computes the roll/pitch of the IMU from the Mahony Filter
- * (Degrees/second)
+ * Returns roll and pitch in degrees from the Mahony filter. Only valid while
+ * the IMU state machine is in IMURun; otherwise returns zero. Quaternion is
+ * copied with interrupts disabled for a consistent snapshot.
  * 
  * @param roll - the roll in degrees
  * @param pitch - the pitch in degrees
  */
 void GetAngles(float* roll, float* pitch)
 {
-    // Compute pitch and roll (in degrees)
-    *roll = atan2f(q0*q1 + q2*q3, 0.5 - q1*q1 + q2*q2) * 57.29578;
-    *pitch = asinf(2.0 * (q0*q2 - q3*q1)) * 57.29578;
+    float qa;
+    float qb;
+    float qc;
+    float qd;
+
+    if (QueryImuSM() != IMURun) {
+        *roll = 0.0f;
+        *pitch = 0.0f;
+        return;
+    }
+
+    __builtin_disable_interrupts();
+    qa = q0;
+    qb = q1;
+    qc = q2;
+    qd = q3;
+    __builtin_enable_interrupts();
+
+    *roll = atan2f(qa * qb + qc * qd, 0.5f - qb * qb + qc * qc) * 57.29578f;
+    *pitch = asinf(2.0f * (qa * qc - qd * qb)) * 57.29578f;
 }
 
 /***************************************************************************
@@ -1062,7 +1081,7 @@ void MahonyUpdate(float ax, float ay, float az, float gx, float gy, float gz, fl
 	q3 *= recipNorm;
 }
 
-void __ISR(IMU_SPI_RX_ISR_VECTOR, IPL7SRS) ImuSpiRxIsr(void)
+void __ISR(IMU_SPI_RX_ISR_VECTOR, IPL5SRS) ImuSpiRxIsr(void)
 {
     static float imu_data[6];
 
@@ -1089,12 +1108,12 @@ void __ISR(IMU_SPI_RX_ISR_VECTOR, IPL7SRS) ImuSpiRxIsr(void)
     ImuSpiClearRxIf();
 }
 
-void __ISR(IMU_SPI_TX_ISR_VECTOR, IPL7SRS) ImuSpiTxIsr(void)
+void __ISR(IMU_SPI_TX_ISR_VECTOR, IPL5SRS) ImuSpiTxIsr(void)
 {
     ImuSpiClearTxIf();
 }
 
-void __ISR(_TIMER_6_VECTOR, IPL7SRS) T6Handler(void)
+void __ISR(_TIMER_6_VECTOR, IPL5SRS) T6Handler(void)
 {
     IFS0CLR = _IFS0_T6IF_MASK;
 
