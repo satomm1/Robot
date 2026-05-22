@@ -24,19 +24,36 @@
 #include <math.h>
 
 /*----------------------------- Module Defines ----------------------------*/
-#define READ  0b10000000
-#define WRITE 0b00000000
-#define FIFO_PACKET_SIZE 16
-/* Must match ACC_CONF / GYR_CONF written in InitIMU (±4g, ±250 dps) */
-#define ACCEL_RANGE_G       4
-#define GYRO_RANGE_DPS      250
-#define ACCEL_LSB_PER_G     8192.0f   /* LSB/g at ±4g */
-#define GYRO_LSB_PER_DPS    131.2f    /* LSB/(deg/s) at ±250 dps */
-#define GRAVITY_MPS2        9.80665f
+/* BMI323 SPI protocol (BST-BMI323 datasheet) */
+#define IMU_SPI_READ_FLAG       0x80u
+#define IMU_REG_CHIP_ID         0x00u
+#define IMU_REG_STATUS          0x02u
+#define IMU_REG_DATA_0          0x03u   /* Accel X — start of accel/gyro burst */
+#define IMU_REG_ACC_CONF        0x20u
+#define IMU_REG_CMD             0x7Eu
+#define BMI323_CHIP_ID_VAL      0x43u
+#define BMI323_CMD_SOFT_RESET   0xDEAFu
 
-#define TWO_KP 2 * 5
-#define TWO_KI 2*0
-#define DT 0.00999936
+/* Burst read: cmd echo + SPI dummy + 6 x int16 (3 accel + 3 gyro) */
+#define IMU_BURST_RX_BYTES      14u
+#define IMU_BURST_DATA_OFFSET   2u      /* First data byte index in rx_data[] */
+#define IMU_BURST_DATA_BYTES    12u     /* Clocks after address + dummy */
+
+/* ES_Timer delays (ms) */
+#define IMU_RESET_DELAY_MS      500u
+#define IMU_DEBUG_PRINT_MS      1000u
+#define IMU_INIT_MAX_ATTEMPTS   5u
+
+/* Must match ACC_CONF / GYR_CONF written in InitIMU (±4g, ±250 dps) */
+#define ACCEL_RANGE_G           4
+#define GYRO_RANGE_DPS          250
+#define ACCEL_LSB_PER_G         8192.0f /* LSB/g at ±4g */
+#define GYRO_LSB_PER_DPS        131.2f  /* LSB/(deg/s) at ±250 dps */
+#define GRAVITY_MPS2            9.80665f
+
+#define TWO_KP                  (2.0f * 5.0f)
+#define TWO_KI                  0.0f
+#define DT                      0.00999936f  /* ~100 Hz, matches T6 PR6 */
 
 /*---------------------------- Module Functions ---------------------------*/
 /* prototypes for private functions for this machine.They should be functions
@@ -48,7 +65,11 @@ void WriteIMU(uint8_t Address, uint8_t LowerByte, uint8_t UpperByte, uint8_t Num
 void WriteIMU2(uint8_t Address, AccelGyroData_t data);
 void WriteIMU2Transfer(uint8_t Address, AccelGyroData_t data1, AccelGyroData_t data2);
 void PrintImuData(void);
-void MahonyUpdate(float ax, float ay, float az, float gx, float gy, float gz, float dt);;
+void MahonyUpdate(float ax, float ay, float az, float gx, float gy, float gz, float dt);
+static void ImuSpiFlushRx(void);
+static void ImuSpiPushTxByte(uint8_t byte);
+static void ImuSpiStartSampleBurst(void);
+static void ImuSpiParseBurstFrame(void);
 static float RawAccelToMps2(int16_t raw);
 static float RawGyroToDegPerS(int16_t raw);
 
@@ -60,29 +81,30 @@ static ImuState_t CurrentState;
 // with the introduction of Gen2, we need a module level Priority var as well
 static uint8_t MyPriority;
 
-static uint8_t FIFO_index = 0;
-static uint8_t Active_FIFO = 1;
-static uint8_t Readable_FIFO;
-static int8_t IMU_FIFO[2][16];
+static AccelGyroData_t Accel[3];
+static AccelGyroData_t Gyro[3];
 
-static AccelGyroData_t Accel[3]; // Holds the current acceleration data from IMU
-static float Accel_g[3]; // Holds acceleration in g's
-static AccelGyroData_t Gyro[3]; // Holds the current gyroscope readings from IMU
-static float Gyro_deg_s[3]; // Holds the angular velocity in deg/s
-
-static bool IntStatusReading = false;
-static bool FifoReading = false;
 static volatile bool SpiTransferBusy = false;
-static uint8_t rx_data[16];
+static uint8_t ImuSpiRxCount = 0;
+static uint8_t ImuInitAttempts = 0;
+static uint8_t rx_data[IMU_BURST_RX_BYTES];
 
 #if PCB_REV == 1
 static volatile __SPI4CONbits_t * pSPICON;
 static volatile __SPI4CON2bits_t * pSPICON2;
 static volatile __SPI4STATbits_t * pSPISTAT;
+#define IMU_SPI_RX_ISR_VECTOR  _SPI4_RX_VECTOR
+#define IMU_SPI_TX_ISR_VECTOR  _SPI4_TX_VECTOR
+#define ImuSpiClearRxIf()      (IFS5CLR = _IFS5_SPI4RXIF_MASK)
+#define ImuSpiClearTxIf()      do { IEC5CLR = _IEC5_SPI4TXIE_MASK; IFS5CLR = _IFS5_SPI4TXIF_MASK; } while (0)
 #elif PCB_REV >= 2
 static volatile __SPI1CONbits_t * pSPICON;
 static volatile __SPI1CON2bits_t * pSPICON2;
 static volatile __SPI1STATbits_t * pSPISTAT;
+#define IMU_SPI_RX_ISR_VECTOR  _SPI1_RX_VECTOR
+#define IMU_SPI_TX_ISR_VECTOR  _SPI1_TX_VECTOR
+#define ImuSpiClearRxIf()      (IFS3CLR = _IFS3_SPI1RXIF_MASK)
+#define ImuSpiClearTxIf()      do { IEC3CLR = _IEC3_SPI1TXIE_MASK; IFS3CLR = _IFS3_SPI1TXIF_MASK; } while (0)
 #endif
 static volatile uint32_t * pSPIBRG;
 static volatile uint32_t * pSPIBUF;
@@ -173,7 +195,7 @@ bool InitImuSM(uint8_t Priority)
   pSPICON->MODE32 = 0; // 8 bit mode
   pSPICON->MODE16 = 0; // 8 bit mode
   pSPICON->SMP = 1; // Data sampled at middle of data output time
-  pSPICON->CKE = 1; // Serial output data changes on transition from active clock state to idle clock state
+  pSPICON->CKE = 0; // Serial output data changes on transition from active clock state to idle clock state
   pSPICON->CKP = 1; // Idle state for the clock is high level
   pSPICON->MSTEN = 1; // Host mode
   pSPICON->DISSDI = 0; // The SDI pin is controlled by the module
@@ -290,11 +312,10 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
     {
       if (ThisEvent.EventType == ES_INIT) 
       {
-        ResetIMU(); // Perform a soft reset of the IMU
-        
-        // now put the machine into the actual initial state
+        ImuInitAttempts = 0;
+        ResetIMU();
         CurrentState = IMUReset;
-        ES_Timer_InitTimer(IMU_TIMER, 500);
+        ES_Timer_InitTimer(IMU_TIMER, IMU_RESET_DELAY_MS);
       }
     }
     break;
@@ -306,10 +327,20 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
                
         case ES_TIMEOUT:
         {
-            bool init_success = InitIMU(); // After giving some time from resetting, apply custom settings
+            bool init_success = InitIMU();
             if (init_success) {
+                ImuInitAttempts = 0;
                 CurrentState = IMUWait;
-                ES_Timer_InitTimer(IMU_TIMER, 500);
+                ES_Timer_InitTimer(IMU_TIMER, IMU_RESET_DELAY_MS);
+            } else {
+                ImuInitAttempts += 1;
+                if (ImuInitAttempts < IMU_INIT_MAX_ATTEMPTS) {
+                    ES_Timer_InitTimer(IMU_TIMER, IMU_RESET_DELAY_MS);
+                } else {
+                    DB_printf("IMU init failed after %u attempts; giving up\r\n",
+                              (unsigned)IMU_INIT_MAX_ATTEMPTS);
+                    CurrentState = IMUInitFailed;
+                }
             }
         }
         break;
@@ -320,6 +351,10 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
       
     }
     break;
+
+    case IMUInitFailed:
+      /* No further init attempts — avoids blocking SPI in RunImuSM */
+      break;
     
     case IMUWait:
     {
@@ -352,7 +387,7 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
             // Periodically print out gyro values.
             PrintImuData();
             
-            ES_Timer_InitTimer(IMU_TIMER, 1000);
+            ES_Timer_InitTimer(IMU_TIMER, IMU_DEBUG_PRINT_MS);
         }
         break;
 
@@ -456,26 +491,26 @@ void GetAngles(float* roll, float* pitch)
      None
 
  Description
-     Sends the correct sequence of writes to the IMU via SPI to correctly set 
-     up the IMU and the IMU FIFO
+     Configures accelerometer and gyroscope after soft reset.
 ****************************************************************************/
 bool InitIMU(void)
 {
     AccelGyroData_t data2send;
     AccelGyroData_t data2send2;
     
-    uint16_t data = ReadIMU16(0x00); // Dummy call to set up SPI  
-    
-    data = ReadIMU8(0x00); // Get chip ID
-    if (data != 0b01000011) {
-        DB_printf("Incorrect Chip ID: %d\r\n", data);
-//        ES_Timer_InitTimer(IMU_TIMER, 1000);
+    /* Post-reset: full 16-bit read at CHIP_ID (addr + SPI dummy + LSB + MSB) */
+    (void)ReadIMU16(IMU_REG_CHIP_ID);
+
+    uint16_t chip_id_word = ReadIMU16(IMU_REG_CHIP_ID);
+    uint8_t chip_id = (uint8_t)(chip_id_word & 0xFFu);
+    if (chip_id != BMI323_CHIP_ID_VAL) {
+        DB_printf("Incorrect Chip ID: %d (word 0x%04X), Expecting: %d\r\n",
+                  chip_id, chip_id_word, BMI323_CHIP_ID_VAL);
         return false;
     }
-    DB_printf("Chip ID: %d\r\n", data);
+    DB_printf("IMU Chip Verified: %d\r\n", chip_id);
 
-    // Get the status of the chip
-    data = ReadIMU16(0x02);
+    uint16_t data = ReadIMU16(IMU_REG_STATUS);
     DB_printf("IMU Status: %d\r\n", data);
                   
     // Setup the accelerometer/gyro settings for the IMU, do a burst write since 
@@ -487,7 +522,7 @@ bool InitIMU(void)
     // Gyro
     data2send2.DataStruct.LowerByte = 0b00011001; // cutoff = gyr_odr/2, gyr_range = +/- GYRO_RANGE_DPS deg/s, Sample Rate = 200 Hz
     data2send2.DataStruct.UpperByte = 0b01000010; // Normal mode, averaging of 4 samples
-    WriteIMU2Transfer(0x20, data2send, data2send2);
+    WriteIMU2Transfer(IMU_REG_ACC_CONF, data2send, data2send2);
 
     return true;
 }
@@ -508,13 +543,12 @@ bool InitIMU(void)
 ****************************************************************************/
 void ResetIMU(void) {
     AccelGyroData_t data2send;
-    uint16_t data = ReadIMU16(0x00); // Dummy call to set up SPI
-    
-    // Reset IMU
-    data2send.FullData = 0xDEAF;
-    WriteIMU2(0x7E, data2send);
-    
-    return;
+
+    /* Dummy read selects SPI before first command after power-on */
+    (void)ReadIMU16(IMU_REG_CHIP_ID);
+
+    data2send.FullData = BMI323_CMD_SOFT_RESET;
+    WriteIMU2(IMU_REG_CMD, data2send);
 }
 
 /****************************************************************************
@@ -608,7 +642,7 @@ uint8_t ReadIMU8(uint8_t Address)
     }
 
     __builtin_disable_interrupts();
-    *pSPIBUF = READ | Address; // Specify the address of data we want to receive
+    *pSPIBUF = IMU_SPI_READ_FLAG | Address;
     *pSPIBUF = 0x00; // This is for the dummy message
     *pSPIBUF = 0x00;
     __builtin_enable_interrupts();
@@ -637,7 +671,7 @@ uint16_t ReadIMU16(uint8_t Address)
     }
     
     __builtin_disable_interrupts();
-    *pSPIBUF = READ | Address; // Specify the address of data we want to receive
+    *pSPIBUF = IMU_SPI_READ_FLAG | Address;
     *pSPIBUF = 0x00; // This is for the dummy message
     *pSPIBUF = 0x00;
     *pSPIBUF = 0x00;
@@ -654,6 +688,82 @@ uint16_t ReadIMU16(uint8_t Address)
     data.DataStruct.LowerByte = *pSPIBUF;
     data.DataStruct.UpperByte = *pSPIBUF;
     return data.FullData;
+}
+
+/**
+ * ImuSpiFlushRx
+ *
+ * Discards any bytes left in the PIC32 SPI RX buffer and clears SPIROV.
+ * Resets ImuSpiRxCount so the next burst starts on byte 0 of a new frame.
+ * Call before starting a new transaction and after overflow / misalignment.
+ */
+static void ImuSpiFlushRx(void)
+{
+    while (!pSPISTAT->SPIRBE) {
+        (void)*pSPIBUF;
+    }
+    pSPISTAT->SPIROV = 0;
+    ImuSpiRxCount = 0;
+}
+
+/**
+ * ImuSpiPushTxByte
+ *
+ * Writes one byte to the SPI TX buffer, blocking until SPITBF is clear.
+ * Required with ENHBUF enabled so bytes are not dropped when the TX FIFO fills.
+ */
+static void ImuSpiPushTxByte(uint8_t byte)
+{
+    while (pSPISTAT->SPITBF) {
+        ;
+    }
+    *pSPIBUF = byte;
+}
+
+/**
+ * ImuSpiParseBurstFrame
+ *
+ * Copies the latest IMU_BURST_RX_BYTES RX buffer into Accel[] and Gyro[].
+ * Skips the first two bytes (command echo and SPI dummy); bytes 2..13 are
+ * six little-endian int16 values: accel X/Y/Z then gyro X/Y/Z.
+ */
+static void ImuSpiParseBurstFrame(void)
+{
+    Accel[0].DataStruct.LowerByte = rx_data[IMU_BURST_DATA_OFFSET + 0];
+    Accel[0].DataStruct.UpperByte = rx_data[IMU_BURST_DATA_OFFSET + 1];
+    Accel[1].DataStruct.LowerByte = rx_data[IMU_BURST_DATA_OFFSET + 2];
+    Accel[1].DataStruct.UpperByte = rx_data[IMU_BURST_DATA_OFFSET + 3];
+    Accel[2].DataStruct.LowerByte = rx_data[IMU_BURST_DATA_OFFSET + 4];
+    Accel[2].DataStruct.UpperByte = rx_data[IMU_BURST_DATA_OFFSET + 5];
+    Gyro[0].DataStruct.LowerByte = rx_data[IMU_BURST_DATA_OFFSET + 6];
+    Gyro[0].DataStruct.UpperByte = rx_data[IMU_BURST_DATA_OFFSET + 7];
+    Gyro[1].DataStruct.LowerByte = rx_data[IMU_BURST_DATA_OFFSET + 8];
+    Gyro[1].DataStruct.UpperByte = rx_data[IMU_BURST_DATA_OFFSET + 9];
+    Gyro[2].DataStruct.LowerByte = rx_data[IMU_BURST_DATA_OFFSET + 10];
+    Gyro[2].DataStruct.UpperByte = rx_data[IMU_BURST_DATA_OFFSET + 11];
+}
+
+/**
+ * ImuSpiStartSampleBurst
+ *
+ * Starts a 14-byte SPI read from DATA_0 (0x03): read address, dummy byte,
+ * then 12 clocks to burst accel and gyro data. RX ISR assembles the response
+ * and clears SpiTransferBusy when IMU_BURST_RX_BYTES have been received.
+ * Invoked from the T6 timer ISR at ~100 Hz during IMURun.
+ */
+static void ImuSpiStartSampleBurst(void)
+{
+    uint8_t i;
+
+    ImuSpiFlushRx();
+    SpiTransferBusy = true;
+    ImuSpiRxCount = 0;
+
+    ImuSpiPushTxByte(IMU_SPI_READ_FLAG | IMU_REG_DATA_0);
+    ImuSpiPushTxByte(0x00u);
+    for (i = 0; i < IMU_BURST_DATA_BYTES; i++) {
+        ImuSpiPushTxByte(0x00u);
+    }
 }
 
 static float RawAccelToMps2(int16_t raw)
@@ -769,109 +879,49 @@ void MahonyUpdate(float ax, float ay, float az, float gx, float gy, float gz, fl
 	q3 *= recipNorm;
 }
 
-#if (PCB_REV ==  1)
-void __ISR(_SPI4_RX_VECTOR, IPL7SRS) SPI4RXHandler(void)
+void __ISR(IMU_SPI_RX_ISR_VECTOR, IPL7SRS) ImuSpiRxIsr(void)
 {
-    static uint8_t data_read = 0;
     static float imu_data[6];
-    
-    while (pSPISTAT->SPIRBE == 0){
-        rx_data[data_read] = *pSPIBUF;
-        data_read += 1;
-        if (data_read == 14) {
-            data_read = 0;
-            Accel[0].DataStruct.LowerByte = rx_data[2];
-            Accel[0].DataStruct.UpperByte = rx_data[3];
-            Accel[1].DataStruct.LowerByte = rx_data[4];
-            Accel[1].DataStruct.UpperByte = rx_data[5];
-            Accel[2].DataStruct.LowerByte = rx_data[6];
-            Accel[2].DataStruct.UpperByte = rx_data[7];
-            Gyro[0].DataStruct.LowerByte = rx_data[8];
-            Gyro[0].DataStruct.UpperByte = rx_data[9];
-            Gyro[1].DataStruct.LowerByte = rx_data[10];
-            Gyro[1].DataStruct.UpperByte = rx_data[11];
-            Gyro[2].DataStruct.LowerByte = rx_data[12];
-            Gyro[2].DataStruct.UpperByte = rx_data[13];
-            
-            // Convert IMU Data to signed data
-            GetIMUData(imu_data);
-            
-            // Do a Mahony Filter Update
-            MahonyUpdate(imu_data[0], imu_data[1], imu_data[2], imu_data[3],
-                            imu_data[4], imu_data[5], DT);
 
+    if (pSPISTAT->SPIROV) {
+        ImuSpiFlushRx();
+        SpiTransferBusy = false;
+        ImuSpiClearRxIf();
+        return;
+    }
+
+    while (pSPISTAT->SPIRBE == 0) {
+        rx_data[ImuSpiRxCount] = (uint8_t)*pSPIBUF;
+        ImuSpiRxCount += 1;
+        if (ImuSpiRxCount >= IMU_BURST_RX_BYTES) {
+            ImuSpiRxCount = 0;
+            ImuSpiParseBurstFrame();
+            GetIMUData(imu_data);
+            MahonyUpdate(imu_data[0], imu_data[1], imu_data[2], imu_data[3],
+                         imu_data[4], imu_data[5], DT);
             SpiTransferBusy = false;
         }
     }
-    IFS5CLR = _IFS5_SPI4RXIF_MASK; // clear the interrupt flag 
+    ImuSpiClearRxIf();
 }
 
-void __ISR(_SPI4_TX_VECTOR, IPL7SRS) SPI4TXHandler(void)
+void __ISR(IMU_SPI_TX_ISR_VECTOR, IPL7SRS) ImuSpiTxIsr(void)
 {
-    IEC5CLR = _IEC5_SPI4TXIE_MASK; // Disable the interrupt
-    IFS5CLR = _IFS5_SPI4TXIF_MASK; // clear the interrupt flag 
+    ImuSpiClearTxIf();
 }
-#elif (PCB_REV >= 2)
-void __ISR(_SPI1_RX_VECTOR, IPL7SRS) SPI1RXHandler(void)
-{
-    static uint8_t data_read = 0;
-    static float imu_data[6];
-    
-    while (pSPISTAT->SPIRBE == 0){
-        rx_data[data_read] = *pSPIBUF;
-        data_read += 1;
-        if (data_read == 14) {
-            data_read = 0;
-            Accel[0].DataStruct.LowerByte = rx_data[2];
-            Accel[0].DataStruct.UpperByte = rx_data[3];
-            Accel[1].DataStruct.LowerByte = rx_data[4];
-            Accel[1].DataStruct.UpperByte = rx_data[5];
-            Accel[2].DataStruct.LowerByte = rx_data[6];
-            Accel[2].DataStruct.UpperByte = rx_data[7];
-            Gyro[0].DataStruct.LowerByte = rx_data[8];
-            Gyro[0].DataStruct.UpperByte = rx_data[9];
-            Gyro[1].DataStruct.LowerByte = rx_data[10];
-            Gyro[1].DataStruct.UpperByte = rx_data[11];
-            Gyro[2].DataStruct.LowerByte = rx_data[12];
-            Gyro[2].DataStruct.UpperByte = rx_data[13];
-            
-            // Convert IMU Data to signed data
-            GetIMUData(imu_data);
-            
-            // Do a Mahony Filter Update
-            MahonyUpdate(imu_data[0], imu_data[1], imu_data[2], imu_data[3],
-                            imu_data[4], imu_data[5], DT);
-
-            SpiTransferBusy = false;
-        }
-    }
-    IFS3CLR = _IFS3_SPI1RXIF_MASK; // clear the interrupt flag 
-}
-
-void __ISR(_SPI1_TX_VECTOR, IPL7SRS) SPI1TXHandler(void)
-{
-    IEC3CLR = _IEC3_SPI1TXIE_MASK; // Disable the interrupt
-    IFS3CLR = _IFS3_SPI1TXIF_MASK; // clear the interrupt flag 
-}
-#endif
 
 void __ISR(_TIMER_6_VECTOR, IPL7SRS) T6Handler(void)
 {
-    // Clear the interrupt flag
     IFS0CLR = _IFS0_T6IF_MASK;
+
+    if (pSPISTAT->SPIROV) {
+        ImuSpiFlushRx();
+        SpiTransferBusy = false;
+    }
 
     if (SpiTransferBusy || pSPISTAT->SPIBUSY) {
         return;
     }
 
-    SpiTransferBusy = true;
-
-    // Get the current accel/gyroscope readings
-    __builtin_disable_interrupts();
-    *pSPIBUF = READ | 0x03; // Accel x address
-    *pSPIBUF = 0x00; // This is for the dummy message
-    for (uint8_t i=0; i<12; i++) {
-        *pSPIBUF = 0x00; // 12 Messages for 12 bytes of accel/gyro data
-    }
-    __builtin_enable_interrupts();
+    ImuSpiStartSampleBurst();
 }
