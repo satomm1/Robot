@@ -36,10 +36,10 @@
 #define Kp 0.2 // Proportional constant for PID law
 #define Ki 0.01 // Integral constant for PID law
 #define Kd 0.0 // Derivative constant for PID law
-#define CONTROL_PERIOD 20000 // Control update period --- (1000 == 6250*2 Hz, 12500 == 500*2 Hz 30000 == 208*2 Hz)
+#define CONTROL_PERIOD 25000 // Control update period --- (1000 == 6250*2 Hz, 12500 == 500*2 Hz 30000 == 208*2 Hz)
 
-#define PULSE_LENGTH_ALPHA 0.5f // Exponential Moving average for Pulse Length
-#define CONTROL_ALPHA 0.5f // Exponential Moving Average for PID Velocity
+#define PULSE_LENGTH_ALPHA 0.3f // Exponential Moving average for Pulse Length
+#define CONTROL_ALPHA 0.3f // Exponential Moving Average for PID Velocity
 #define ODOMETRY_ALPHA 0.3f // Exponential Moving Average for Odometry Velocity
 
 #if (MOTOR_TYPE==1)
