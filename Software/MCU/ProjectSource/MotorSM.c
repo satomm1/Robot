@@ -30,7 +30,7 @@
 #define IC_PERIOD 65535 // Input capture period
 #define OC_PERIOD 200  // 312   // Output compare period (312 ~ 10 kHz, 200==15.625 kHz)
 #define NO_SPEED_PERIOD 65535 // Period to indicate motor not spinning
-#define DEAD_RECKONING_PERIOD 7812 // Chosen so that we update at 50 Hz rate (50 mHZ / 256 prescaler / 7812 * 2 = 50 Hz)
+#define DEAD_RECKONING_PERIOD 15624 // Chosen so that we update at 25 Hz rate (50 mHZ / 256 prescaler / 15624 * 2 = 25 Hz)
 #define Kp_DRIVE 0.2f // Proportional gain for driving (V != 0 or low w)
 #define Ki_DRIVE 0.01f // Integral gain for driving
 #define Kd_DRIVE 0.0f // Derivative gain for driving
@@ -41,16 +41,16 @@
 #define W_PIVOT_THRESH 0.05f // |w_desired| above this with low V => pivot gains
 #define PIVOT_RPM_FILTER_ALPHA 0.5f // EMA on measured RPM in pivot (higher = smoother, slower)
 #define PIVOT_DUTY_SLEW_MAX 0.5f // Max change in PI duty (%) per control tick in pivot (~500 Hz)
-#define CONTROL_PERIOD 12500 // Control update period --- (1000 == 6250*2 Hz, 12500 == 500*2 Hz 30000 == 208*2 Hz)
+#define CONTROL_PERIOD 20000 // Control update period --- (1000 == 6250*2 Hz, 12500 == 500*2 Hz 30000 == 208*2 Hz)
 
 #if (MOTOR_TYPE==1)
-#define ENCODER_RESOLUTION 374 // Number of pulses per revolution
+#define ENCODER_RESOLUTION (374*2) // Number of pulses per revolution
 #elif (MOTOR_TYPE==2)
 //#define ENCODER_RESOLUTION 1440 // Number of pulses per revolution
 #define ENCODER_RESOLUTION 360
 #endif
 
-#define SPEED_CONVERSION_FACTOR ((1.6e7*60)/ENCODER_RESOLUTION)
+#define SPEED_CONVERSION_FACTOR ((1.6e7*60)/(ENCODER_RESOLUTION))
 
 #define DEAD_RECKONING_TIME (256.0f  * DEAD_RECKONING_PERIOD / 2.0f / 50000000.0f) // Time between dead reckoning updates in seconds (depends on DEAD_RECKONING_PERIOD)
 #define DEAD_RECKONING_RATIO (2.0f * (float)M_PI / ENCODER_RESOLUTION / DEAD_RECKONING_TIME * WHEEL_RADIUS) // This number times change in encoder clicks is linear velocity in m/second
@@ -60,13 +60,23 @@
 #define V_WHEEL_CAP (V_MAX + 0.5f * w_MAX * WHEEL_BASE) // Max allowable measured velocity for each wheel
 
 #define BUFF_SIZE 65
+
+#if (PCB_REV <= 2)
+#define RIGHT_ENCODER_SIGN (1)
+#define LEFT_ENCODER_SIGN  (1)
+#else
+#define RIGHT_ENCODER_SIGN (-1)
+#define LEFT_ENCODER_SIGN (-1)
+#endif
+
 /*---------------------------- Module Functions ---------------------------*/
-/* prototypes for private functions for this machine.They should be functions
+/* prototypes for private functions for this machine. They should be functions
    relevant to the behavior of this state machine
 */
 static void Store_RL_Data(void);
 static bool IsPivotControlMode(void);
 static float SlewDuty(float Target, float Prev, float MaxDelta);
+static int8_t EncoderDeltaFromEdge(uint8_t RisingEdge, uint8_t ChannelB);
 
 /*---------------------------- Module Variables ---------------------------*/
 // everybody needs a state variable, you may need others as well.
@@ -240,8 +250,8 @@ bool InitMotorSM(uint8_t Priority)
   IC3CONbits.ICI = 0b00; // Interrupt on every capture event
     
 #if (MOTOR_TYPE==1)
-  IC1CONbits.ICM = 0b011; // Every rising edge mode
-  IC3CONbits.ICM = 0b011; // Every rising edge mode
+  IC1CONbits.ICM = 0b110; // Every edge after first falling edge (synced 2x)
+  IC3CONbits.ICM = 0b110; // Every edge after first falling edge (synced 2x)
 #elif (MOTOR_TYPE==2)
   IC1CONbits.ICM = 0b100; // Every 4th rising edge mode
   IC3CONbits.ICM = 0b100; // Every 4th rising edge mode
@@ -353,7 +363,7 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
         
         LeftPrevRotations = 0;
         RightPrevRotations = 0;
-          
+
         // now put the machine into the actual initial state
         CurrentState = MotorWait;
         
@@ -702,6 +712,28 @@ static float SlewDuty(float Target, float Prev, float MaxDelta)
     return Target;
 }
 
+/* ICM sync: first falling edge, then alternating fall/rise. A high => rising edge. */
+static int8_t EncoderDeltaFromEdge(uint8_t RisingEdge, uint8_t ChannelB)
+{
+    int8_t Delta = 0;
+
+    if (RisingEdge != 0u) {
+        if (ChannelB != 0u) {
+            Delta = -1;
+        } else {
+            Delta = 1;
+        }
+    } else {
+        if (ChannelB != 0u) {
+            Delta = 1;
+        } else {
+            Delta = -1;
+        }
+    }
+
+    return Delta;
+}
+
 ////////////////////// Interrupt Service Routines //////////////////////
 
 /****************************************************************************
@@ -709,14 +741,14 @@ static float SlewDuty(float Target, float Prev, float MaxDelta)
     IC1Handler
 
  Description
-   Counts time between encoder pulses for measuring right motor pulse lengths
+   Right encoder: pulse timing plus 2x quadrature (A on IC1, B on GPIO).
 ****************************************************************************/
 void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
 {
-    static uint8_t ChannelB = 0; // static for speed
-    
-    ChannelB = PORTHbits.RH8;
-    
+    uint8_t RisingEdge = (uint8_t)PORTDbits.RD0;
+    uint8_t ChannelB = (uint8_t)PORTHbits.RH8;
+    int8_t Delta;
+
     MyTimer.TimeStruct.TimerBits = (uint16_t)IC1BUF; // grab the captured time 
     IFS0CLR = _IFS0_IC1IF_MASK; // Clear the interrupt
     if (IFS0bits.T3IF && MyTimer.TimeStruct.TimerBits < 0x8000) {            
@@ -725,24 +757,11 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
     }                                                     
     
     // Calculate the time length between encoder pulses
-    uint32_t CurrentPulseLength = MyTimer.FullTime - RightPrevTime; 
-    RightPulseLength = (uint32_t)(0.8*CurrentPulseLength + 0.2*RightPulseLength);
+    RightPulseLength = MyTimer.FullTime - RightPrevTime;
     RightPrevTime = MyTimer.FullTime; // update our last time variable 
     
-    // Update number of rotations for dead reckoning
-    if (PCB_REV <= 2){
-        if (ChannelB) {
-            RightRotations -= 1;
-        } else {
-            RightRotations += 1;
-        }
-    } else {
-        if (ChannelB) {
-            RightRotations += 1;
-        } else {
-            RightRotations -= 1;
-        }
-    }
+    Delta = EncoderDeltaFromEdge(RisingEdge, ChannelB);
+    RightRotations += (int32_t)(Delta * RIGHT_ENCODER_SIGN);
         
     // restart Timer5 (timer to indicate if right motor is stopped)
     T5CONCLR = _T5CON_ON_MASK;     
@@ -752,7 +771,7 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
 
 void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL7SRS) IC2Handler(void)
 {
-    // Probably don't need this here, we should just use this input to see if wheel moving forwards or backwards
+    /* Channel B is GPIO-only; quadrature decode runs in IC1/IC3 on channel A edges. */
 }
 
 /****************************************************************************
@@ -760,14 +779,14 @@ void __ISR(_INPUT_CAPTURE_2_VECTOR, IPL7SRS) IC2Handler(void)
     IC3Handler
 
  Description
-   Counts time between encoder pulses for measuring left motor pulse lengths
+   Left encoder: pulse timing plus 2x quadrature (A on IC3, B on GPIO).
 ****************************************************************************/
 void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
 {
-    static uint8_t ChannelB = 0; // static for speed
-    
-    ChannelB = PORTCbits.RC4;
-    
+    uint8_t RisingEdge = (uint8_t)PORTCbits.RC1;
+    uint8_t ChannelB = (uint8_t)PORTCbits.RC4;
+    int8_t Delta;
+
     MyTimer.TimeStruct.TimerBits = (uint16_t)IC3BUF; // grab the captured time 
     IFS0CLR = _IFS0_IC3IF_MASK; // Clear the interrupt
     if (IFS0bits.T3IF && MyTimer.TimeStruct.TimerBits < 0x8000) {            
@@ -776,24 +795,11 @@ void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
     }                                                     
     
     // Calculate the time length between encoder pulses
-    uint32_t CurrentPulseLength = MyTimer.FullTime - LeftPrevTime;    
-    LeftPulseLength = (uint32_t)(0.8*CurrentPulseLength + 0.2*LeftPulseLength);         
+    LeftPulseLength = MyTimer.FullTime - LeftPrevTime;           
     LeftPrevTime = MyTimer.FullTime; // update our last time variable 
     
-    // Update number of rotations for dead reckoning
-    if (PCB_REV <= 2){
-        if (ChannelB) {
-            LeftRotations += 1;
-        } else {
-            LeftRotations -= 1;
-        }  
-    } else {
-        if (ChannelB) {
-            LeftRotations -= 1;
-        } else {
-            LeftRotations += 1;
-        }   
-    } 
+    Delta = EncoderDeltaFromEdge(RisingEdge, (uint8_t)(ChannelB ^ 1u));
+    LeftRotations += (int32_t)(Delta * LEFT_ENCODER_SIGN);
     
     // restart Timer4 (timer to indicate if left motor is stopped)
     T4CONCLR = _T4CON_ON_MASK;     
@@ -803,7 +809,7 @@ void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
 
 void __ISR(_INPUT_CAPTURE_4_VECTOR, IPL7SRS) IC4Handler(void)
 {
-    // Probably don't need this here, we should just use this input to see if wheel moving forwards or backwards
+    /* Channel B is GPIO-only; quadrature decode runs in IC1/IC3 on channel A edges. */
 }
 
 /****************************************************************************
@@ -872,6 +878,8 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
         LeftPrevError = 0;
         RightPrevError = 0;
         
+        ActualLeftRPM = 0;
+        ActualRightRPM = 0;
         FilteredLeftRPM = 0;
         FilteredRightRPM = 0;
         PrevLeftPiDuty = 0;
@@ -880,9 +888,10 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
         return;
     }
     
-    // Calculate current RPM based on pulse lengths from encoders
-    ActualLeftRPM = SPEED_CONVERSION_FACTOR / LeftPulseLength;
-    ActualRightRPM = SPEED_CONVERSION_FACTOR / RightPulseLength;
+    // Calculate current RPM based on pulse lengths from encoders and use 
+    // exponential moving average
+    ActualLeftRPM = 0.3 * SPEED_CONVERSION_FACTOR / LeftPulseLength + 0.7*ActualLeftRPM;
+    ActualRightRPM = 0.3 * SPEED_CONVERSION_FACTOR / RightPulseLength + 0.7*ActualRightRPM;
     
     PivotMode = IsPivotControlMode();
     if (PivotMode) {
@@ -1093,6 +1102,8 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
 {
     static float V_l; // Left wheel linear velocity (m/s)
     static float V_r; // Right wheel linear velocity (m/s)
+    static float V_l_prev = 0.0; // Previous left wheel linear velocity
+    static float V_r_prev = 0.0; // Previous right wheel linear velocity
     static float V;   // Robot linear velocity (m/s)
     static float omega; // Robot angular velocity (rad/second)
     static float prev_theta;
@@ -1132,6 +1143,14 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     V_l = fmaxf(fminf(V_l, V_WHEEL_CAP), -V_WHEEL_CAP);
     V_r = fmaxf(fminf(V_r, V_WHEEL_CAP), -V_WHEEL_CAP);
     
+    // Perform exponential moving average on the wheel velocities
+    V_l = 0.3 * V_l + 0.7 * V_l_prev;
+    V_r = 0.3 * V_r + 0.7 * V_r_prev;
+    
+    // Store wheel velocities for next odometry update
+    V_l_prev = V_l;
+    V_r_prev = V_r;
+                   
     // Calculate the instantaneous linear/angular velocity of robot
     V = (V_l + V_r) * 0.5f; 
     omega = (V_r - V_l) / WHEEL_BASE;
