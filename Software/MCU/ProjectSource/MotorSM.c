@@ -45,8 +45,7 @@
 #if (MOTOR_TYPE==1)
 #define ENCODER_RESOLUTION (2*374) // Number of pulses per revolution
 #elif (MOTOR_TYPE==2)
-//#define ENCODER_RESOLUTION 1440 // Number of pulses per revolution
-#define ENCODER_RESOLUTION 360
+#define ENCODER_RESOLUTION (1440 / 2) // 720: one ISR per 2 rising edges (ICI=0b01)
 #endif
 
 #define SPEED_CONVERSION_FACTOR ((1.25e7*60.0f)/((float)ENCODER_RESOLUTION)) // 1.25e7 = 6.25MHz T3 speed *2
@@ -77,6 +76,7 @@
 static void Store_RL_Data(void);
 static bool IsPivotControlMode(void);
 static int8_t EncoderDeltaFromEdge(uint8_t RisingEdge, uint8_t ChannelB);
+static uint16_t ReadSecondCapture(volatile uint32_t *icbuf);
 
 /*---------------------------- Module Variables ---------------------------*/
 // everybody needs a state variable, you may need others as well.
@@ -246,17 +246,20 @@ bool InitMotorSM(uint8_t Priority)
   IC3CON = 0; // Reset IC3CON register settings 
   IC1CONbits.ICTMR = 0; // User timery (timer3)
   IC3CONbits.ICTMR = 0; // User timery (timer3)
+
+    
+#if (MOTOR_TYPE==1)
   IC1CONbits.ICI = 0b00; // Interrupt on every capture event
   IC3CONbits.ICI = 0b00; // Interrupt on every capture event
   IC1CONbits.FEDGE = 0;
   IC3CONbits.FEDGE = 0;
-    
-#if (MOTOR_TYPE==1)
-  IC1CONbits.ICM = 0b110; // Every edge mode
-  IC3CONbits.ICM = 0b110; // Every edge mode
+  IC1CONbits.ICM = 0b110; // Every edge mode with specified first edge
+  IC3CONbits.ICM = 0b110; // Every edge mode with specified first edge
 #elif (MOTOR_TYPE==2)
-  IC1CONbits.ICM = 0b100; // Every 4th rising edge mode
-  IC3CONbits.ICM = 0b100; // Every 4th rising edge mode
+  IC1CONbits.ICI = 0b01; // Interrupt every 2nd capture event
+  IC3CONbits.ICI = 0b01;
+  IC1CONbits.ICM = 0b011; // Simple capture: every rising edge
+  IC3CONbits.ICM = 0b011; // Simple capture: every rising edge
 #endif
   
   // Setup Interrupts
@@ -723,6 +726,13 @@ static int8_t EncoderDeltaFromEdge(uint8_t RisingEdge, uint8_t ChannelB)
     return Delta;
 }
 
+/* ICI=0b01 requires two FIFO reads per interrupt; discard the first. */
+static uint16_t ReadSecondCapture(volatile uint32_t *icbuf)
+{
+    (void)*icbuf;
+    return (uint16_t)(*icbuf);
+}
+
 ////////////////////// Interrupt Service Routines //////////////////////
 
 /****************************************************************************
@@ -734,10 +744,14 @@ static int8_t EncoderDeltaFromEdge(uint8_t RisingEdge, uint8_t ChannelB)
 ****************************************************************************/
 void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
 {
-    uint8_t RisingEdge = (uint8_t)PORTDbits.RD0;
     uint8_t ChannelB = (uint8_t)PORTHbits.RH8;
     int8_t Delta;
-    MyTimer.TimeStruct.TimerBits = (uint16_t)IC1BUF; // grab the captured time 
+#if (MOTOR_TYPE==1)
+    uint8_t RisingEdge = (uint8_t)PORTDbits.RD0;
+    MyTimer.TimeStruct.TimerBits = (uint16_t)IC1BUF;
+#else // MOTOR_TYPE==2
+    MyTimer.TimeStruct.TimerBits = ReadSecondCapture(&IC1BUF);
+#endif
     IFS0CLR = _IFS0_IC1IF_MASK; // Clear the interrupt
     if (IFS0bits.T3IF && MyTimer.TimeStruct.TimerBits < 0x8000) {            
         MyTimer.TimeStruct.RolloverBits += 1; // increment the rollover counter
@@ -750,9 +764,13 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
     RightPrevTime = MyTimer.FullTime; // update our last time variable 
     
     // Update number of rotations for dead reckoning
+#if (MOTOR_TYPE==1)
     Delta = EncoderDeltaFromEdge(RisingEdge, ChannelB);
+#else // MOTOR_TYPE==2
+    Delta = EncoderDeltaFromEdge(1u, ChannelB);
+#endif
     RightRotations += (int32_t)(Delta * RIGHT_ENCODER_SIGN);
-        
+    
     // restart Timer5 (timer to indicate if right motor is stopped)
     T5CONCLR = _T5CON_ON_MASK;     
     TMR5 = 0;     
@@ -768,10 +786,14 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
 ****************************************************************************/
 void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
 {
-    uint8_t RisingEdge = (uint8_t)PORTCbits.RC1;
     uint8_t ChannelB = (uint8_t)PORTCbits.RC4;
     int8_t Delta;
-    MyTimer.TimeStruct.TimerBits = (uint16_t)IC3BUF; // grab the captured time 
+#if (MOTOR_TYPE==1)
+    uint8_t RisingEdge = (uint8_t)PORTCbits.RC1;
+    MyTimer.TimeStruct.TimerBits = (uint16_t)IC3BUF;
+#else // MOTOR_TYPE==2
+    MyTimer.TimeStruct.TimerBits = ReadSecondCapture(&IC3BUF);    
+#endif
     IFS0CLR = _IFS0_IC3IF_MASK; // Clear the interrupt
     if (IFS0bits.T3IF && MyTimer.TimeStruct.TimerBits < 0x8000) {            
         MyTimer.TimeStruct.RolloverBits += 1; // increment the rollover counter
@@ -784,9 +806,13 @@ void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
     LeftPrevTime = MyTimer.FullTime; // update our last time variable 
     
     // Update number of rotations for dead reckoning
+#if (MOTOR_TYPE==1)
     Delta = EncoderDeltaFromEdge(RisingEdge, (uint8_t)(ChannelB ^ 1u));
+#else // MOTOR_TYPE==2
+    Delta = EncoderDeltaFromEdge(1u, (uint8_t)(ChannelB ^ 1u));
+#endif
     LeftRotations += (int32_t)(Delta * LEFT_ENCODER_SIGN);
-    
+        
     // restart Timer4 (timer to indicate if left motor is stopped)
     T4CONCLR = _T4CON_ON_MASK;     
     TMR4 = 0;     
