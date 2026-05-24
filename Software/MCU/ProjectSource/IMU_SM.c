@@ -58,6 +58,7 @@
 #define ACCEL_LSB_PER_G         8192.0f /* LSB/g at ±4g */
 #define GYRO_LSB_PER_DPS        131.2f  /* LSB/(deg/s) at ±250 dps */
 #define GRAVITY_MPS2            9.80665f
+#define IMU_YAW_GYRO_SIGN       (1.0f)  /* flip to -1.0f if pivot spin direction is inverted */
 
 #define TWO_KP                  (2.0f * 5.0f)
 #define TWO_KI                  0.0f
@@ -547,6 +548,32 @@ void GetAngles(float* roll, float* pitch)
 
     *roll = atan2f(qa * qb + qc * qd, 0.5f - qb * qb + qc * qc) * 57.29578f;
     *pitch = asinf(2.0f * (qa * qc - qd * qb)) * 57.29578f;
+}
+
+/**
+ * GetRobotYawRate
+ *
+ * Returns robot yaw rate in rad/s from Gyro Z. Only valid while the IMU
+ * state machine is in IMURun; otherwise returns false and leaves *rad_per_s
+ * unchanged. Gyro sample is copied with interrupts disabled for consistency.
+ *
+ * @param rad_per_s - robot yaw rate in rad/s (positive = CCW when viewed from above)
+ * @return true if IMU is running and rate was written, false otherwise
+ */
+bool GetRobotYawRate(float *rad_per_s)
+{
+    int16_t raw;
+
+    if (QueryImuSM() != IMURun) {
+        return false;
+    }
+
+    __builtin_disable_interrupts();
+    raw = (int16_t)Gyro[2].FullData;
+    __builtin_enable_interrupts();
+
+    *rad_per_s = IMU_YAW_GYRO_SIGN * RawGyroToDegPerS(raw) * 0.0174533f;
+    return true;
 }
 
 /***************************************************************************

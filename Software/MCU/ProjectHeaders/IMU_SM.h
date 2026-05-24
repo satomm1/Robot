@@ -48,5 +48,6 @@ void WriteImuToSPI(uint8_t *Message2Send);
 uint8_t ReadIMU8(uint8_t Address);
 uint16_t ReadIMU16(uint8_t Address);
 void GetAngles(float* roll, float* pitch);
+bool GetRobotYawRate(float *rad_per_s);
 #endif /* ImuFSM_H */
 
