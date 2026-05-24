@@ -33,9 +33,9 @@
 #define DEAD_RECKONING_PERIOD 15624 // Chosen so that we update at 25 Hz rate (50 mHZ / 256 prescaler / 15624 * 2 = 25 Hz)
 #define V_PIVOT_THRESH 0.05f // |V_desired| below this with |w_desired| above W_PIVOT_THRESH => pivot gains
 #define W_PIVOT_THRESH 0.05f // |w_desired| above this with low V => pivot gains
-#define Kp 0.2 // Proportional constant for PID law
-#define Ki 0.01 // Integral constant for PID law
-#define Kd 0.0 // Derivative constant for PID law
+#define Kp 0.2f // Proportional constant for PID law
+#define Ki 0.01f // Integral constant for PID law
+#define Kd 0.0f // Derivative constant for PID law
 #define CONTROL_PERIOD 30000 // Control update period --- (1000 == 6250*2 Hz, 12500 == 500*2 Hz 30000 == 208*2 Hz)
 
 #define PULSE_LENGTH_ALPHA 0.3f // Exponential Moving average for Pulse Length
