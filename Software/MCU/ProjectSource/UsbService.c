@@ -326,7 +326,7 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
       {
         float x_val, y_val, theta_val;
         GetPosition(&x_val, &y_val, &theta_val);
-        DB_printf("%d, %d, %d\r\n", (int32_t)x_val, (int32_t)y_val, (int32_t)theta_val);
+        DB_printf("%d, %d, %d\r\n", (int32_t)(100*x_val), (int32_t)(100*y_val), (int32_t)(100*theta_val));
       }
       
     }

@@ -178,7 +178,7 @@
 // the name of the run function
 #define SERV_8_RUN RunEEPROMSM
 // How big should this services Queue be?
-#define SERV_8_QUEUE_SIZE 3
+#define SERV_8_QUEUE_SIZE 5
 #endif
 
 /****************************************************************************/
@@ -303,12 +303,14 @@ typedef enum
   EV_BUTTON3_RELEASED,
   EV_UPDATE_MOTOR_SPEED,
   EV_IMU_DATA_UPDATE,
+  EV_IMU_RECOVERY,
   EV_LED_ON,
   EV_LED_OFF,
   EV_EEPROM_RX_COMPLETE,
   EV_WRITE_ENABLED,
   EV_WRITE_DISABLED,
   EV_WRITE_COMPLETE,
+  EV_SPI_TX_DONE,
   EV_BEGIN_WRITE,
   EV_PRINT_RL_DATA,
   EV_I2C_COMPLETE,
