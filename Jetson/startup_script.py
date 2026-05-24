@@ -41,21 +41,25 @@ class LaunchServer(BaseHTTPRequestHandler):
                     "source /opt/ros/noetic/setup.bash && "
                     "source /workspace/catkin_ws/devel/setup.bash && "
                     "source /workspace/catkin_ws/src/robot_env.sh && "
-                    "printf '%s' \"$ROBOT_HEIGHT\""
+                    "printf '%s\\n%s' \"$ROBOT_HEIGHT\" \"$ROBOT_CAR\""
                 )
-                robot_height = subprocess.run(
+                env_out = subprocess.run(
                     env_cmd,
                     shell=True,
                     executable="/bin/bash",
                     capture_output=True,
                     text=True,
-                ).stdout.strip().lower()
+                ).stdout.strip()
+                parts = env_out.split("\n", 1)
+                robot_height = (parts[0] if parts else "").strip().lower()
+                robot_car = (parts[1] if len(parts) > 1 else "false").strip().lower()
                 launch_file = "tall.launch" if robot_height == "tall" else "short.launch"
+                car_arg = "true" if robot_car == "true" else "false"
                 cmd = (
                     "source /opt/ros/noetic/setup.bash && "
                     "source /workspace/catkin_ws/devel/setup.bash && "
                     "source /workspace/catkin_ws/src/robot_env.sh && "
-                    f"roslaunch mattbot_bringup {launch_file}"
+                    f"roslaunch mattbot_bringup {launch_file} car:={car_arg}"
                 )
                 launch_process = subprocess.Popen(
                     cmd, shell=True, executable="/bin/bash"
