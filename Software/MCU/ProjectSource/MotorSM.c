@@ -36,14 +36,14 @@
 #define Kp 0.2 // Proportional constant for PID law
 #define Ki 0.01 // Integral constant for PID law
 #define Kd 0.0 // Derivative constant for PID law
-#define CONTROL_PERIOD 25000 // Control update period --- (1000 == 6250*2 Hz, 12500 == 500*2 Hz 30000 == 208*2 Hz)
+#define CONTROL_PERIOD 30000 // Control update period --- (1000 == 6250*2 Hz, 12500 == 500*2 Hz 30000 == 208*2 Hz)
 
 #define PULSE_LENGTH_ALPHA 0.3f // Exponential Moving average for Pulse Length
 #define CONTROL_ALPHA 0.3f // Exponential Moving Average for PID Velocity
 #define ODOMETRY_ALPHA 0.3f // Exponential Moving Average for Odometry Velocity
 
 #if (MOTOR_TYPE==1)
-#define ENCODER_RESOLUTION 374 // Number of pulses per revolution
+#define ENCODER_RESOLUTION (2*374) // Number of pulses per revolution
 #elif (MOTOR_TYPE==2)
 //#define ENCODER_RESOLUTION 1440 // Number of pulses per revolution
 #define ENCODER_RESOLUTION 360
@@ -53,17 +53,28 @@
 
 #define DEAD_RECKONING_TIME (256.0f  * DEAD_RECKONING_PERIOD / 2.0f / 50000000.0f) // Time between dead reckoning updates in seconds (depends on DEAD_RECKONING_PERIOD)
 #define DEAD_RECKONING_RATIO (2.0f * (float)M_PI / ENCODER_RESOLUTION / DEAD_RECKONING_TIME * WHEEL_RADIUS) // This number times change in encoder clicks is linear velocity in m/second
+#define CONTROL_TIME (8.0f * CONTROL_PERIOD / 2.0f / 50000000.0f)
+#define CONTROL_RATIO (60.0f / ENCODER_RESOLUTION / CONTROL_TIME) // This number times change in encoder clicks is rpm
 
 #define V_MAX 1 // max 1 m/sec
 #define w_MAX 3 // max 2 rad/sec
 
 #define BUFF_SIZE 65
+
+#if (PCB_REV <= 2)
+#define RIGHT_ENCODER_SIGN (1)
+#define LEFT_ENCODER_SIGN  (1)
+#else
+#define RIGHT_ENCODER_SIGN (-1)
+#define LEFT_ENCODER_SIGN (-1)
+#endif
 /*---------------------------- Module Functions ---------------------------*/
 /* prototypes for private functions for this machine.They should be functions
    relevant to the behavior of this state machine
 */
 static void Store_RL_Data(void);
 static bool IsPivotControlMode(void);
+static int8_t EncoderDeltaFromEdge(uint8_t RisingEdge, uint8_t ChannelB);
 
 /*---------------------------- Module Variables ---------------------------*/
 // everybody needs a state variable, you may need others as well.
@@ -235,10 +246,12 @@ bool InitMotorSM(uint8_t Priority)
   IC3CONbits.ICTMR = 0; // User timery (timer3)
   IC1CONbits.ICI = 0b00; // Interrupt on every capture event
   IC3CONbits.ICI = 0b00; // Interrupt on every capture event
+  IC1CONbits.FEDGE = 0;
+  IC3CONbits.FEDGE = 0;
     
 #if (MOTOR_TYPE==1)
-  IC1CONbits.ICM = 0b011; // Every rising edge mode
-  IC3CONbits.ICM = 0b011; // Every rising edge mode
+  IC1CONbits.ICM = 0b110; // Every edge mode
+  IC3CONbits.ICM = 0b110; // Every edge mode
 #elif (MOTOR_TYPE==2)
   IC1CONbits.ICM = 0b100; // Every 4th rising edge mode
   IC3CONbits.ICM = 0b100; // Every 4th rising edge mode
@@ -686,6 +699,28 @@ static bool IsPivotControlMode(void)
     return (fabsf(V_desired) < V_PIVOT_THRESH) && (fabsf(w_desired) > W_PIVOT_THRESH);
 }
 
+/* ICM sync: first falling edge, then alternating fall/rise. A high => rising edge. */
+static int8_t EncoderDeltaFromEdge(uint8_t RisingEdge, uint8_t ChannelB)
+{
+    int8_t Delta = 0;
+
+    if (RisingEdge != 0u) {
+        if (ChannelB != 0u) {
+            Delta = -1;
+        } else {
+            Delta = 1;
+        }
+    } else {
+        if (ChannelB != 0u) {
+            Delta = 1;
+        } else {
+            Delta = -1;
+        }
+    }
+
+    return Delta;
+}
+
 ////////////////////// Interrupt Service Routines //////////////////////
 
 /****************************************************************************
@@ -697,10 +732,9 @@ static bool IsPivotControlMode(void)
 ****************************************************************************/
 void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
 {
-    static uint8_t ChannelB = 0; // static for speed
-    
-    ChannelB = PORTHbits.RH8;
-    
+    uint8_t RisingEdge = (uint8_t)PORTDbits.RD0;
+    uint8_t ChannelB = (uint8_t)PORTHbits.RH8;
+    int8_t Delta;
     MyTimer.TimeStruct.TimerBits = (uint16_t)IC1BUF; // grab the captured time 
     IFS0CLR = _IFS0_IC1IF_MASK; // Clear the interrupt
     if (IFS0bits.T3IF && MyTimer.TimeStruct.TimerBits < 0x8000) {            
@@ -714,19 +748,8 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
     RightPrevTime = MyTimer.FullTime; // update our last time variable 
     
     // Update number of rotations for dead reckoning
-    if (PCB_REV <= 2){
-        if (ChannelB) {
-            RightRotations -= 1;
-        } else {
-            RightRotations += 1;
-        }
-    } else {
-        if (ChannelB) {
-            RightRotations += 1;
-        } else {
-            RightRotations -= 1;
-        }
-    }
+    Delta = EncoderDeltaFromEdge(RisingEdge, ChannelB);
+    RightRotations += (int32_t)(Delta * RIGHT_ENCODER_SIGN);
         
     // restart Timer5 (timer to indicate if right motor is stopped)
     T5CONCLR = _T5CON_ON_MASK;     
@@ -743,10 +766,9 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
 ****************************************************************************/
 void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
 {
-    static uint8_t ChannelB = 0; // static for speed
-    
-    ChannelB = PORTCbits.RC4;
-    
+    uint8_t RisingEdge = (uint8_t)PORTCbits.RC1;
+    uint8_t ChannelB = (uint8_t)PORTCbits.RC4;
+    int8_t Delta;
     MyTimer.TimeStruct.TimerBits = (uint16_t)IC3BUF; // grab the captured time 
     IFS0CLR = _IFS0_IC3IF_MASK; // Clear the interrupt
     if (IFS0bits.T3IF && MyTimer.TimeStruct.TimerBits < 0x8000) {            
@@ -760,19 +782,8 @@ void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
     LeftPrevTime = MyTimer.FullTime; // update our last time variable 
     
     // Update number of rotations for dead reckoning
-    if (PCB_REV <= 2){
-        if (ChannelB) {
-            LeftRotations += 1;
-        } else {
-            LeftRotations -= 1;
-        }  
-    } else {
-        if (ChannelB) {
-            LeftRotations -= 1;
-        } else {
-            LeftRotations += 1;
-        }   
-    } 
+    Delta = EncoderDeltaFromEdge(RisingEdge, (uint8_t)(ChannelB ^ 1u));
+    LeftRotations += (int32_t)(Delta * LEFT_ENCODER_SIGN);
     
     // restart Timer4 (timer to indicate if left motor is stopped)
     T4CONCLR = _T4CON_ON_MASK;     
@@ -812,6 +823,13 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     static float ActualLeftRPM = 0;
     static float ActualRightRPM = 0;
     
+    static int32_t CurLeftRotations;
+    static int32_t PrevLeftRotations_motor = 0;
+    static int32_t CurRightRotations;
+    static int32_t PrevRightRotations_motor = 0;
+    static int32_t DeltaLeftRotations = 0;
+    static int32_t DeltaRightRotations = 0;
+    
     IFS0CLR = _IFS0_T1IF_MASK; // Clear the timer interrupt
     
     // If desired is static:
@@ -836,13 +854,36 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
         RightPrevError = 0;
         ActualLeftRPM = 0;
         ActualRightRPM = 0;
+        PrevLeftRotations_motor = LeftRotations;
+        PrevRightRotations_motor = RightRotations;
         return;
     }
     
-    // Calculate Current RPM based on Pulse Lengths from encoders
-    ActualLeftRPM = CONTROL_ALPHA * SPEED_CONVERSION_FACTOR / LeftPulseLength + (1-CONTROL_ALPHA)*ActualLeftRPM;
-    ActualRightRPM = CONTROL_ALPHA * SPEED_CONVERSION_FACTOR / RightPulseLength + (1-CONTROL_ALPHA)*ActualRightRPM;
-
+    // First thing we do is grab current number of rotations so this doesn't change mid function
+    CurLeftRotations = LeftRotations;
+    CurRightRotations = RightRotations;
+    
+    DeltaLeftRotations = CurLeftRotations - PrevLeftRotations_motor;
+    DeltaRightRotations = CurRightRotations - PrevRightRotations_motor;
+    PrevLeftRotations_motor = CurLeftRotations;
+    PrevRightRotations_motor = CurRightRotations;
+    
+    if (abs(DeltaLeftRotations) > 3) {
+        // Calculate Current RPM based on # of pulses between control cycles
+        ActualLeftRPM = CONTROL_ALPHA * CONTROL_RATIO * (float)abs(DeltaLeftRotations)  + (1-CONTROL_ALPHA)*ActualLeftRPM;
+    } else {
+        // Calculate Current RPM based on Pulse Lengths from encoders
+        ActualLeftRPM = CONTROL_ALPHA * SPEED_CONVERSION_FACTOR / LeftPulseLength + (1-CONTROL_ALPHA)*ActualLeftRPM;
+    }
+    
+    if (abs(DeltaRightRotations) > 3) {
+        // Calculate Current RPM based on # of pulses between control cycles
+        ActualRightRPM = CONTROL_ALPHA * CONTROL_RATIO * (float)abs(DeltaRightRotations) + (1-CONTROL_ALPHA)*ActualRightRPM;
+    } else {
+        // Calculate Current RPM based on Pulse Lengths from encoders
+        ActualRightRPM = CONTROL_ALPHA * SPEED_CONVERSION_FACTOR / RightPulseLength + (1-CONTROL_ALPHA)*ActualRightRPM;
+    }
+   
     // Calculate error from desired RPM
     LeftError = DesiredLeftRPM - ActualLeftRPM;
     RightError = DesiredRightRPM - ActualRightRPM;
