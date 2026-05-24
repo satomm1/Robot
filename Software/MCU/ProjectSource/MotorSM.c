@@ -55,6 +55,8 @@
 #define DEAD_RECKONING_RATIO (2.0f * (float)M_PI / ENCODER_RESOLUTION / DEAD_RECKONING_TIME * WHEEL_RADIUS) // This number times change in encoder clicks is linear velocity in m/second
 #define CONTROL_TIME (8.0f * CONTROL_PERIOD / 2.0f / 50000000.0f)
 #define CONTROL_RATIO (60.0f / ENCODER_RESOLUTION / CONTROL_TIME) // This number times change in encoder clicks is rpm
+#define HYBRID_COUNT_ENTER_DELTA 4 // Switch to count-based RPM when |delta| > 3
+#define HYBRID_COUNT_EXIT_DELTA  2 // Return to pulse-length RPM when |delta| <= 2
 
 #define V_MAX 1 // max 1 m/sec
 #define w_MAX 3 // max 2 rad/sec
@@ -101,8 +103,8 @@ static volatile float theta = 0; // angular position of the robot
 static volatile float V_current = 0.;
 static volatile float w_current = 0.;
 
-static float DesiredLeftRPM;
-static float DesiredRightRPM;
+static volatile float DesiredLeftRPM;
+static volatile float DesiredRightRPM;
 
 static Direction_t LeftDirection = Forward;
 static Direction_t RightDirection = Forward;
@@ -527,7 +529,7 @@ void SetDesiredSpeed(float V, float w)
     w_desired = w;
             
     // We turn off control for stopped to prevent jittering
-    if (V==0 && w == 0) {
+    if (fabsf(V) < 1e-6 && fabsf(w) < 1e-6) {
         SetDesiredRPM(0,0); // This will cause T1 to be turned off in the ISR
         return;
     } else {
@@ -829,6 +831,8 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     static int32_t PrevRightRotations_motor = 0;
     static int32_t DeltaLeftRotations = 0;
     static int32_t DeltaRightRotations = 0;
+    static bool LeftUseCountMode = false;
+    static bool RightUseCountMode = false;
     
     IFS0CLR = _IFS0_T1IF_MASK; // Clear the timer interrupt
     
@@ -854,6 +858,8 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
         RightPrevError = 0;
         ActualLeftRPM = 0;
         ActualRightRPM = 0;
+        LeftUseCountMode = false;
+        RightUseCountMode = false;
         PrevLeftRotations_motor = LeftRotations;
         PrevRightRotations_motor = RightRotations;
         return;
@@ -868,17 +874,33 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     PrevLeftRotations_motor = CurLeftRotations;
     PrevRightRotations_motor = CurRightRotations;
     
-    if (abs(DeltaLeftRotations) > 3) {
+    if (LeftUseCountMode) {
+        if (labs(DeltaLeftRotations) <= HYBRID_COUNT_EXIT_DELTA) {
+            LeftUseCountMode = false;
+        }
+    } else if (labs(DeltaLeftRotations) >= HYBRID_COUNT_ENTER_DELTA) {
+        LeftUseCountMode = true;
+    }
+
+    if (RightUseCountMode) {
+        if (labs(DeltaRightRotations) <= HYBRID_COUNT_EXIT_DELTA) {
+            RightUseCountMode = false;
+        }
+    } else if (labs(DeltaRightRotations) >= HYBRID_COUNT_ENTER_DELTA) {
+        RightUseCountMode = true;
+    }
+
+    if (LeftUseCountMode) {
         // Calculate Current RPM based on # of pulses between control cycles
-        ActualLeftRPM = CONTROL_ALPHA * CONTROL_RATIO * (float)abs(DeltaLeftRotations)  + (1-CONTROL_ALPHA)*ActualLeftRPM;
+        ActualLeftRPM = CONTROL_ALPHA * CONTROL_RATIO * (float)labs(DeltaLeftRotations) + (1-CONTROL_ALPHA)*ActualLeftRPM;
     } else {
         // Calculate Current RPM based on Pulse Lengths from encoders
         ActualLeftRPM = CONTROL_ALPHA * SPEED_CONVERSION_FACTOR / LeftPulseLength + (1-CONTROL_ALPHA)*ActualLeftRPM;
     }
     
-    if (abs(DeltaRightRotations) > 3) {
+    if (RightUseCountMode) {
         // Calculate Current RPM based on # of pulses between control cycles
-        ActualRightRPM = CONTROL_ALPHA * CONTROL_RATIO * (float)abs(DeltaRightRotations) + (1-CONTROL_ALPHA)*ActualRightRPM;
+        ActualRightRPM = CONTROL_ALPHA * CONTROL_RATIO * (float)labs(DeltaRightRotations) + (1-CONTROL_ALPHA)*ActualRightRPM;
     } else {
         // Calculate Current RPM based on Pulse Lengths from encoders
         ActualRightRPM = CONTROL_ALPHA * SPEED_CONVERSION_FACTOR / RightPulseLength + (1-CONTROL_ALPHA)*ActualRightRPM;
