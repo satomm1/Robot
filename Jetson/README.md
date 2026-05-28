@@ -36,142 +36,112 @@ We use an 8 GB Nvidia Jetson Orin Nano Developer Kit for high level control of t
 9) Connect the corresponding I2S pins on the header to the I2S pins on the microphone control board. The corresponding pins are listed in the [Microphone README](../Electrical/Microphones/README.md).
 
 ## WiFi Roaming Setup Instructions
-Configuring the WiFi driver to roam is not straightforward. But, roaming will allow us to switch access points when connection is poor, rather than waiting for complete loss of connection to switch access points. 
 
-1) Make sure a roaming enabled WiFi card (and driver) is installed. We use Intel AC9260.
+Configuring the WiFi driver to roam is not straightforward. Roaming lets the Jetson switch access points when the signal is weak, instead of waiting for a full disconnect.
 
-2) Disable NetworkManager for your WiFi interface (in our case wlan0) by editing `/etc/NetworkManager/NetworkManager.conf`:
+We automate setup with `wifi_roaming_setup.sh` in this directory. The script:
 
+1. **NetworkManager** — Writes `/etc/NetworkManager/NetworkManager.conf` so your WiFi NIC (detected as `wlan*`, e.g. `wlan0`) is unmanaged by NetworkManager.
+2. **wpa_supplicant** — Writes `/etc/wpa_supplicant/wpa_supplicant-<iface>.conf` with roaming `bgscan`, then enables **`wpa_supplicant@<iface>.service`** as the sole WiFi controller (and disables the generic `wpa_supplicant.service` to avoid conflicts).
+3. **DHCP on boot** — Installs `/usr/local/bin/custom_wifi.sh` (runs `dhclient` only) and **`custom_wifi.service`**, which starts after `wpa_supplicant@<iface>`.
+
+In `bgscan="simple:30:-60:600"`: **-60** = -60 dBm to trigger a scan, **30** = scan every 30 seconds while below -60 dBm, **600** = scan every 600 seconds otherwise.
+
+### Prerequisites
+
+1. Install a roaming-capable WiFi card and driver. We use the **Intel AC9260** (see bring-up step 2).
+2. Complete initial Jetson bring-up through step 4 (`sudo apt update`, `nano` installed) so you can SSH in.
+3. On the Jetson, install `wpasupplicant` if it is not already present:
     ```
-    sudo nano /etc/NetworkManager/NetworkManager.conf
+    sudo apt install wpasupplicant
     ```
-
-    The configuration file should contain the following:
-
+4. Confirm a `wlan*` interface exists (e.g. `wlan0`):
     ```
-    [main]
-    plugins=ifupdown,keyfile
-
-    [ifupdown]
-    managed=false
-
-    [device]
-    wifi.scan-rand-mac-address=no
-
-    [keyfile]
-    unmanaged-devices=mac:<WiFi Card MAC Address>
+    ip link show | grep wlan
     ```
 
-    Your WiFi card MAC address can be determined by calling:
+### Copy the setup script to the Jetson
 
-    ```
-    ifconfig
-    ```
-    and looking at the corresponding wlan0 entry.
+**Option A — Download with `wget`**
 
-    Last, restart the NetworkManager: 
+On the Jetson:
 
-    ```
-    sudo systemctl restart NetworkManager
-    ```
+```
+cd ~
+wget "https://raw.githubusercontent.com/satomm1/Robot/main/Jetson/wifi_roaming_setup.sh"
+chmod +x wifi_roaming_setup.sh
+```
 
-3) Set your wpa_supplicant configuration file at `/etc/wpa_supplicant/wpa_supplicant.conf`:
+**Option B — Create the file with `nano`**
 
-    ```
-    sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
-    ```
+On the Jetson, open the file from this repo in a browser or editor, copy its contents, then:
 
-    The wpa_supplicant configuration file should contain the following:
+```
+nano ~/wifi_roaming_setup.sh
+```
 
-    ```
-    ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-    update_config=1
-    country=US
-    bgscan="simple:30:-60:600"
+Paste the contents, save (`Ctrl+O`, `Enter`, `Ctrl+X`), then:
 
-    network={
-        ssid="<Your WiFi SSID> "
-        psk="<Your WiFi Password>"
-        key_mgmt=WPA-PSK
-    }
-    ```
+```
+chmod +x ~/wifi_roaming_setup.sh
+```
 
-    **IMPORTANT**: Be sure to replace the placeholders with your own WiFi SSD and password
+### Run the setup script
 
-    Restart wpa_supplicant: 
-    
-    ```
-    sudo systemctl restart wpa_supplicant
-    ```
+SSH into the Jetson, then:
 
-    **Note**: In bgscan, -60 = -60 dBm to trigger a scan, 30 = scan every 30 seconds while below -60 dBM, 600 = scan every 600 seconds no matter what.
+```
+chmod +x ~/wifi_roaming_setup.sh
+sudo ~/wifi_roaming_setup.sh
+```
 
-4) Create a shell script for connecting to the WiFi network at `/usr/local/bin/custom_wifi.sh`:
+The script will:
 
-    ```
-    sudo nano /usr/local/bin/custom_wifi.sh
-    ```
+- Prompt for confirmation (it modifies system network files; backups use a `.bak` suffix).
+- Auto-detect the first `wlan*` interface and its MAC address.
+- Prompt for your WiFi **SSID** and **password**.
+- Ask whether the device operates in the **USA** (`US`) or **South Korea** (`KR`) and set the WiFi regulatory country code accordingly.
 
-    The script should contain:
+When it finishes, **reboot**:
 
-    ```
-    #!/bin/bash
+```
+sudo reboot
+```
 
-    INTERFACE="wlan0"
-    SSID="<Your WiFI SSID Here>"
+### Verify after reboot
 
-    sudo ifconfig $INTERFACE down
-    sudo iwconfig $INTERFACE essid $SSID
-    sudo ifconfig $INTERFACE up
+```
+sudo systemctl status wpa_supplicant@wlan0 custom_wifi.service
+iw dev wlan0 link
+ip addr show wlan0
+```
 
-    sudo wpa_supplicant -B -i $INTERFACE -c /etc/wpa_supplicant/wpa_supplicant.conf
+Replace `wlan0` with your interface name if different.
 
-    sudo dhclient $INTERFACE
-    ```
+Optional manual test before reboot:
 
-    Make the script executable: 
-    ```
-    sudo chmod +x /usr/local/bin/custom_wifi.sh
-    ```
+```
+sudo systemctl start custom_wifi.service
+```
 
-5) Run the shell script automatically upon start up.
+### Undo / restore previous networking
 
-    - Create a systemmd service: 
-       
-        ```
-        sudo nano /etc/systemd/system/custom_wifi.service
-        ```
-        
-        The service should contain:
-        ```
-        [Unit]
-        Description=Custom WiFi Setup
-        After=network.target
+If you need to revert:
 
-        [Service]
-        ExecStart=/usr/local/bin/custom_wifi.sh
-        RemainAfterExit=yes
+```
+sudo systemctl disable --now custom_wifi.service
+sudo systemctl disable --now wpa_supplicant@wlan0.service
+sudo systemctl enable wpa_supplicant.service
+sudo rm /etc/systemd/system/custom_wifi.service /usr/local/bin/custom_wifi.sh
+sudo mv /etc/wpa_supplicant/wpa_supplicant-wlan0.conf.bak /etc/wpa_supplicant/wpa_supplicant-wlan0.conf
+sudo mv /etc/NetworkManager/NetworkManager.conf.bak /etc/NetworkManager/NetworkManager.conf
+sudo reboot
+```
 
-        [Install]
-        WantedBy=multi-user.target
-        ```
-    - Reload systemctl
-        ```
-        sudo systemctl daemon-reload
-        ```
-    - Enable systemctl
-        ```
-        sudo systemctl enable custom_wifi.service
-        ```
-    - [Optional] Test the service
-        ```
-        sudo systemctl start custom_wifi.service
-        ```
-
-6) Reboot the Jetson for everything to take effect.
+Adjust paths if your interface is not `wlan0` or if no `.bak` files were created.
 
 > [!TIP]
-> I recommend assigning an IP address to the MAC address of the Jetson so that the Jetson always has the same IP address. This is usually done in the DHCP settings of the LAN.
+> Assign a fixed IP to the Jetson’s WiFi MAC in your router’s DHCP settings so the Jetson keeps the same address on the LAN.
 
 ## Docker Setup
 Getting a Docker container that does everything we need is not trivial. The following steps worked for my NVIDIA Jetson Orin Nano. If you already have a docker image saved as a .tar.gz file, please look at the end for instructions.
