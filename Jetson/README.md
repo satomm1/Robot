@@ -25,9 +25,19 @@ We use an 8 GB Nvidia Jetson Orin Nano Developer Kit for high level control of t
         - Select options to activate SPI1 and I2S
     - Reboot the Jetson for the new pin functions to take effect
 
-6) Load the spidev module automatically on start up:
-	- Edit the file: `sudo nano /etc/modules-load.d/spidev.conf`
- 	- write: `spidev` in the file, and save the file. Reboot the Jetson to take effect.
+6) Load the spidev module automatically on start up.
+
+    **Automated (recommended):** download and run `spidev_setup.sh` from this directory:
+
+    ```
+    cd ~
+    wget "https://raw.githubusercontent.com/satomm1/Robot/main/Jetson/spidev_setup.sh"
+    chmod +x spidev_setup.sh
+    sudo ./spidev_setup.sh
+    sudo reboot
+    ```
+
+    **Manual:** edit `/etc/modules-load.d/spidev.conf`, write `spidev` in the file, save, and reboot.
 
 7) If you have issues with `dev/ttyUSB0`, you may need to call `sudo apt remove brltty`
 
