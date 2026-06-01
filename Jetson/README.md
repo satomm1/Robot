@@ -397,12 +397,15 @@ If everything has gone according to plan, you should now have a docker container
 ----
 ### Setting up the Gemini Container
 
-1) Download and load the Gemini image:
-You can download the image here: https://drive.google.com/file/d/1xQtwj8xyFaPMbaMlJZ36KgxLJ6gVcdOr/view?usp=sharing
+1) Pull the Gemini image from GHCR (public; no `docker login` required):
 
     ```
-    sudo docker load < gemini_latest.tar.gz
+    docker pull ghcr.io/satomm1/gemini:latest
     ```
+
+    To refresh after an update on GHCR, run `docker pull ghcr.io/satomm1/gemini:latest` again.
+
+    **Offline / no registry access:** on a connected machine, `docker pull ghcr.io/satomm1/gemini:latest`, then `docker save ghcr.io/satomm1/gemini:latest | gzip > gemini.tar.gz`, copy to the Jetson, and `sudo docker load < gemini.tar.gz`.
 
 2) Clone the gemini_api repo:
     ```
@@ -411,7 +414,7 @@ You can download the image here: https://drive.google.com/file/d/1xQtwj8xyFaPMba
 
 3) Start the container:
     ```
-    sudo docker run -v ~/gemini_api:/gemini_code -v ~/Desktop/audio:/audio -w /gemini_code -it --rm --privileged -p 5000:5000  --name gemini gemini:latest
+    sudo docker run -v ~/gemini_api:/gemini_code -v ~/Desktop/audio:/audio -w /gemini_code -it --rm --privileged -p 5000:5000 --name gemini ghcr.io/satomm1/gemini:latest
     ```
 
 4) To run the needed file, run the `start_scripts.sh` script (which just runs `endpoint.py`):
