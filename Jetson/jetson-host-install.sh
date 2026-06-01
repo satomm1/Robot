@@ -91,7 +91,7 @@ DOCKER_RUN_CMD = (
     "-v /dev/bus/usb:/dev/bus/usb "
     "-v /dev/video0:/dev/video0 -v /dev/video1:/dev/video1 "
     "--device=/dev/ttyUSB0 --device=/dev/spidev0.0 "
-    "--rm --privileged --pid=host --name ros_noetic ghcr.io/satomm1/ml_ros:latest "
+    "--rm --privileged --name ros_noetic ghcr.io/satomm1/ml_ros:latest "
     "bash -lc 'python3 /workspace/catkin_ws/src/startup_script.py & exec tail -f /dev/null'"
 )
 
