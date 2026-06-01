@@ -154,7 +154,8 @@ Adjust paths if your interface is not `wlan0` or if no `.bak` files were created
 > Assign a fixed IP to the Jetson’s WiFi MAC in your router’s DHCP settings so the Jetson keeps the same address on the LAN.
 
 ## Docker Setup
-Getting a Docker container that does everything we need is not trivial. The following steps worked for my NVIDIA Jetson Orin Nano. If you already have a docker image saved as a .tar.gz file, please look at the end for instructions.
+
+Most setups should use the pre-built **`ml_ros`** image from GitHub Container Registry (GHCR). Building the image from scratch on the Jetson is only needed if you are customizing the container.
 
 1)  Follow system setup (through at least the “Relocating Docker Data Root” step) from https://github.com/dusty-nv/jetson-containers/blob/master/docs/setup.md
     
@@ -173,11 +174,35 @@ Getting a Docker container that does everything we need is not trivial. The foll
     ```
 
 ----
-If you already have a docker container image, skip to the [next section](#load-docker-image)!
+<a name="load-docker-image"></a>
+### Pull the pre-built `ml_ros` image (recommended)
 
-Docker images can be downloaded from: https://drive.google.com/file/d/1__ZI9WkVhz9b7KRzaHHCewiELtFPr_nl/view?usp=sharing.
+After Docker is installed on the Jetson, pull the published image from GHCR:
+
+```bash
+docker pull ghcr.io/satomm1/ml_ros:latest
+```
+
+Verify:
+
+```bash
+docker images ghcr.io/satomm1/ml_ros:latest
+```
+
+No `docker login` is required—the package is public on GHCR.
+
+To refresh an existing Jetson after the image is updated on GHCR, run `docker pull ghcr.io/satomm1/ml_ros:latest` again.
+
+Skip the [manual build](#build-ml_ros-from-scratch) steps below and continue with [Setting Up ROS Workspace](#setting-up-ros-workspace).
+
+**Offline / no registry access:** on a connected machine, `docker pull ghcr.io/satomm1/ml_ros:latest`, then `docker save ghcr.io/satomm1/ml_ros:latest | gzip > ml_ros.tar.gz`, copy to the Jetson, and `sudo docker load < ml_ros.tar.gz`.
 
 ----
+
+<a name="build-ml_ros-from-scratch"></a>
+### Build `ml_ros` from scratch (optional)
+
+The following steps worked for my NVIDIA Jetson Orin Nano when assembling the image locally before it was published to GHCR.
 
 2)	Choose a base container. I like l4t-ml since it contains cuda enabled pytorch, cuda enabled tensorflow2, and cuda enabled opencv. The full list of containers can be found https://github.com/dusty-nv/jetson-containers/tree/master
 
@@ -267,20 +292,11 @@ Docker images can be downloaded from: https://drive.google.com/file/d/1__ZI9WkVh
 If everything has gone according to plan, you should now have a docker container which has ROS, cuda enabled pytorch/tensorflow, and everything else you might need!
 
 ----
-<a name="load-docker-image"></a>
-### What if I already have a docker image saved as a \*.tar.gz file?
-
-Use this pre-existing docker image: https://drive.google.com/file/d/1__ZI9WkVhz9b7KRzaHHCewiELtFPr_nl/view?usp=sharing
-
-In this case, just set docker up and the call:
-```
-sudo docker load < your_image.tar.gz
-```
-----
+<a name="setting-up-ros-workspace"></a>
 ### Setting Up ROS Workspace
 1) Start the ROS docker container. 
     ```
-    sudo docker run --runtime nvidia --network=host -v ~/workspaces/catkin_ws:/workspace/catkin_ws -v ~/gemini_api:/gemini_code -v /dev/bus/usb:/dev/bus/usb -v /dev/video0:/dev/video0 -v /dev/video1:/dev/video1 -it --device=/dev/ttyUSB0 --device=/dev/spidev0.0 --rm --privileged --name ros_noetic ml_ros:latest
+    sudo docker run --runtime nvidia --network=host -v ~/workspaces/catkin_ws:/workspace/catkin_ws -v ~/gemini_api:/gemini_code -v /dev/bus/usb:/dev/bus/usb -v /dev/video0:/dev/video0 -v /dev/video1:/dev/video1 -it --device=/dev/ttyUSB0 --device=/dev/spidev0.0 --rm --privileged --name ros_noetic ghcr.io/satomm1/ml_ros:latest
     ```
 
     You should source ROS via:
