@@ -404,6 +404,22 @@ You can download the image here: https://drive.google.com/file/d/1xQtwj8xyFaPMba
     ```
 
 ----
+## Jetson host service (GUI startup)
+
+The operator GUI uses HTTP on port **8081** on the Jetson host (outside Docker) to start/stop the ROS container and power off the machine. ROS launch and software updates stay on port **8080** inside Docker (`startup_script.py`).
+
+**Automated (recommended):** after Docker is installed, run `jetson-host-install.sh` from this directory. Full details: [JETSON_HOST_SERVICE.md](JETSON_HOST_SERVICE.md).
+
+```
+cd ~
+wget "https://raw.githubusercontent.com/satomm1/Robot/main/Jetson/jetson-host-install.sh"
+chmod +x jetson-host-install.sh
+sudo ./jetson-host-install.sh
+```
+
+Verify: `curl -s http://127.0.0.1:8081/status`
+
+----
 ### Setting up the Display
 
 1) Clone the display repository:
