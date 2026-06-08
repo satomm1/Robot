@@ -7,3 +7,4 @@ export CAMERA_TYPE=astra_pro_plus  # camera type, i.e. <astra_pro_plus, astra, a
 export ROBOT_HEIGHT=<short or tall>  # robot height, either short or tall, used for determining what scripts to run on startup
 export ROBOT_CAR=<true or false>  # robot configuration, true for car or false for other configurations, used for determining arguments to run on startup
 export CYCLONEDDS_HOME="/home/cyclonedds/install"
+export CYCLONEDDS_URI="/workspace/catkin_ws/src/cyclonedds.xml"

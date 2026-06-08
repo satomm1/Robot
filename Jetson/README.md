@@ -363,7 +363,19 @@ If everything has gone according to plan, you should now have a docker container
     ```
     Please update the file with the Jetson IP address, Robot ID, MCU SPI number, camera type, and robot height.
 
-8) Make sure our ROS environment and robot environment settings are sourced via the `bashrc` file:
+8) Configure Cyclone DDS peer discovery in `cyclonedds.xml` (downloaded by `clone_repos.sh` in step 5):
+    ```
+    nano /workspace/catkin_ws/src/cyclonedds.xml
+    ```
+    This file disables multicast and uses an explicit peer list for WiFi mesh discovery. **You must update the `<Peer Address="..."/>` entries** so they list the actual IP addresses of every robot and device that should participate in DDS discovery on your network.
+
+    - Include this Jetson’s IP address (the same value you set for `ROS_IP` in `robot_env.sh`).
+    - Add the IP addresses of any other robots or machines running ROS on the mesh.
+    - Remove any placeholder entries that do not correspond to a real device.
+
+    The default file assumes the `wlan0` interface; change `<NetworkInterface name="wlan0"/>` only if your WiFi interface has a different name.
+
+9) Make sure our ROS environment and robot environment settings are sourced via the `bashrc` file:
     ```
 	nano ~/.bashrc
     ```
@@ -377,19 +389,19 @@ If everything has gone according to plan, you should now have a docker container
     source ~/.bashrc
     ```
 
-8) Test the setup, call roscore. If you have no errors, this is good!
+10) Test the setup, call roscore. If you have no errors, this is good!
     ```
 	roscore 
     ```
 
-9) Set up the Astra Camera.  You will also need to navigate to the `ros_astra_camera` directory and perform these two commands outside of the docker container:
+11) Set up the Astra Camera.  You will also need to navigate to the `ros_astra_camera` directory and perform these two commands outside of the docker container:
     ```
     cd ~/workspaces/catkin_ws/src/ros_astra_camera
     ./scripts/create_udev_rules
     sudo udevadm control --reload && sudo udevadm trigger
     ```
 
-10) You should commit the docker container to save any changes. Outside of the docker container (but with the docker container running), run this command:
+12) You should commit the docker container to save any changes. Outside of the docker container (but with the docker container running), run this command:
     ```
     sudo docker commit ros_noetic ml_ros:latest
     ```

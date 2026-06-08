@@ -18,6 +18,7 @@ repositories=(
 files=(
     "https://raw.githubusercontent.com/satomm1/Robot/main/Jetson/robot_env.sh"
     "https://raw.githubusercontent.com/satomm1/dds_robot_platform/main/robot/startup_script.py"
+    "https://raw.githubusercontent.com/satomm1/Robot/main/Jetson/cyclonedds.xml"
 )
 
 
