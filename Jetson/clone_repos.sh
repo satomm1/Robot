@@ -4,6 +4,7 @@ repositories=(
     "https://github.com/satomm1/mattbot_bringup.git"
     "https://github.com/satomm1/mattbot_dds.git"
     "https://github.com/satomm1/mattbot_record.git"
+    "https://github.com/satomm1/mattbot_capture.git"
     "https://github.com/satomm1/mattbot_image_detection.git"
     "https://github.com/satomm1/mattbot_mcl.git"
     "https://github.com/satomm1/mattbot_navigation.git"

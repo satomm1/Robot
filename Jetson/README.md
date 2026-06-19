@@ -337,6 +337,7 @@ If everything has gone according to plan, you should now have a docker container
     The script will clone the following repositories/files from https://github.com/satomm1/
     
     - mattbot_record
+    - mattbot_capture
     - mattbot_bringup          
     - mattbot_dds         
     - mattbot_image_detection  
