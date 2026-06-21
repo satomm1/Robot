@@ -63,11 +63,9 @@
 #define BUFF_SIZE 65
 
 #if (PCB_REV <= 2)
-#define RIGHT_ENCODER_SIGN (1)
-#define LEFT_ENCODER_SIGN  (1)
+#define ENCODER_SIGN ((1)*(CAR ? -1 : 1)) // Flip the sign of the encoder readings for the car chassis
 #else
-#define RIGHT_ENCODER_SIGN (-1)
-#define LEFT_ENCODER_SIGN (-1)
+#define ENCODER_SIGN ((-1)*(CAR ? -1 : 1)) // Flip the sign of the encoder readings for the car chassis
 #endif
 /*---------------------------- Module Functions ---------------------------*/
 /* prototypes for private functions for this machine.They should be functions
@@ -77,6 +75,7 @@ static void Store_RL_Data(void);
 static bool IsPivotControlMode(void);
 static int8_t EncoderDeltaFromEdge(uint8_t RisingEdge, uint8_t ChannelB);
 static uint16_t ReadSecondCapture(volatile uint32_t *icbuf);
+static void SetMotorDirection(bool LeftDir, bool RightDir);
 
 /*---------------------------- Module Variables ---------------------------*/
 // everybody needs a state variable, you may need others as well.
@@ -85,19 +84,37 @@ static MotorState_t CurrentState;
 
 // Everything we need for measuring motor speed
 static volatile MotorTimer_t MyTimer;
-static volatile uint32_t LeftPulseLength = 4294967295; 
-static volatile uint32_t RightPulseLength = 4294967295; 
-static volatile uint32_t LeftPrevTime = 0; 
-static volatile uint32_t RightPrevTime = 0; 
+static volatile uint32_t * pLeftPulseLength; 
+static volatile uint32_t * pRightPulseLength;
+static volatile uint32_t IC1PulseLength = 4294967295;
+static volatile uint32_t IC3PulseLength = 4294967295;
+static volatile uint32_t IC1PrevTime = 0;
+static volatile uint32_t IC3PrevTime = 0;
 
 // Used for dead reckoning to determine current position
-static volatile int32_t LeftRotations = 0;
-static volatile int32_t RightRotations = 0;
+static volatile int32_t * pLeftRotations;
+static volatile int32_t * pRightRotations;
 static volatile int32_t LeftPrevRotations = 0;
 static volatile int32_t RightPrevRotations = 0;
+static volatile int32_t IC1Rotations = 0;
+static volatile int32_t IC3Rotations = 0;
+
+// Variables for odometry calculation
 static volatile float x = 0; // x position of the robot
 static volatile float y = 0; // y position of the robot
 static volatile float theta = 0; // angular position of the robot
+
+// Right/Left OCSR registers (PWM)
+static volatile uint32_t * pRightOCRS;
+static volatile uint32_t * pLeftOCRS;
+
+// Right/Left Direction Pins (H-Bridge)
+static uint32_t RightDirMask;
+static uint32_t LeftDirMask;
+static volatile uint32_t * pRightDirSet;
+static volatile uint32_t * pRightDirClear;
+static volatile uint32_t * pLeftDirSet;
+static volatile uint32_t * pLeftDirClear;
 
 // History variables to keep track of current V and w
 static volatile float V_current = 0.;
@@ -106,8 +123,8 @@ static volatile float w_current = 0.;
 static volatile float DesiredLeftRPM;
 static volatile float DesiredRightRPM;
 
-static Direction_t LeftDirection = Forward;
-static Direction_t RightDirection = Forward;
+static bool LeftDirection = HW_LEFT_DIR_FORWARD;
+static bool RightDirection = HW_RIGHT_DIR_FORWARD;
 
 static float V_desired = 0.;
 static float w_desired = 0.;
@@ -156,10 +173,25 @@ bool InitMotorSM(uint8_t Priority)
   
   RPF2R = 0b1100; // Set RF2 -> OC1
   RPD5R = 0b1011; // Set RD5 -> OC2
-  
-  LATFbits.LATF8 = 0; // Start direction pins low
-  LATJbits.LATJ3 = 0; // Start direction pins low
-  
+
+  if (!CAR) {
+      RightDirMask = _LATF_LATF8_MASK;
+      pRightDirSet = &LATFSET;
+      pRightDirClear = &LATFCLR;
+      LeftDirMask = _LATJ_LATJ3_MASK;
+      pLeftDirSet = &LATJSET;
+      pLeftDirClear = &LATJCLR;
+
+  } else {
+      RightDirMask = _LATJ_LATJ3_MASK;
+      pRightDirSet = &LATJSET;
+      pRightDirClear = &LATJCLR;
+      LeftDirMask = _LATF_LATF8_MASK;
+      pLeftDirSet = &LATFSET;
+      pLeftDirClear = &LATFCLR;
+  }
+  SetMotorDirection(0, 0); // Initialize to forward direction
+
   // Set encoder pins and fault pins to digital inputs
   ANSELCCLR = _ANSELC_ANSC1_MASK | _ANSELC_ANSC4_MASK;
   TRISCSET = _TRISC_TRISC1_MASK | _TRISC_TRISC4_MASK;
@@ -237,9 +269,16 @@ bool InitMotorSM(uint8_t Priority)
   
   // Set the OC register to 0 to initialize
   OC1R = 0;
-  OC1RS = 0;
   OC2R = 0;
-  OC2RS = 0;
+  if (!CAR) {
+      pRightOCRS = &OC1RS;
+      pLeftOCRS = &OC2RS;
+  } else {
+      pRightOCRS = &OC2RS;
+      pLeftOCRS = &OC1RS;
+  }
+  *pRightOCRS = 0;
+  *pLeftOCRS = 0;
   
   // Setup Input capture
   IC1CON = 0; // Reset IC1CON register settings 
@@ -262,6 +301,18 @@ bool InitMotorSM(uint8_t Priority)
   IC3CONbits.ICM = 0b011; // Simple capture: every rising edge
 #endif
   
+  if (!CAR) {
+    pRightPulseLength = &IC1PulseLength;
+    pLeftPulseLength = &IC3PulseLength;
+    pRightRotations = &IC1Rotations;
+    pLeftRotations = &IC3Rotations;
+  } else {
+    pRightPulseLength = &IC3PulseLength;
+    pLeftPulseLength = &IC1PulseLength;
+    pRightRotations = &IC3Rotations;
+    pLeftRotations = &IC1Rotations;
+  }
+
   // Setup Interrupts
   INTCONbits.MVEC = 1; // Use multivector mode
   PRISSbits.PRI7SS = 0b0111; // Priority 7 interrupt use shadow set 7
@@ -363,8 +414,8 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
     {
       if (ThisEvent.EventType == ES_INIT) 
       {
-        LeftRotations = 0;
-        RightRotations = 0;
+        *pLeftRotations = 0;
+        *pRightRotations = 0;
         
         LeftPrevRotations = 0;
         RightPrevRotations = 0;
@@ -566,24 +617,21 @@ void SetDesiredSpeed(float V, float w)
     // Set the direction pins to the motor driver to get correct forward or 
     // backward motion
     if (left_w  >= 0) {
-        LATJbits.LATJ3 = 0; // Set direction pin forward
-        LeftDirection = Forward;
+        LeftDirection = HW_LEFT_DIR_FORWARD;
     } else {
-        LATJbits.LATJ3 = 1; // Set direction pin to backward
-        LeftDirection = Backward;
+        LeftDirection = !HW_LEFT_DIR_FORWARD;
         left_w = -left_w;
     }
     
     if (right_w >= 0) {
-        LATFbits.LATF8 = 0; // Set direction pin forward
-        RightDirection = Forward;
+        RightDirection = HW_RIGHT_DIR_FORWARD;
     } else {
-        LATFbits.LATF8 = 1; // Set direction pin to backward
-        RightDirection = Backward;
+        RightDirection = !HW_RIGHT_DIR_FORWARD;
         right_w = - right_w;
     }
+    SetMotorDirection(LeftDirection, RightDirection);
     
-    // Last set the desired RPM variables
+    // Set the desired RPM variables
     SetDesiredRPM(left_w, right_w);
 }
 
@@ -759,9 +807,9 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
     }                                                     
     
     // Calculate the time length between encoder pulses
-    uint32_t CurrentPulseLength = MyTimer.FullTime - RightPrevTime; 
-    RightPulseLength = (uint32_t)(PULSE_LENGTH_ALPHA*CurrentPulseLength + (1-PULSE_LENGTH_ALPHA)*RightPulseLength);
-    RightPrevTime = MyTimer.FullTime; // update our last time variable 
+    uint32_t CurrentPulseLength = MyTimer.FullTime - IC1PrevTime; 
+    IC1PulseLength = (uint32_t)(PULSE_LENGTH_ALPHA*CurrentPulseLength + (1-PULSE_LENGTH_ALPHA)*IC1PulseLength);
+    IC1PrevTime = MyTimer.FullTime; // update our last time variable 
     
     // Update number of rotations for dead reckoning
 #if (MOTOR_TYPE==1)
@@ -769,8 +817,8 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
 #else // MOTOR_TYPE==2
     Delta = EncoderDeltaFromEdge(1u, ChannelB);
 #endif
-    RightRotations += (int32_t)(Delta * RIGHT_ENCODER_SIGN);
-    
+    IC1Rotations += (int32_t)(Delta * ENCODER_SIGN);
+        
     // restart Timer5 (timer to indicate if right motor is stopped)
     T5CONCLR = _T5CON_ON_MASK;     
     TMR5 = 0;     
@@ -801,9 +849,9 @@ void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
     }                                                     
     
     // Calculate the time length between encoder pulses
-    uint32_t CurrentPulseLength = MyTimer.FullTime - LeftPrevTime;    
-    LeftPulseLength = (uint32_t)(PULSE_LENGTH_ALPHA*CurrentPulseLength + (1-PULSE_LENGTH_ALPHA)*LeftPulseLength);         
-    LeftPrevTime = MyTimer.FullTime; // update our last time variable 
+    uint32_t CurrentPulseLength = MyTimer.FullTime - IC3PrevTime;    
+    IC3PulseLength = (uint32_t)(PULSE_LENGTH_ALPHA*CurrentPulseLength + (1-PULSE_LENGTH_ALPHA)*IC3PulseLength);         
+    IC3PrevTime = MyTimer.FullTime; // update our last time variable 
     
     // Update number of rotations for dead reckoning
 #if (MOTOR_TYPE==1)
@@ -811,8 +859,8 @@ void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
 #else // MOTOR_TYPE==2
     Delta = EncoderDeltaFromEdge(1u, (uint8_t)(ChannelB ^ 1u));
 #endif
-    LeftRotations += (int32_t)(Delta * LEFT_ENCODER_SIGN);
-        
+    IC3Rotations += (int32_t)(Delta * ENCODER_SIGN);
+                
     // restart Timer4 (timer to indicate if left motor is stopped)
     T4CONCLR = _T4CON_ON_MASK;     
     TMR4 = 0;     
@@ -869,13 +917,12 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
         TMR1 = 0;
                 
         // Manually set drive pins to stopped
-        LATJbits.LATJ3 = 0; // Set direction pin forward
-        LeftDirection = Forward;
-        LATFbits.LATF8 = 0; // Set direction pin forward
-        RightDirection = Forward;
+        LeftDirection = HW_LEFT_DIR_FORWARD;
+        RightDirection = HW_RIGHT_DIR_FORWARD;
+        SetMotorDirection(0, 0);
         
-        OC1RS = 0;
-        OC2RS = 0;
+        *pRightOCRS = 0;
+        *pLeftOCRS = 0;
         
         // Reset stored values
         LeftErrorSum = 0;
@@ -886,14 +933,14 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
         ActualRightRPM = 0;
         LeftUseCountMode = false;
         RightUseCountMode = false;
-        PrevLeftRotations_motor = LeftRotations;
-        PrevRightRotations_motor = RightRotations;
+        PrevLeftRotations_motor = *pLeftRotations;
+        PrevRightRotations_motor = *pRightRotations;
         return;
     }
     
     // First thing we do is grab current number of rotations so this doesn't change mid function
-    CurLeftRotations = LeftRotations;
-    CurRightRotations = RightRotations;
+    CurLeftRotations = *pLeftRotations;
+    CurRightRotations = *pRightRotations;
     
     DeltaLeftRotations = CurLeftRotations - PrevLeftRotations_motor;
     DeltaRightRotations = CurRightRotations - PrevRightRotations_motor;
@@ -921,7 +968,7 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
         ActualLeftRPM = CONTROL_ALPHA * CONTROL_RATIO * (float)labs(DeltaLeftRotations) + (1-CONTROL_ALPHA)*ActualLeftRPM;
     } else {
         // Calculate Current RPM based on Pulse Lengths from encoders
-        ActualLeftRPM = CONTROL_ALPHA * SPEED_CONVERSION_FACTOR / LeftPulseLength + (1-CONTROL_ALPHA)*ActualLeftRPM;
+        ActualLeftRPM = CONTROL_ALPHA * SPEED_CONVERSION_FACTOR / (*pLeftPulseLength) + (1-CONTROL_ALPHA)*ActualLeftRPM;
     }
     
     if (RightUseCountMode) {
@@ -929,7 +976,7 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
         ActualRightRPM = CONTROL_ALPHA * CONTROL_RATIO * (float)labs(DeltaRightRotations) + (1-CONTROL_ALPHA)*ActualRightRPM;
     } else {
         // Calculate Current RPM based on Pulse Lengths from encoders
-        ActualRightRPM = CONTROL_ALPHA * SPEED_CONVERSION_FACTOR / RightPulseLength + (1-CONTROL_ALPHA)*ActualRightRPM;
+        ActualRightRPM = CONTROL_ALPHA * SPEED_CONVERSION_FACTOR / (*pRightPulseLength) + (1-CONTROL_ALPHA)*ActualRightRPM;
     }
    
     // Calculate error from desired RPM
@@ -997,15 +1044,15 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     }
         
     // Lastly, Set the duty cycle of the motors by updating Output Compare
-    if (LeftDirection == Backward) {
+    if (LeftDirection == 1) {
         LeftDutyCycle = 100 - LeftDutyCycle;
     }
-    OC2RS = (int16_t)((OC_PERIOD + 1)/100 * LeftDutyCycle);
+    *pLeftOCRS = (int16_t)((OC_PERIOD + 1)/100 * LeftDutyCycle);
     
-    if (RightDirection == Backward) {
+    if (RightDirection == 1) {
         RightDutyCycle = 100 - RightDutyCycle;
     }
-    OC1RS = (int16_t)((OC_PERIOD + 1)/100 * RightDutyCycle);
+    *pRightOCRS = (int16_t)((OC_PERIOD + 1)/100 * RightDutyCycle);
     
 #ifdef RL_MOTOR_LOGGING
     LeftDelta = LeftDutyCycle - PrevLeftDutyCycle;
@@ -1071,7 +1118,7 @@ void __ISR(_TIMER_4_VECTOR, IPL6SRS) T4Handler(void)
 {
     IFS0CLR = _IFS0_T4IF_MASK; // clear the interrupt flag     
     T4CONCLR = _T4CON_ON_MASK; // stop the timer 
-    LeftPulseLength = 4294967295; // set LeftPulseLength to max    
+    IC3PulseLength = 4294967295; // set LeftPulseLength to max    
 }
 
 /****************************************************************************
@@ -1085,7 +1132,7 @@ void __ISR(_TIMER_5_VECTOR, IPL6SRS) T5Handler(void)
 {
     IFS0CLR = _IFS0_T5IF_MASK; // clear the interrupt flag     
     T5CONCLR = _T5CON_ON_MASK; // stop the timer 
-    RightPulseLength = 4294967295; // set RightPulseLength to max    
+    IC1PulseLength = 4294967295; // set RightPulseLength to max    
 }
 
 // Using an exact method to solve the differential equations
@@ -1102,25 +1149,24 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     
     static int32_t CurLeftRotations;
     static int32_t CurRightRotations;
-        
-    static float roll;
-    static float pitch;
     
     IFS1CLR = _IFS1_T7IF_MASK; // clear the interrupt flag 
-    
-    // Pitch correction only when IMU is actively sampling (encoder odometry always runs)
-    roll = 0.0f;
-    pitch = 0.0f;
-    if (QueryImuSM() == IMURun) {
-        GetAngles(&roll, &pitch);
-        if (fabsf(pitch) < 2.5f) {
-            pitch = 0.0f;
-        }
-    }
+
+    // TEMP: car pitch correction disabled
+//    static float roll;
+//    static float pitch;
+//    roll = 0.0f;
+//    pitch = 0.0f;
+//    if (QueryImuSM() == IMURun) {
+//        GetAngles(&roll, &pitch);
+//        if (!isfinite(pitch) || fabsf(pitch) < 2.5f) {
+//            pitch = 0.0f;
+//        }
+//    }
         
     // First thing we do is grab current number of rotations so this doesn't change mid function
-    CurLeftRotations = LeftRotations;
-    CurRightRotations = RightRotations;
+    CurLeftRotations = *pLeftRotations;
+    CurRightRotations = *pRightRotations;
     
     // Next we calculate the linear velocity of each wheel
     V_l = (CurLeftRotations - LeftPrevRotations) * DEAD_RECKONING_RATIO; 
@@ -1139,8 +1185,18 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     RightPrevRotations = CurRightRotations;
     
     // Calculate the instantaneous linear/angular velocity of robot
-    V = (V_l + V_r) * 0.5f; 
+    V = (V_l + V_r) * 0.5f;
     omega = (V_r - V_l) / WHEEL_BASE;
+
+    // // Get angular velocity from encoders or imu depending on IMU status and control mode
+    // float omega_enc = (V_r - V_l) / WHEEL_BASE;
+    // omega = omega_enc;
+    // if (IsPivotControlMode()) {
+    //     float omega_gyro;
+    //     if (GetRobotYawRate(&omega_gyro)) {
+    //         omega = omega_gyro;
+    //     }
+    // }
         
     w_current = omega; // used to store current angular velocity
     
@@ -1156,12 +1212,16 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
     }
     V_current = V;
     
-    if (CAR) {
-        pitch *= 0.0174533; // Convert pitch to radians
-        effective_V = V * cosf(pitch); // Get effective velocity for pitch
-    } else {
+    // TEMP: car pitch correction disabled
+//    if (CAR) {
+//        pitch *= 0.0174533f; // Convert pitch to radians
+//        effective_V = V * cosf(pitch); // Get effective velocity for pitch
+//        if (!isfinite(effective_V)) {
+//            effective_V = V;
+//        }
+//    } else {
         effective_V = V;
-    }
+//    }
     
     if (omega < 0.01 && omega > -0.01) {
         // No account for pitch
@@ -1229,4 +1289,22 @@ static void Store_RL_Data(void) {
     RL_Data[RL_Data_Index][31] = peek_rl_data[60];
 
     RL_Data_Index += 1;
+}
+
+/*
+    Sets the H-Bridge direction pin for left/right motors. Controls
+    which direction motors will spin.
+*/
+static void SetMotorDirection(bool LeftDir, bool RightDir) {
+    if (LeftDir) {
+        *pLeftDirSet = LeftDirMask;
+    } else {
+        *pLeftDirClear = LeftDirMask;
+    }
+    
+    if (RightDir) {
+        *pRightDirSet = RightDirMask;
+    } else {
+        *pRightDirClear = RightDirMask;
+    }
 }

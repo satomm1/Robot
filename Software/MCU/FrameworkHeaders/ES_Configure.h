@@ -38,8 +38,19 @@
 //#define WHEEL_RADIUS 0.036 // 72 mm wheels
 #define WHEEL_RADIUS 0.040 // 80 mm wheels
 
-#define CAR false
-//#define CAR true
+#define CAR 0
+//#define CAR 1 // Car chassis rotated 180 on same wiring (see MotorSM.c)
+
+// H-bridge direction pin level (0 or 1) for robot-forward on each wired channel.
+// LATJ3 = wired-left motor, LATF8 = wired-right motor. Flip individually if one
+// side drives backward after a mechanical change.
+#if CAR
+#define HW_LEFT_DIR_FORWARD   1
+#define HW_RIGHT_DIR_FORWARD  1
+#else
+#define HW_LEFT_DIR_FORWARD   0
+#define HW_RIGHT_DIR_FORWARD  0
+#endif
 
 // Define if we want to log data for RL Motor control
 //#define RL_MOTOR_LOGGING

@@ -546,8 +546,22 @@ void GetAngles(float* roll, float* pitch)
     qd = q3;
     __builtin_enable_interrupts();
 
+    float sin_pitch = 2.0f * (qa * qc - qd * qb);
+    if (!isfinite(qa) || !isfinite(qb) || !isfinite(qc) || !isfinite(qd) || !isfinite(sin_pitch)) {
+        *roll = 0.0f;
+        *pitch = 0.0f;
+        return;
+    }
+    sin_pitch = fmaxf(fminf(sin_pitch, 1.0f), -1.0f);
+
     *roll = atan2f(qa * qb + qc * qd, 0.5f - qb * qb + qc * qc) * 57.29578f;
-    *pitch = asinf(2.0f * (qa * qc - qd * qb)) * 57.29578f;
+    *pitch = asinf(sin_pitch) * 57.29578f;
+    if (!isfinite(*roll)) {
+        *roll = 0.0f;
+    }
+    if (!isfinite(*pitch)) {
+        *pitch = 0.0f;
+    }
 }
 
 /**
@@ -1052,21 +1066,30 @@ void MahonyUpdate(float ax, float ay, float az, float gx, float gy, float gz, fl
 	gy *= 0.0174533;
 	gz *= 0.0174533;
     
-    // Normalize accelerometer
-    recipNorm = 1/sqrtf(ax*ax + ay*ay + az*az);
-    ax *= recipNorm;
-    ay *= recipNorm;
-    az *= recipNorm;
-    
-    // Estimate the direction of gravity
-    halfvx = q1*q3 - q0*q2;
-    halfvy = q0*q1 + q2*q3;
-    halfvz = q0*q0 - 0.5 + q3*q3;
-    
-    // Error (cross product of estimated and measured direction of gravity)
-    halfex = (ay * halfvz - az * halfvy);
-    halfey = (az * halfvx - ax * halfvz);
-    halfez = (ax * halfvy - ay * halfvx);
+    // Normalize accelerometer; skip accel correction when magnitude is invalid
+    {
+        float accel_sq = ax * ax + ay * ay + az * az;
+        if (accel_sq > 1.0e-12f) {
+            recipNorm = 1.0f / sqrtf(accel_sq);
+            ax *= recipNorm;
+            ay *= recipNorm;
+            az *= recipNorm;
+
+            // Estimate the direction of gravity
+            halfvx = q1 * q3 - q0 * q2;
+            halfvy = q0 * q1 + q2 * q3;
+            halfvz = q0 * q0 - 0.5f + q3 * q3;
+
+            // Error (cross product of estimated and measured direction of gravity)
+            halfex = (ay * halfvz - az * halfvy);
+            halfey = (az * halfvx - ax * halfvz);
+            halfez = (ax * halfvy - ay * halfvx);
+        } else {
+            halfex = 0.0f;
+            halfey = 0.0f;
+            halfez = 0.0f;
+        }
+    }
     
     // Apply integral feedback
     if (TWO_KI > 0) {
@@ -1101,11 +1124,18 @@ void MahonyUpdate(float ax, float ay, float az, float gx, float gy, float gz, fl
 	q3 += (qa * gz + qb * gy - qc * gx);
 
 	// Normalize quaternion
-	recipNorm = 1/sqrtf(q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3);
-	q0 *= recipNorm;
-	q1 *= recipNorm;
-	q2 *= recipNorm;
-	q3 *= recipNorm;
+    {
+        float q_sq = q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3;
+        if (q_sq > 1.0e-12f) {
+            recipNorm = 1.0f / sqrtf(q_sq);
+            q0 *= recipNorm;
+            q1 *= recipNorm;
+            q2 *= recipNorm;
+            q3 *= recipNorm;
+        } else {
+            ImuMahonyReset();
+        }
+    }
 }
 
 void __ISR(IMU_SPI_RX_ISR_VECTOR, IPL5SRS) ImuSpiRxIsr(void)
