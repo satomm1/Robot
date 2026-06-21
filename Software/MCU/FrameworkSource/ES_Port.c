@@ -288,8 +288,7 @@ void _HW_Timer_Init(const TimerRate_t Rate)
  Author
     R. Merchant, 10/05/20  18:57
 ****************************************************************************/
-void __ISR(_CORE_TIMER_VECTOR, IPL3AUTO ) _HW_SysTickIntHandler(void)
-{
+void __ISR(_CORE_TIMER_VECTOR, IPL3SOFT) _HW_SysTickIntHandler(void) {
   static uint32_t deltaTime; // static for speed
   static uint8_t intsThatShouldHaveHappened;
   
