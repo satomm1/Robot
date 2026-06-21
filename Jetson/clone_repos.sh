@@ -14,6 +14,7 @@ repositories=(
     "https://github.com/satomm1/rplidar_ros.git"
     "https://github.com/satomm1/twist_mux.git"
     "https://github.com/satomm1/slam_gmapping.git"
+    "https://github.com/satomm1/path_planning.git"
 )
 
 files=(
