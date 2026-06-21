@@ -50,3 +50,22 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# MPLAB for VS Code
+Software/MCU/_build/
+Software/MCU/out/
+Software/MCU/cmake/**/.generated/
+Software/MCU/.vscode/settings.json
+
+# MPLAB X
+Software/MCU/dist/
+Software/MCU/build/
+Software/MCU/debug/**/queuelogs/
+Software/MCU/.generated_files/
+Software/MCU/defmplabxtrace.log
+Software/MCU/defmplabxtrace.log.inx
+
+# MPLAB X machine-local / IDE state
+Software/MCU/nbproject/private/
+Software/MCU/nbproject/Makefile-local-*.mk
+Software/MCU/nbproject/Makefile-genesis.properties
