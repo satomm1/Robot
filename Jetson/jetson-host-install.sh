@@ -71,7 +71,8 @@ install_host_service_py() {
 """HTTP host service on port 8081. Runs on the Jetson base machine (not inside Docker).
 
 Endpoints: GET /status, /docker-start, /docker-stop, /poweroff
-GUI polls GET /status; Docker start/stop and power off go through this service.
+Deploy on Jetson: scp Jetson/jetson-host-install.sh and sudo bash ~/jetson-host-install.sh
+Keep in sync with the embedded copy in jetson-host-install.sh.
 """
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -82,8 +83,11 @@ from urllib.parse import urlparse
 
 HOST_SERVICE_PORT = 8081
 DOCKER_CONTAINER = "ros_noetic"
+GEMINI_CONTAINER = "gemini"
 DOCKER_STOP_TIMEOUT_SEC = 30
+CONTAINER_START_WAIT_SEC = 5
 
+# __JETSON_HOME__ is replaced with the install user's home when you run jetson-host-install.sh.
 DOCKER_RUN_CMD = (
     "docker run -d --runtime nvidia --network=host "
     "-v __JETSON_HOME__/workspaces/catkin_ws:/workspace/catkin_ws "
@@ -93,6 +97,13 @@ DOCKER_RUN_CMD = (
     "--device=/dev/ttyUSB0 --device=/dev/spidev0.0 "
     "--rm --privileged --name ros_noetic ghcr.io/satomm1/ml_ros:latest "
     "bash -lc 'python3 /workspace/catkin_ws/src/startup_script.py & exec tail -f /dev/null'"
+)
+
+GEMINI_DOCKER_RUN_CMD = (
+    "docker run -d --network=host "
+    "-v __JETSON_HOME__/gemini_api:/gemini_code "
+    "-w /gemini_code --rm --privileged --name gemini ghcr.io/satomm1/gemini:latest "
+    "bash -lc '. start_scripts.sh & exec tail -f /dev/null'"
 )
 
 HOST_POWEROFF_CMD = (
@@ -122,6 +133,15 @@ def _container_running(name):
         timeout=10,
     )
     return ok and stdout.lower() == "true"
+
+
+def _wait_container_running(name, timeout_sec=CONTAINER_START_WAIT_SEC):
+    polls = max(1, int(timeout_sec / 0.5))
+    for _ in range(polls):
+        if _container_running(name):
+            return True
+        time.sleep(0.5)
+    return False
 
 
 def _list_running_container_ids():
@@ -185,22 +205,20 @@ def _poweroff_summary():
     }
 
 
-def _docker_start():
-    if _container_running(DOCKER_CONTAINER):
-        return True, f"Container {DOCKER_CONTAINER} is already running."
+def _start_container(name, run_cmd):
+    if _container_running(name):
+        return True, f"Container {name} is already running."
 
-    if not DOCKER_RUN_CMD:
-        return False, "ROBOT_DOCKER_RUN_CMD is not configured."
+    if not run_cmd:
+        return False, f"Run command for {name} is not configured."
 
-    ok, stdout, stderr = _run_cmd(DOCKER_RUN_CMD, shell=True, timeout=120)
+    ok, stdout, stderr = _run_cmd(run_cmd, shell=True, timeout=120)
     if not ok:
         detail = stderr or stdout or "docker run failed"
-        return False, detail
+        return False, f"{name}: {detail}"
 
-    for _ in range(10):
-        if _container_running(DOCKER_CONTAINER):
-            return True, f"Container {DOCKER_CONTAINER} started."
-        time.sleep(0.5)
+    if _wait_container_running(name):
+        return True, f"Container {name} started."
 
     log_hint = ""
     cid = (stdout or "").strip().splitlines()[-1] if stdout else ""
@@ -211,20 +229,59 @@ def _docker_start():
 
     return (
         False,
-        f"Container {DOCKER_CONTAINER} exited right after start.{log_hint} "
+        f"Container {name} exited right after start.{log_hint} "
         "Detached runs need a long-lived main process (use 'tail -f /dev/null' not 'exec bash'). "
         "Check: docker ps -a; journalctl -u robot-host-service",
     )
 
 
-def _docker_stop():
-    if not _container_running(DOCKER_CONTAINER):
-        return True, f"Container {DOCKER_CONTAINER} is not running."
+def _docker_start():
+    # Start Gemini before ROS so the API is up when robot nodes launch.
+    start_steps = (
+        (GEMINI_CONTAINER, GEMINI_DOCKER_RUN_CMD),
+        (DOCKER_CONTAINER, DOCKER_RUN_CMD),
+    )
+    messages = []
+    all_ok = True
+    for name, run_cmd in start_steps:
+        ok, message = _start_container(name, run_cmd)
+        messages.append(message)
+        if not ok:
+            all_ok = False
+            break
 
-    ok, note = _stop_container(DOCKER_CONTAINER, DOCKER_STOP_TIMEOUT_SEC)
-    if ok:
-        return True, f"Container {DOCKER_CONTAINER} stopped."
-    return False, note or f"Failed to stop {DOCKER_CONTAINER}."
+    return all_ok, " ".join(messages)
+
+
+def _docker_stop():
+    # Stop ROS before Gemini.
+    stop_order = (DOCKER_CONTAINER, GEMINI_CONTAINER)
+    messages = []
+    all_ok = True
+    for name in stop_order:
+        if not _container_running(name):
+            messages.append(f"Container {name} is not running.")
+            continue
+        ok, note = _stop_container(name, DOCKER_STOP_TIMEOUT_SEC)
+        if ok:
+            messages.append(f"Container {name} stopped.")
+        else:
+            all_ok = False
+            messages.append(note or f"Failed to stop {name}.")
+
+    return all_ok, " ".join(messages)
+
+
+def _container_status():
+    ros_running = _container_running(DOCKER_CONTAINER)
+    gemini_running = _container_running(GEMINI_CONTAINER)
+    return {
+        "host_service": True,
+        "docker_running": ros_running and gemini_running,
+        "container": DOCKER_CONTAINER,
+        "ros_noetic_running": ros_running,
+        "gemini_running": gemini_running,
+    }
 
 
 def _schedule_host_poweroff():
@@ -264,14 +321,7 @@ class HostServiceHandler(BaseHTTPRequestHandler):
         pathname = parsed.path
 
         if pathname == "/status":
-            running = _container_running(DOCKER_CONTAINER)
-            self._send_json(
-                {
-                    "host_service": True,
-                    "docker_running": running,
-                    "container": DOCKER_CONTAINER,
-                }
-            )
+            self._send_json(_container_status())
             return
 
         if pathname == "/docker-start":
