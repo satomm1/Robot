@@ -8,6 +8,7 @@ Keep in sync with the embedded copy in jetson-host-install.sh.
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
+import os
 import subprocess
 import time
 from urllib.parse import urlparse
@@ -30,8 +31,11 @@ DOCKER_RUN_CMD = (
     "bash -lc 'python3 /workspace/catkin_ws/src/startup_script.py & exec tail -f /dev/null'"
 )
 
+GEMINI_ENV_FILE = "__JETSON_HOME__/gemini_api/.env"
+
 GEMINI_DOCKER_RUN_CMD = (
     "docker run -d --network=host "
+    f"--env-file {GEMINI_ENV_FILE} "
     "-v __JETSON_HOME__/gemini_api:/gemini_code "
     "-w /gemini_code --rm --privileged --name gemini ghcr.io/satomm1/gemini:latest "
     "bash -lc '. start_scripts.sh & exec tail -f /dev/null'"
@@ -136,7 +140,35 @@ def _poweroff_summary():
     }
 
 
+def _gemini_env_ready():
+    """Gemini is started detached; API_KEY must come from an env file, not host .bashrc."""
+    if not os.path.isfile(GEMINI_ENV_FILE):
+        return (
+            False,
+            f"Gemini env file not found: {GEMINI_ENV_FILE}. "
+            "Create it with a line like API_KEY=your-key",
+        )
+    try:
+        with open(GEMINI_ENV_FILE, encoding="utf-8") as fh:
+            for line in fh:
+                stripped = line.strip()
+                if not stripped or stripped.startswith("#"):
+                    continue
+                if stripped.startswith("export "):
+                    stripped = stripped[len("export ") :]
+                if stripped.startswith("API_KEY=") and stripped != "API_KEY=":
+                    return True, ""
+    except OSError as exc:
+        return False, f"Cannot read {GEMINI_ENV_FILE}: {exc}"
+    return False, f"{GEMINI_ENV_FILE} must contain a non-empty API_KEY= line."
+
+
 def _start_container(name, run_cmd):
+    if name == GEMINI_CONTAINER:
+        ok, message = _gemini_env_ready()
+        if not ok:
+            return False, message
+
     if _container_running(name):
         return True, f"Container {name} is already running."
 
