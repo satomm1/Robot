@@ -70,7 +70,7 @@ install_host_service_py() {
 #!/usr/bin/env python3
 """HTTP host service on port 8081. Runs on the Jetson base machine (not inside Docker).
 
-Endpoints: GET /status, /docker-start, /docker-stop, /poweroff
+Endpoints: GET /status, /docker-start, /docker-stop, /poweroff, /map
 Deploy on Jetson: scp Jetson/jetson-host-install.sh and sudo bash ~/jetson-host-install.sh
 Keep in sync with the embedded copy in jetson-host-install.sh.
 """
@@ -81,6 +81,19 @@ import os
 import subprocess
 import time
 from urllib.parse import urlparse
+
+# Default map path; __JETSON_HOME__ replaced by jetson-host-install.sh (same as DOCKER_RUN_CMD).
+DEFAULT_MAP_JSON_PATH = (
+    "__JETSON_HOME__/workspaces/catkin_ws/src/mattbot_mcl/map_json/current_map.json"
+)
+
+
+def _map_json_path():
+    override = os.environ.get("ROBOT_MAP_JSON_PATH", "").strip()
+    if override:
+        return override
+    return DEFAULT_MAP_JSON_PATH
+
 
 HOST_SERVICE_PORT = 8081
 DOCKER_CONTAINER = "ros_noetic"
@@ -326,6 +339,17 @@ def _schedule_host_poweroff():
     )
 
 
+def _read_map_json():
+    path = _map_json_path()
+    if not os.path.isfile(path):
+        return None, path, None
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return f.read(), path, None
+    except OSError as exc:
+        return None, path, str(exc)
+
+
 class HostServiceHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         if args and str(args[0]).startswith("GET "):
@@ -334,6 +358,14 @@ class HostServiceHandler(BaseHTTPRequestHandler):
 
     def _send_json(self, payload, status=200):
         body = json.dumps(payload).encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _send_raw_json(self, raw_text, status=200):
+        body = raw_text.encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
@@ -373,6 +405,23 @@ class HostServiceHandler(BaseHTTPRequestHandler):
             self.wfile.flush()
             return
 
+        if pathname == "/map":
+            raw, path, err = _read_map_json()
+            if raw is None and err is None:
+                self._send_json(
+                    {"ok": False, "error": "map not found", "path": path},
+                    status=404,
+                )
+                return
+            if raw is None:
+                self._send_json(
+                    {"ok": False, "error": f"map read failed: {err}", "path": path},
+                    status=500,
+                )
+                return
+            self._send_raw_json(raw, status=200)
+            return
+
         self._send_text("Invalid request.", 404)
 
 
@@ -380,7 +429,7 @@ if __name__ == "__main__":
     server = HTTPServer(("0.0.0.0", HOST_SERVICE_PORT), HostServiceHandler)
     print(
         f"Robot host service listening on port {HOST_SERVICE_PORT} "
-        "(GET /status, /docker-start, /docker-stop, /poweroff)..."
+        "(GET /status, /docker-start, /docker-stop, /poweroff, /map)..."
     )
     server.serve_forever()
 HOST_SERVICE_PY_EOF
