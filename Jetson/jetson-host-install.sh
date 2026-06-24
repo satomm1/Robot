@@ -70,7 +70,7 @@ install_host_service_py() {
 #!/usr/bin/env python3
 """HTTP host service on port 8081. Runs on the Jetson base machine (not inside Docker).
 
-Endpoints: GET /status, /docker-start, /docker-stop, /poweroff, /map
+Endpoints: GET /status, /docker-start, /docker-stop, /poweroff, /map; POST /map
 Deploy on Jetson: scp Jetson/jetson-host-install.sh and sudo bash ~/jetson-host-install.sh
 Keep in sync with the embedded copy in jetson-host-install.sh.
 """
@@ -350,6 +350,72 @@ def _read_map_json():
         return None, path, str(exc)
 
 
+def _map_json_dir():
+    return os.path.dirname(_map_json_path())
+
+
+def _named_map_path(map_name):
+    return os.path.join(_map_json_dir(), f"{map_name}.json")
+
+
+def _map_name_from_payload(payload):
+    name = payload.get("name")
+    if not isinstance(name, str) or not name.strip():
+        return None, 'missing or empty top-level "name" field'
+    if "/" in name or "\\" in name or "\0" in name or name in (".", ".."):
+        return None, "invalid map name"
+    return name, None
+
+
+def _write_map_json(raw_text):
+    try:
+        payload = json.loads(raw_text)
+    except json.JSONDecodeError as exc:
+        return False, {"ok": False, "error": f"invalid JSON: {exc}"}, 400
+
+    map_name, name_err = _map_name_from_payload(payload)
+    if name_err:
+        return False, {"ok": False, "error": name_err}, 400
+
+    current_path = os.path.abspath(_map_json_path())
+    named_path = os.path.abspath(_named_map_path(map_name))
+    same_file = named_path == current_path
+
+    map_dir = _map_json_dir()
+    try:
+        os.makedirs(map_dir, exist_ok=True)
+    except OSError as exc:
+        return False, {"ok": False, "error": f"cannot create map directory: {exc}"}, 500
+
+    paths_to_write = [current_path]
+    if not same_file:
+        paths_to_write.append(named_path)
+
+    written = []
+    try:
+        for path in paths_to_write:
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(raw_text)
+            written.append(path)
+    except OSError as exc:
+        for path in written:
+            if path != current_path:
+                try:
+                    os.remove(path)
+                except OSError:
+                    pass
+        return False, {"ok": False, "error": f"map write failed: {exc}"}, 500
+
+    result = {
+        "ok": True,
+        "name": map_name,
+        "current_path": current_path,
+    }
+    if not same_file:
+        result["named_path"] = named_path
+    return True, result, 200
+
+
 class HostServiceHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         if args and str(args[0]).startswith("GET "):
@@ -424,12 +490,36 @@ class HostServiceHandler(BaseHTTPRequestHandler):
 
         self._send_text("Invalid request.", 404)
 
+    def do_POST(self):
+        parsed = urlparse(self.path)
+        pathname = parsed.path
+
+        if pathname == "/map":
+            length = int(self.headers.get("Content-Length", 0))
+            if length <= 0:
+                self._send_json({"ok": False, "error": "empty request body"}, status=400)
+                return
+            try:
+                raw = self.rfile.read(length).decode("utf-8")
+            except (OSError, UnicodeDecodeError) as exc:
+                self._send_json(
+                    {"ok": False, "error": f"cannot read request body: {exc}"},
+                    status=400,
+                )
+                return
+
+            ok, payload, status = _write_map_json(raw)
+            self._send_json(payload, status=status)
+            return
+
+        self._send_text("Invalid request.", 404)
+
 
 if __name__ == "__main__":
     server = HTTPServer(("0.0.0.0", HOST_SERVICE_PORT), HostServiceHandler)
     print(
         f"Robot host service listening on port {HOST_SERVICE_PORT} "
-        "(GET /status, /docker-start, /docker-stop, /poweroff, /map)..."
+        "(GET /status, /docker-start, /docker-stop, /poweroff, /map; POST /map)..."
     )
     server.serve_forever()
 HOST_SERVICE_PY_EOF
