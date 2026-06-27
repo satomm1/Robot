@@ -432,12 +432,7 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
     {
       switch (ThisEvent.EventType)
       {
-        case ES_LOCK:  
-        { 
-          
-        }
-        break;
-        
+       
         
         case ES_TIMEOUT:
         {
@@ -476,6 +471,10 @@ ES_Event_t RunMotorSM(ES_Event_t ThisEvent)
                     ES_Event_t NewEvent = {EV_LED_OFF, 4};
                     PostLEDService(NewEvent);
                 }
+            } else if (ThisEvent.EventParam == MOTOR_BROWNOUT_TIMER) {
+                SetDesiredSpeed(0,0);
+                SetDesiredRPM(0, 0);
+                DB_printf("Motor brownout: stopping wheels\r\n");
             }
         }
         break;
@@ -543,6 +542,12 @@ void SetDesiredRPM(uint16_t LeftRPM, uint16_t RightRPM)
 {    
   DesiredLeftRPM = LeftRPM;
   DesiredRightRPM = RightRPM;
+  
+  if (LeftRPM || RightRPM) {
+      ES_Timer_InitTimer(MOTOR_BROWNOUT_TIMER, 3000);
+  } else {
+      ES_Timer_StopTimer(MOTOR_BROWNOUT_TIMER);
+  }
 }
 
 /****************************************************************************

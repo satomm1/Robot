@@ -332,9 +332,9 @@ typedef enum
 // These are the definitions for the Distribution lists. Each definition
 // should be a comma separated list of post functions to indicate which
 // services are on that distribution list.
-#define NUM_DIST_LISTS 0
+#define NUM_DIST_LISTS 1
 #if NUM_DIST_LISTS > 0
-#define DIST_LIST0 PostTestHarnessService0, PostTestHarnessService0
+#define DIST_LIST0 PostMotorSM, PostJetsonSM
 #endif
 #if NUM_DIST_LISTS > 1
 #define DIST_LIST1 PostTestHarnessService1, PostTestHarnessService1
@@ -372,7 +372,7 @@ typedef enum
 #define TIMER0_RESP_FUNC TIMER_UNUSED
 #define TIMER1_RESP_FUNC TIMER_UNUSED
 #define TIMER2_RESP_FUNC TIMER_UNUSED
-#define TIMER3_RESP_FUNC TIMER_UNUSED
+#define TIMER3_RESP_FUNC ES_PostList00
 #define TIMER4_RESP_FUNC PostEnvironmentSensorSM
 #define TIMER5_RESP_FUNC PostEnvironmentSensorSM
 #define TIMER6_RESP_FUNC PostMotorSM
@@ -405,5 +405,6 @@ typedef enum
 #define RL_TIMER 6
 #define ENV_TIMER 5
 #define ENV_WAIT_TIMER 4
+#define MOTOR_BROWNOUT_TIMER 3
 
 #endif /* ES_CONFIGURE_H */
