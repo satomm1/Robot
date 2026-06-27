@@ -44,6 +44,9 @@
 /* prototypes for private functions for this machine.They should be functions
    relevant to the behavior of this state machine
 */
+static void StartRobotPending(void);
+static bool IsBringupMessage(uint8_t BufferIndex);
+static void ResetSpiRxFraming(void); // SPI ISR framing recovery
 
 /*---------------------------- Module Variables ---------------------------*/
 // everybody needs a state variable, you may need others as well.
@@ -57,7 +60,11 @@ static uint8_t ReceiveBuffer[2][16];
 static uint8_t MessageToSend[16];
 
 // Indicates what message we are currently sending from MCU to Jetson
-static uint8_t CurrentMessage; 
+static uint8_t CurrentMessage;
+
+// SPI RX framing state (shared between ISR and ResetSpiRxFraming)
+static bool SpiInMessage = false;
+static uint8_t SpiMessageIndex = 0;
 
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
@@ -216,22 +223,9 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
       {
         case EV_JETSON_MESSAGE_RECEIVED:  
         { 
-          if (ReceiveBuffer[ThisEvent.EventParam][1] == 0b11111111 && ReceiveBuffer[ThisEvent.EventParam][0] == 90) {
-
-            // Send message received message to Jetson
-            MessageToSend[0] = 0;
-            MessageToSend[1] = 0b11111111;
-            MessageToSend[2] = 0; 
-            MessageToSend[3] = ROBOT_ID; // Send Robot ID
-            for (uint8_t ii = 4; ii < 16; ii++) {
-                MessageToSend[ii] = 0; // Fill rest of buffer with 0's
-            }
-            
-            // Start pending timeout timer
-            ES_Timer_InitTimer(JETSON_TIMER, PENDING_TIMEOUT);
-            
-            CurrentState = RobotPending;  
-            DB_printf("Moving to RobotPending\r\n");
+          // Jetson bringup: [90, 255, ...] moves us to RobotPending
+          if (IsBringupMessage(ThisEvent.EventParam)) {
+            StartRobotPending();
           } else {
               for (uint8_t ii = 0; ii < 16; ii++) {
                 MessageToSend[ii] = 0; // Fill rest of buffer with 0's
@@ -252,7 +246,10 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
       {
         case EV_JETSON_MESSAGE_RECEIVED:  
         { 
-          if (ReceiveBuffer[ThisEvent.EventParam][0] == 90 && ReceiveBuffer[ThisEvent.EventParam][1] == 0b10101010) {
+          // Duplicate bringup while pending: restart the pending timeout
+          if (IsBringupMessage(ThisEvent.EventParam)) {
+            StartRobotPending();
+          } else if (ReceiveBuffer[ThisEvent.EventParam][0] == 90 && ReceiveBuffer[ThisEvent.EventParam][1] == 0b10101010) {
             // We received confirmation that the message was received
             
             // Get starting position(s)
@@ -335,6 +332,14 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
                     CurrentMessage = 0;
                     ResetPosition();
                     DB_printf("Received End Message: going to RobotInactive\r\n");
+                } else if (ReceiveBuffer[ThisEvent.EventParam][1] == 0b11111111) {
+                    // Bringup while active (e.g. Jetson resync): stop and restart handshake
+                    SetDesiredRPM(0, 0); // Stop all movement of the robot
+                    ES_Timer_StopTimer(JETSON_TIMER); // Stop timer
+                    YELLOW_LATCH = 1; // Turn yellow LED on
+                    GREEN_LATCH = 0;  // Turn green LED off
+                    CurrentMessage = 0;
+                    StartRobotPending();
                 }
             }
             break;
@@ -417,7 +422,11 @@ ES_Event_t RunJetsonSM(ES_Event_t ThisEvent)
             break;
             
             default:
-              ;  
+            {
+              // Unknown message type while active: stop wheels as a safety precaution
+              SetDesiredRPM(0, 0);
+            }
+            break;
           }       
         }
         break;
@@ -473,6 +482,80 @@ JetsonState_t QueryJetsonSM(void)
 
 /****************************************************************************
  Function
+     IsBringupMessage
+
+ Parameters
+     uint8_t BufferIndex : which ReceiveBuffer row to inspect
+
+ Returns
+     bool, true if buffer holds Jetson bringup message [90, 255, ...]
+
+ Description
+     Step 1 of the handshake. Distinct from confirmation (byte[1] == 0b10101010).
+****************************************************************************/
+static bool IsBringupMessage(uint8_t BufferIndex)
+{
+  return (ReceiveBuffer[BufferIndex][0] == 90 &&
+          ReceiveBuffer[BufferIndex][1] == 0b11111111);
+}
+
+/****************************************************************************
+ Function
+     StartRobotPending
+
+ Parameters
+     None
+
+ Returns
+     None
+
+ Description
+     Prepare bringup acknowledgement for Jetson and enter RobotPending.
+     Called from RobotInactive, RobotPending (retry), and RobotActive (resync).
+****************************************************************************/
+static void StartRobotPending(void)
+{
+  // Send message received message to Jetson
+  MessageToSend[0] = 0;
+  MessageToSend[1] = 0b11111111;
+  MessageToSend[2] = 0;
+  MessageToSend[3] = ROBOT_ID; // Send Robot ID
+  for (uint8_t ii = 4; ii < 16; ii++) {
+    MessageToSend[ii] = 0; // Fill rest of buffer with 0's
+  }
+
+  // Start pending timeout timer
+  ES_Timer_InitTimer(JETSON_TIMER, PENDING_TIMEOUT);
+
+  CurrentState = RobotPending;
+  DB_printf("Moving to RobotPending\r\n");
+}
+
+/****************************************************************************
+ Function
+     ResetSpiRxFraming
+
+ Parameters
+     None
+
+ Returns
+     None
+
+ Description
+     Clear SPI RX framing state after overflow, too_late sync, or other fault.
+****************************************************************************/
+static void ResetSpiRxFraming(void)
+{
+  SpiInMessage = false;
+  SpiMessageIndex = 0;
+  while (!SPI2STATbits.SPIRBE) {
+    (void)SPI2BUF;
+  }
+  SPI2STATbits.SPIROV = 0;
+}
+
+/****************************************************************************
+ Function
     SPI2TX
 
  Description
@@ -502,33 +585,47 @@ void __ISR(_SPI2_TX_VECTOR, IPL7SRS) SPI2TXHandler(void)
 ****************************************************************************/
 void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
 {
-    static bool InMessage = false;
-    
     // Static for speed
     static ES_Event_t ReceiveEvent = {EV_JETSON_MESSAGE_RECEIVED, 0};
     static uint8_t buffer_num = 0;
-    static uint8_t MessageIndex = 0;
     static uint8_t TempData;
+    static uint8_t TxSnapshot[16];
+    uint8_t ii;
+
+    if (SPI2STATbits.SPIROV) {
+        // RX overflow: discard partial frame and wait for next sync
+        ResetSpiRxFraming();
+        IFS4CLR = _IFS4_SPI2RXIF_MASK;
+        return;
+    }
     
-    if (InMessage) {
-        while (!SPI2STATbits.SPIRBE && MessageIndex <= 15) {
-            ReceiveBuffer[buffer_num][MessageIndex] = SPI2BUF;
-            MessageIndex += 1;
+    if (SpiInMessage) {
+        // Collect payload bytes 2..17 of the current transaction (after sync)
+        while (!SPI2STATbits.SPIRBE && SpiMessageIndex <= 15) {
+            ReceiveBuffer[buffer_num][SpiMessageIndex] = SPI2BUF;
+            SpiMessageIndex += 1;
         }
     } else {
         TempData = SPI2BUF;
         if (TempData == 55) {
             bool too_late = false;
+            // RX FIFO must be empty after sync or this transaction is rejected
             while (!SPI2STATbits.SPIRBE) {
                 too_late = true;
                 TempData = SPI2BUF;
             }
 
             if (!too_late){
-                for (uint8_t ii = 0; ii < 16; ii++) {
-                    SPI2BUF = MessageToSend[ii];
+                // Snapshot before preload so SM cannot tear MessageToSend mid-ISR
+                for (ii = 0; ii < 16; ii++) {
+                    TxSnapshot[ii] = MessageToSend[ii];
                 }
-                InMessage = true; // Now we are accepting message bytes
+                for (ii = 0; ii < 16; ii++) {
+                    SPI2BUF = TxSnapshot[ii];
+                }
+                SpiInMessage = true; // Now we are accepting message bytes
+            } else {
+                ResetSpiRxFraming();
             }
             
         }
@@ -536,9 +633,9 @@ void __ISR(_SPI2_RX_VECTOR, IPL7SRS) SPI2RXHandler(void)
     
     IFS4CLR = _IFS4_SPI2RXIF_MASK; // Clear the interrupt
     
-    if (MessageIndex == 16) {
-        MessageIndex = 0; // Reset Message index once full
-        InMessage = false; // No longer accepting message bytes
+    if (SpiMessageIndex == 16) {
+        SpiMessageIndex = 0; // Reset Message index once full
+        SpiInMessage = false; // No longer accepting message bytes
         
         // Tell which buffer we just stored the data in
         ReceiveEvent.EventParam = buffer_num;
