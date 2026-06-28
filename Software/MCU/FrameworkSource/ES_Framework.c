@@ -338,6 +338,9 @@ ES_Return_t ES_Run(void)
 #ifdef _INCLUDE_BASIC_FRAMEWORK_DEBUG_
     _HW_DebugClearLine2();
 #endif
+    
+    _HW_WDT_Kick();
+    
   }
 }
 

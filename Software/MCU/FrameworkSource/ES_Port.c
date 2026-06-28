@@ -54,10 +54,10 @@
 #pragma config POSCMOD = OFF            // Primary Oscillator Configuration (Primary osc disabled)
 #pragma config OSCIOFNC = OFF           // CLKO Output Signal Active on the OSCO Pin (Disabled)
 #pragma config FCKSM = CSDCMD           // Clock Switching and Monitor Selection (Clock Switch Disabled, FSCM Disabled)
-#pragma config WDTPS = PS1048576        // Watchdog Timer Postscaler (1:1048576)
+#pragma config WDTPS = PS512           // Watchdog Timer Postscaler (1:512) (0.512 s)
 #pragma config WDTSPGM = STOP           // Watchdog Timer Stop During Flash Programming (WDT stops during Flash programming)
 #pragma config WINDIS = NORMAL          // Watchdog Timer Window Mode (Watchdog Timer is in non-Window mode)
-#pragma config FWDTEN = OFF             // Watchdog Timer Enable (WDT Disabled)
+#pragma config FWDTEN = ON              // Watchdog Timer Enable (WDT Enabled)
 #pragma config FWDTWINSZ = WINSZ_25     // Watchdog Timer Window Size (Window size is 25%)
 #pragma config DMTCNT = DMT31           // Deadman Timer Count Selection (2^31 (2147483648))
 #pragma config FDMTEN = OFF             // Deadman Timer Enable (Deadman Timer is disabled)
@@ -104,6 +104,7 @@
 #include "ES_Timers.h"      // framework timer prototypes
 
 #include "terminal.h"       // terminal prototypes for init function
+#include "dbprintf.h"
 
 // TickCount is used to track the number of timer ints that have occurred
 // since the last check. It should really never be more than 1, but just to
@@ -131,7 +132,7 @@ static volatile TimerRate_t tickPeriod;
 /****************************************************************************
  * Module Level defines
  ***************************************************************************/
-
+#define WDT_CLEAR_KEY 0x5743
 //#define LED_DEBUG
 /****************************************************************************
  Function
@@ -422,6 +423,48 @@ bool _HW_Process_Pending_Ints(void)
 void _HW_ConsoleInit(void)
 {
   Terminal_HWInit();
+}
+
+/*
+ *  Function
+ *      _HW_WDT_Kick
+ *  Parameters
+ *      None
+ *  Returns
+ *      None
+ *  Description
+ *      Services the watch dog timer to prevent reset when operating correctly
+ *  Author
+ *      MMS 6/28/2026
+*/
+void _HW_WDT_Kick(void) 
+{
+    WDTCONbits.WDTCLRKEY = WDT_CLEAR_KEY;  // Clears the watchdog timer
+}
+
+/*
+ *  Function
+ *      _HW_WDT_Reset
+ *  Parameters
+ *      None
+ *  Returns
+ *      bool: true if Watch Dog Timer caused reset
+ *  Description
+ *      Determines if the most recent reset was due to WDT. If so, clears the
+ *      bit
+ *  Author
+ *      MMS 6/28/2026
+*/
+bool _HW_WDT_Reset(void)
+{
+    if (RCONbits.WDTO) {
+        DB_printf("MCU reset from Watchdog Timer\r\n\r\n");
+        RCONbits.WDTO = 0;
+        LATCbits.LATC12 = 1; // LED 6 indicator for WDT
+        return true;
+    } else {
+        return false;
+    }
 }
 
 #if 0 // moved to terminal.c

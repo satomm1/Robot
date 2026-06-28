@@ -29,6 +29,7 @@ void main(void)
   ErrorType = ES_Initialize(ES_Timer_RATE_1mS);
   if (ErrorType == Success)
   {
+    _HW_WDT_Reset(); // Check if reset is from WDT
     ErrorType = ES_Run();
   }
   //if we got to here, there was an error

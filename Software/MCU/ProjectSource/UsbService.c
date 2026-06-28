@@ -159,6 +159,14 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
 //      {
 //          PrintBufferSize();
 //      }
+      
+      if (';' == ThisEvent.EventParam)
+      {
+          // Blocking code to test WDT
+          while (1) {
+              ;
+          }
+      }
         
       if ('a' == ThisEvent.EventParam)
       {

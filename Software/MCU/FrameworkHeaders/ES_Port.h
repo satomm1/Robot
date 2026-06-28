@@ -120,6 +120,8 @@ bool _HW_Process_Pending_Ints(void);
 uint16_t _HW_GetTickCount(void);
 void _HW_ConsoleInit(void);
 void _HW_SysTickIntHandler(void);
+void _HW_WDT_Kick(void);
+bool _HW_WDT_Reset(void);
 
 // and the one Framework function that we define here
 uint16_t ES_Timer_GetTime(void);
