@@ -15,7 +15,7 @@ from urllib.parse import urlparse
 
 # Default map path; __JETSON_HOME__ replaced by jetson-host-install.sh (same as DOCKER_RUN_CMD).
 DEFAULT_MAP_JSON_PATH = (
-    "__JETSON_HOME__/workspaces/catkin_ws/src/mattbot_mcl/map_json/current_map.json"
+    "__JETSON_HOME__/workspaces/catkin_ws/src/mattbot_mcl/map_json/current_map_mod.json"
 )
 
 
