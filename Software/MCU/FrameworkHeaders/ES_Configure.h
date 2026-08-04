@@ -26,7 +26,7 @@
 
 /****************************************************************************/
 // Define the Robot ID, this should be a unique 8 bit ID for each robot
-#define ROBOT_ID 5
+#define ROBOT_ID 6
 
 // Define the PCB Revision Number being used
 #define PCB_REV 4
@@ -68,7 +68,7 @@
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 11
+#define NUM_SERVICES 10
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service.
@@ -378,7 +378,11 @@ typedef enum
 #define TIMER6_RESP_FUNC PostMotorSM
 #define TIMER7_RESP_FUNC PostEEPROMSM
 #define TIMER8_RESP_FUNC PostImuSM
+#if NUM_SERVICES > 10
 #define TIMER9_RESP_FUNC PostReflectService
+#else
+#define TIMER9_RESP_FUNC TIMER_UNUSED
+#endif
 #define TIMER10_RESP_FUNC PostUsbService
 #define TIMER11_RESP_FUNC PostButton3DebouncerSM
 #define TIMER12_RESP_FUNC PostButton2DebouncerSM

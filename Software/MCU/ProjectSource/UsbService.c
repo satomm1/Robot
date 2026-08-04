@@ -27,6 +27,7 @@
 #include "dbprintf.h"
 #include "MotorSM.h"
 #include "EEPROMSM.h"
+#include "ADC_HAL.h"
 #include "matt_circular_buffer.h"
 #include "IMU_SM.h"
 #include "EnvironmentSensorSM.h"
@@ -315,7 +316,19 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
       if('u' == ThisEvent.EventParam) {
           PrintDutyCycle();
       }
-      
+
+      if ('i' == ThisEvent.EventParam) {
+          uint16_t left_counts, right_counts;
+          ReadADC();
+          while (!ADC_ConversionReady()) {
+              ;
+          }
+          GetMotorCurrentADC(&left_counts, &right_counts);
+          DB_printf("Left: %u counts, %u mA | Right: %u counts, %u mA\r\n",
+                    (unsigned)left_counts, (unsigned)MotorCurrentCountsTomA(left_counts),
+                    (unsigned)right_counts, (unsigned)MotorCurrentCountsTomA(right_counts));
+      }
+
       if ('0' == ThisEvent.EventParam) {
           ES_Event_t NewEvent = {EV_PRINT_RL_DATA,0};
           PostMotorSM(NewEvent);

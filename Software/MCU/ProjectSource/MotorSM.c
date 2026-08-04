@@ -20,6 +20,7 @@
 #include "ES_Framework.h"
 #include "MotorSM.h"
 #include "LEDService.h"
+#include "ADC_HAL.h"
 #include "dbprintf.h"
 #include <sys/attribs.h>
 #include <math.h>
@@ -203,12 +204,13 @@ bool InitMotorSM(uint8_t Priority)
   IC1R = 0b0011; // Set IC1 -> RD0
   IC3R = 0b1010; // Set IC3 -> RC1
   
-  // Set motor current pins to be analog inputs
+  // Motor ISEN: right=RA1/AN29, left=RJ9/AN36 (0.25 ohm to GND on DRV8842)
   ANSELJSET = _ANSELJ_ANSJ9_MASK;
   ANSELASET = _ANSELA_ANSA1_MASK;
   TRISJSET = _TRISJ_TRISJ9_MASK;
   TRISASET = _TRISA_TRISA1_MASK;
-  
+  InitADC(); // Idempotent; needed when ReflectService is not running
+
   // Set motor driver fault pins to be digital inputs
   TRISASET = _TRISA_TRISA4_MASK;  // Fault2
   TRISJSET = _TRISJ_TRISJ12_MASK; // Fault1

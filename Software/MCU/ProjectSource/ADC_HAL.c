@@ -2,226 +2,211 @@
  Module
    ADC_HAL.c
 
- Revision
-   1.0.1
-
  Description
-   This implements a hardware abstraction layer for the PIC32 ADC
-
- Notes
-
+   Shared PIC32 ADC HAL for cliff sensors and motor current (DRV8842 ISEN).
+   Scan: AN4, AN6, AN29 (right ISEN/RA1), AN36 (left ISEN/RJ9), AN37.
+   InitADC is idempotent so MotorSM and ReflectService may both call it.
 ****************************************************************************/
 #include "ES_Configure.h"
 #include "ES_Framework.h"
+#include "ADC_HAL.h"
 #include "dbprintf.h"
+#include <sys/attribs.h>
+#include <xc.h>
 
-/**************************************************************************
-  Function
-     InitADC
+/* I_mA = counts * Vref / 4095 / Rsense * 1000; Vref=3.3, Rsense=0.25 */
+#define ADC_TO_MA_NUM 13200u  /* 3.3 * 1000 / 0.25 */
+#define ADC_TO_MA_DEN 4095u
 
- Parameters
-     None
+static bool adc_initialized = false;
+static volatile bool conversion_done = false;
+static volatile uint16_t cliff_results[3];   /* AN6, AN37, AN4 */
+static volatile uint16_t motor_right_an29; /* RA1 / right motor ISEN */
+static volatile uint16_t motor_left_an36;  /* RJ9 / left motor ISEN */
 
- Returns
-     None
+void InitADC(void)
+{
+  if (adc_initialized) {
+    return;
+  }
 
- Description
-     Initializes the ADC
- Notes
- 
- *************************************************************************/
-void InitADC(void) {
-  /* 
-    Step 1: Initialize the ADC calibration values by
-    copying them from the factory programmed
-    DEVADCx Flash locations starting at 0xBFC45000
-    into the ADCxCFG registers starting at 0xBF887D00,
-    respectively. 
-   */
-   ADC0CFG = DEVADC0;        //Load ADC0 Calibration values    
-   ADC1CFG = DEVADC1;        //Load ADC1 Calibration values
-   ADC2CFG = DEVADC2;        //Load ADC2 Calibration values    
-   ADC3CFG = DEVADC3;        //Load ADC3 Calibration values
-   ADC4CFG = DEVADC4;        //Load ADC4 Calibration values
-   ADC7CFG = DEVADC7;        //Load ADC7 Calibration values
-   
-  /*
-   Step 2: The user writes all the essential ADC
-    configuration SFRs including the ADC control clock
-    and all ADC core clocks setup:
-    -ADCCON1, keeping the ON bit = 0
-    -ADCCON2, especially paying attention to ADCDIV<6:0> and SAMC<9:0>
-    -ADCANCON, keeping all analog enables ANENx bit = 0, WKUPCLKCNT bit = 0xA
-    -ADCCON3, keeping all DIGEN5x = 0, especially paying attention to ADCSEL<1:0>, CONCLKDIV <5:0>, and VREFSEL<2:0>
-    -ADCxTIME, ADCDIVx<6:0>, and SAMCx<9:0>
-    -ADCTRGMODE, ADCIMCONx, ADCTRGSNS, ADCCSSx, ADCGIRQENx, ADCTRGx, ADCBASE
-    -Comparators, Filters, etc.
-   */
-   
-   /* Configure ADCCON1 */ 
-   ADCCON1 = 0; // No ADCCON1 features are enabled including: Stop-in-Idle, turbo, 
-                // CVD mode, Fractional mode and scan trigger source. 
-   ADCCON1bits.SELRES = 0b11; // ADC7 resolution is 12 bits 
-   ADCCON1bits.STRGSRC = 0b00001; // Select scan trigger.
-   
-   // Set these to 0 since Vdd > 2.5 V
-   ADCCON1bits.AICPMPEN = 0;
-   CFGCONbits.IOANCPEN = 0; 
-   
-   /* Configure ADCCON2 */ 
-   ADCCON2bits.SAMC = 5; // ADC7 sampling time = 7 * TAD7 
-   ADCCON2bits.ADCDIV = 1; // ADC7 clock freq is half of control clock = TAD7
-   ADCCON2bits.EOSIEN = 1; // End of scan interrupt enabled
-   
-   /* Initialize warm up time register */ 
-   ADCANCON = 0; 
-   ADCANCONbits.WKUPCLKCNT = 0xA; // Wakeup exponent
-   
-   /* Clock setting */ 
-//   ADCCON3 = 0;
-   ADCCON3bits.ADCSEL = 0; // Select Tclk = PBCLK3 (50 MHz)
-   ADCCON3bits.CONCLKDIV = 1; // Control clock frequency is half of input clock (TQ =25 MHz)
-   ADCCON3bits.VREFSEL = 0; // Select AVDD and AVSS as reference source
-   
-   // ADCxTIME registers
-   ADC4TIMEbits.ADCEIS = 0b000; // Data ready interrupt 1 ADC clock early
-   ADC4TIMEbits.SELRES = 0b11; // 12 bit resolution
-   ADC4TIMEbits.ADCDIV = 1; // ADC4 clock freq is half of control clock
-   ADC4TIMEbits.SAMC = 5; // ADC4 sampling time = 7*TAD4
-   
-   // ADCTRGMODE
-   ADCTRGMODE = 0; // Use AN4 for ADC4, don't use presynchronized triggers, don't use synchronous sampling
-   
-   /* Select ADC input mode */ 
-   ADCIMCON1bits.SIGN4 = 0; // unsigned data format 
-   ADCIMCON1bits.DIFF4 = 0; // Single ended mode 
-   ADCIMCON1bits.SIGN6 = 0; // unsigned data format 
-   ADCIMCON1bits.DIFF6 = 0; // Single ended mode 
-   ADCIMCON3bits.SIGN37 = 0; // unsigned data format 
-   ADCIMCON3bits.DIFF37 = 0; // Single ended mode 
-   
-   /* Configure ADCGIRQENx */ 
-   ADCGIRQEN1 = 0; // No interrupts
-   ADCGIRQEN2 = 0; // No interrupts
-  
-   /* Configure ADCCSSx */ 
-   ADCCSS1 = 0; // Clear all bits 
-   ADCCSS2 = 0; 
-   ADCCSS1bits.CSS4 = 1; // AN4 set for scan 
-   ADCCSS1bits.CSS6 = 1; // AN6 set for scan 
-   ADCCSS2bits.CSS37 = 1; // AN37 set for scan 
-   
-   // Also need to set trigger source for AN4/AN6 since class1/class2
-   ADCTRG2bits.TRGSRC4 = 0b00011; // STRIG
-   ADCTRG2bits.TRGSRC6 = 0b00011; // STRIG
-   
-   // Not using digital comparator, don't worry about ADCCMPENx
-   ADCCMPEN1 = 0;
-   ADCCMPEN2 = 0;
-   ADCCMPEN3 = 0;
-   ADCCMPEN4 = 0;
-   ADCCMPEN5 = 0;
-   ADCCMPEN6 = 0;
-   
-   /* Configure ADCCMPCONx */ 
-   ADCCMPCON1 = 0; // No digital comparators are used. Setting the ADCCMPCONx 
-   ADCCMPCON2 = 0; // register to '0' ensures that the comparator is disabled.
-   ADCCMPCON3 = 0;
-   ADCCMPCON4 = 0;
-   ADCCMPCON5 = 0;
-   ADCCMPCON6 = 0;
-   
-   /* Configure ADCFLTRx */ 
-   ADCFLTR1 = 0; // No oversampling filters are used. 
-   ADCFLTR2 = 0; 
-   ADCFLTR3 = 0; 
-   ADCFLTR4 = 0; 
-   ADCFLTR5 = 0; 
-   ADCFLTR6 = 0; 
-   
-   // ADCFSTAT: not using FIFO so dont worry about it
-   
-   // ADCBASE: Not using interrupts so don't worry about it
-   
-   // ADCTRGSNS: leave at default-use poitive edge of trigger
-   ADCTRGSNS = 0;
-   
-   /* Early interrupt */ 
-   ADCEIEN1 = 0; // No early interrupt 
-   ADCEIEN2 = 0;
-   
-   /* 
-     Enable local/global interrupts
-    */
-   INTCONbits.MVEC = 1; // Use multivector mode
-   PRISSbits.PRI4SS = 0b0100; // Priority 4 interrupt use shadow set 4
-   IPC11bits.ADCIP = 4; // ADC global interrupt priority
-   
-   // Clear interrupt flags
+  /* Factory calibration */
+  ADC0CFG = DEVADC0;
+  ADC1CFG = DEVADC1;
+  ADC2CFG = DEVADC2;
+  ADC3CFG = DEVADC3;
+  ADC4CFG = DEVADC4;
+  ADC7CFG = DEVADC7;
+
+  ADCCON1 = 0;
+  ADCCON1bits.SELRES = 0b11;     /* ADC7: 12-bit */
+  ADCCON1bits.STRGSRC = 0b00001; /* scan trigger */
+  ADCCON1bits.AICPMPEN = 0;
+  CFGCONbits.IOANCPEN = 0;
+
+  ADCCON2bits.SAMC = 5;
+  ADCCON2bits.ADCDIV = 1;
+  ADCCON2bits.EOSIEN = 1;        /* end-of-scan IRQ */
+
+  ADCANCON = 0;
+  ADCANCONbits.WKUPCLKCNT = 0xA;
+
+  ADCCON3bits.ADCSEL = 0;        /* PBCLK3 */
+  ADCCON3bits.CONCLKDIV = 1;
+  ADCCON3bits.VREFSEL = 0;       /* AVDD/AVSS */
+
+  ADC4TIMEbits.ADCEIS = 0b000;
+  ADC4TIMEbits.SELRES = 0b11;
+  ADC4TIMEbits.ADCDIV = 1;
+  ADC4TIMEbits.SAMC = 5;
+
+  ADCTRGMODE = 0;
+
+  /* Unsigned, single-ended for all scanned channels */
+  ADCIMCON1bits.SIGN4 = 0;
+  ADCIMCON1bits.DIFF4 = 0;
+  ADCIMCON1bits.SIGN6 = 0;
+  ADCIMCON1bits.DIFF6 = 0;
+  ADCIMCON2bits.SIGN29 = 0;
+  ADCIMCON2bits.DIFF29 = 0;
+  ADCIMCON3bits.SIGN36 = 0;
+  ADCIMCON3bits.DIFF36 = 0;
+  ADCIMCON3bits.SIGN37 = 0;
+  ADCIMCON3bits.DIFF37 = 0;
+
+  ADCGIRQEN1 = 0;
+  ADCGIRQEN2 = 0;
+
+  /* Scan: cliffs AN4/AN6/AN37 + motor ISEN AN29 (right) / AN36 (left) */
+  ADCCSS1 = 0;
+  ADCCSS2 = 0;
+  ADCCSS1bits.CSS4 = 1;
+  ADCCSS1bits.CSS6 = 1;
+  ADCCSS1bits.CSS29 = 1;
+  ADCCSS2bits.CSS36 = 1;
+  ADCCSS2bits.CSS37 = 1;
+
+  /* Class 1/2 channels need explicit scan trigger source */
+  ADCTRG2bits.TRGSRC4 = 0b00011; /* STRIG */
+  ADCTRG2bits.TRGSRC6 = 0b00011;
+
+  ADCCMPEN1 = 0;
+  ADCCMPEN2 = 0;
+  ADCCMPEN3 = 0;
+  ADCCMPEN4 = 0;
+  ADCCMPEN5 = 0;
+  ADCCMPEN6 = 0;
+  ADCCMPCON1 = 0;
+  ADCCMPCON2 = 0;
+  ADCCMPCON3 = 0;
+  ADCCMPCON4 = 0;
+  ADCCMPCON5 = 0;
+  ADCCMPCON6 = 0;
+
+  ADCFLTR1 = 0;
+  ADCFLTR2 = 0;
+  ADCFLTR3 = 0;
+  ADCFLTR4 = 0;
+  ADCFLTR5 = 0;
+  ADCFLTR6 = 0;
+
+  ADCTRGSNS = 0;
+  ADCEIEN1 = 0;
+  ADCEIEN2 = 0;
+
+  INTCONbits.MVEC = 1;
+  PRISSbits.PRI4SS = 0b0100;
+  IPC11bits.ADCIP = 4;
   IFS1CLR = _IFS1_ADCIF_MASK;
-  
-  // Local disable interrupts
   IEC1CLR = _IEC1_ADCIE_MASK;
-  
-  __builtin_enable_interrupts(); // Global enable interrupts
-  
-   /*
-    Step 4: The user sets the ON bit to 1, which enables 
-    * the ADC control clock.
-   */
-   ADCCON1bits.ON = 1;
-   
-   /*
-    Step 5: The user waits for the interrupt/polls the
-    BGVRRDY bit (ADCCON2<31>) and the WKRDYx
-    bit (ADCANCON<15,13:8>) = 1, which signals that
-    the device analog environment (band gap and VREF)
-    is ready.
-   */
-   while(!ADCCON2bits.BGVRRDY); // Wait until the reference voltage is ready 
-   while(ADCCON2bits.REFFLT); // Wait if there is a fault with the reference voltage
-   
-    /*
-    Step 3: The user sets the ANENx bit to 1 for the ADC 
-    SAR Cores needed (which internally in the ADC module 
-    enables the control clock to generate by division the 
-    core clocks for the desired ADC SAR Cores, which in turn 
-    enables the bias circuitry for these ADC SAR Cores).
-   */ 
-   ADCANCONbits.ANEN7 = 1; // Enable, ADC 7
-   while(!ADCANCONbits.WKRDY7); // Wait until ADC7 is ready
-   
-   ADCANCONbits.ANEN4 = 1; // Enable ADC 4
-   while (!ADCANCONbits.WKRDY4); // Wait until ADC4 is ready
-   
-   /*
-    Step 6: Set the DIGENx bit (ADCCON3<15,13:8>) to
-    1, which enables the digital circuitry to immediately
-    begin processing incoming triggers to perform data
-    conversions. 
-   */
-   ADCCON3bits.DIGEN4 = 1 ; // Enable ADC4
-   ADCCON3bits.DIGEN7 = 1; // Enable ADC7
+  __builtin_enable_interrupts();
+
+  ADCCON1bits.ON = 1;
+  while (!ADCCON2bits.BGVRRDY) {
+    ;
+  }
+  while (ADCCON2bits.REFFLT) {
+    ;
+  }
+
+  ADCANCONbits.ANEN7 = 1;
+  while (!ADCANCONbits.WKRDY7) {
+    ;
+  }
+  ADCANCONbits.ANEN4 = 1;
+  while (!ADCANCONbits.WKRDY4) {
+    ;
+  }
+
+  ADCCON3bits.DIGEN4 = 1;
+  ADCCON3bits.DIGEN7 = 1;
+
+  adc_initialized = true;
+}
+
+void ReadADC(void)
+{
+  conversion_done = false;
+  IEC1SET = _IEC1_ADCIE_MASK;  // Enable local interrupt
+  ADCCON3bits.GSWTRG = 1;  // Trigger a conversion    
+}
+
+bool ADC_ConversionReady(void)
+{
+  return conversion_done;
+}
+
+void GetCliffADC(uint16_t out[3])
+{
+  out[0] = cliff_results[0];
+  out[1] = cliff_results[1];
+  out[2] = cliff_results[2];
+}
+
+void GetMotorCurrentADC(uint16_t *left_counts, uint16_t *right_counts)
+{
+  if (left_counts) {
+    *left_counts = motor_left_an36;
+  }
+  if (right_counts) {
+    *right_counts = motor_right_an29;
+  }
 }
 
 /**************************************************************************
   Function
-     ReadADCValues
+     MotorCurrentCountsTomA
 
  Parameters
-     uint32_t* Results: a pointer to a vector which the ADC results will be
-                        placed
+     counts: 12-bit ADC reading from a DRV8842 ISEN pin
 
  Returns
-     None
+     Estimated motor current in milliamps
 
  Description
-     Places the readings from the ADC into Results
- Notes
- 
+     Converts ISEN ADC counts to mA assuming AVDD=3.3 V reference and a
+     0.25 ohm sense resistor (V_ISEN = I * R_sense).
  *************************************************************************/
-void ReadADC(uint16_t *Results){
-    
-    IEC1SET = _IEC1_ADCIE_MASK; // Enable local interrupt
-    ADCCON3bits.GSWTRG = 1; // Trigger a conversion    
+uint32_t MotorCurrentCountsTomA(uint16_t counts)
+{
+  return ((uint32_t)counts * ADC_TO_MA_NUM) / ADC_TO_MA_DEN;
+}
+
+void __ISR(_ADC_VECTOR, IPL4SRS) ADCHandler(void)
+{
+  uint32_t status = ADCCON2; /* reading ADCCON2 also clears EOSRDY */
+  if ((status >> 29) & 1) {
+    IFS1CLR = _IFS1_ADCIF_MASK;  // Clear the ADC interrupt flag
+    IEC1CLR = _IEC1_ADCIE_MASK;  // Disable local interrupt
+
+    cliff_results[0] = (uint16_t)ADCDATA6;
+    cliff_results[1] = (uint16_t)ADCDATA37;
+    cliff_results[2] = (uint16_t)ADCDATA4;
+    motor_right_an29 = (uint16_t)ADCDATA29;
+    motor_left_an36 = (uint16_t)ADCDATA36;
+
+    conversion_done = true;
+  } else {
+    DB_printf("Unexpected ADC interrupt\r\n");
+  }
 }

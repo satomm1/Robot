@@ -25,7 +25,6 @@
 #include "ReflectService.h"
 #include "ADC_HAL.h"
 #include "dbprintf.h"
-#include <sys/attribs.h>
 
 /*----------------------------- Module Defines ----------------------------*/
 #define CLIFF_THRESHOLD 1000
@@ -134,23 +133,25 @@ ES_Event_t RunReflectService(ES_Event_t ThisEvent)
   ReturnEvent.EventType = ES_NO_EVENT; // assume no errors
   
   if (ThisEvent.EventType == ES_TIMEOUT) {
-      ReadADC(ReflectiveResults);
-      
+      /* Use last completed scan, then kick the next conversion */
+      GetCliffADC(ReflectiveResults);
+      ReadADC();
+
 //      DB_printf("Reflect 1: %d\r\n", ReflectiveResults[0]);
 //      DB_printf("Reflect 2: %d\r\n", ReflectiveResults[1]);
 //      DB_printf("Reflect 3: %d\r\n", ReflectiveResults[2]);
-      
+
       if (ReflectiveResults[0] > CLIFF_THRESHOLD) {
-          
+
       } else if (ReflectiveResults[1] > CLIFF_THRESHOLD) {
-          
+
       } else if (ReflectiveResults[2] > CLIFF_THRESHOLD) {
-          
+
       } else {
-          
+
       }
-      
-      ES_Timer_InitTimer(REFLECT_TIMER, 10); // Init Timer to read again
+
+      ES_Timer_InitTimer(REFLECT_TIMER, 10);
   }
   
   return ReturnEvent;
@@ -196,22 +197,6 @@ void UpdateButtonStatus(uint8_t ButtonNum, bool Status){
     }
 }
 
-/***************************************************************************
- private functions
- ***************************************************************************/
-void __ISR(_ADC_VECTOR, IPL4SRS) ADCHandler(void) {
-    uint32_t status = ADCCON2;
-    if ((status>>29) & 1) { 
-        IFS1CLR = _IFS1_ADCIF_MASK; // Clear interrupt flag
-        IEC1CLR = _IEC1_ADCIE_MASK; // Disable the interrupt
-        
-        ReflectiveResults[0] = ADCDATA6; // fetch the result
-        ReflectiveResults[1] = ADCDATA37; // fetch the result
-        ReflectiveResults[2] = ADCDATA4; // fetch the result
-    } else {
-        DB_printf("Some other ADC interrupt is active!\r\n");
-    }
-}
 /*------------------------------- Footnotes -------------------------------*/
 /*------------------------------ End of file ------------------------------*/
 
