@@ -39,6 +39,10 @@
 #define TWO_SEC (ONE_SEC * 2)
 #define FIVE_SEC (ONE_SEC * 5)
 
+/* Max-over-window: ISEN is only valid during PWM on-time */
+#define MOTOR_I_SAMPLE_COUNT 64
+#define MOTOR_I_SAMPLE_MS    1
+
 #define ENTER_POST     ((MyPriority<<3)|0)
 #define ENTER_RUN      ((MyPriority<<3)|1)
 #define ENTER_TIMEOUT  ((MyPriority<<3)|2)
@@ -59,6 +63,8 @@ static uint32_t address = 0;
 static int16_t circ_buff_array[5];
 static circular_buffer_t cb;  // Buffer for keeping State data
 static int16_t data = 1;
+
+static uint8_t current_samples_left = 0; /* 0 = idle; non-blocking motor-I capture */
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
  Function
@@ -318,15 +324,11 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
       }
 
       if ('i' == ThisEvent.EventParam) {
-          uint16_t left_counts, right_counts;
+          /* Restartable non-blocking max capture over many PWM periods */
+          StartMotorCurrentMaxCapture();
+          current_samples_left = MOTOR_I_SAMPLE_COUNT;
           ReadADC();
-          while (!ADC_ConversionReady()) {
-              ;
-          }
-          GetMotorCurrentADC(&left_counts, &right_counts);
-          DB_printf("Left: %u counts, %u mA | Right: %u counts, %u mA\r\n",
-                    (unsigned)left_counts, (unsigned)MotorCurrentCountsTomA(left_counts),
-                    (unsigned)right_counts, (unsigned)MotorCurrentCountsTomA(right_counts));
+          ES_Timer_InitTimer(USB_TIMER, MOTOR_I_SAMPLE_MS);
       }
 
       if ('0' == ThisEvent.EventParam) {
@@ -359,10 +361,28 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
     
     case ES_TIMEOUT:
     {
+      if (ThisEvent.EventParam == USB_TIMER) {
+        if (current_samples_left > 0) {
+          current_samples_left--;
+          if (current_samples_left > 0) {
+            ReadADC();
+            ES_Timer_InitTimer(USB_TIMER, MOTOR_I_SAMPLE_MS);
+          } else {
+            uint16_t left_counts, right_counts;
+            StopMotorCurrentMaxCapture();
+            GetMotorCurrentMaxADC(&left_counts, &right_counts);
+            DB_printf("Left max: %u counts, %u mA | Right max: %u counts, %u mA\r\n",
+                      (unsigned)left_counts, (unsigned)MotorCurrentCountsTomA(left_counts),
+                      (unsigned)right_counts, (unsigned)MotorCurrentCountsTomA(right_counts));
+          }
+        }
+      } else {
+        /* Legacy test path: stop motors on non-USB timeouts */
         OC1RS = 0;
         OC2RS = 0;
-        LATFbits.LATF8 = 0; 
-        LATJbits.LATJ3 = 0; 
+        LATFbits.LATF8 = 0;
+        LATJbits.LATJ3 = 0;
+      }
     }
     break;
     

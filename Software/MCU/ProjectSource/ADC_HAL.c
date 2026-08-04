@@ -24,6 +24,11 @@ static volatile uint16_t cliff_results[3];   /* AN6, AN37, AN4 */
 static volatile uint16_t motor_right_an29; /* RA1 / right motor ISEN */
 static volatile uint16_t motor_left_an36;  /* RJ9 / left motor ISEN */
 
+/* Peak capture: ISEN is only valid during PWM on-time, so track max over a window */
+static volatile bool capture_active = false;
+static volatile uint16_t max_left_counts = 0;
+static volatile uint16_t max_right_counts = 0;
+
 void InitADC(void)
 {
   if (adc_initialized) {
@@ -192,6 +197,28 @@ uint32_t MotorCurrentCountsTomA(uint16_t counts)
   return ((uint32_t)counts * ADC_TO_MA_NUM) / ADC_TO_MA_DEN;
 }
 
+void StartMotorCurrentMaxCapture(void)
+{
+  max_left_counts = 0;
+  max_right_counts = 0;
+  capture_active = true;
+}
+
+void StopMotorCurrentMaxCapture(void)
+{
+  capture_active = false;
+}
+
+void GetMotorCurrentMaxADC(uint16_t *left_counts, uint16_t *right_counts)
+{
+  if (left_counts) {
+    *left_counts = max_left_counts;
+  }
+  if (right_counts) {
+    *right_counts = max_right_counts;
+  }
+}
+
 void __ISR(_ADC_VECTOR, IPL4SRS) ADCHandler(void)
 {
   uint32_t status = ADCCON2; /* reading ADCCON2 also clears EOSRDY */
@@ -204,6 +231,15 @@ void __ISR(_ADC_VECTOR, IPL4SRS) ADCHandler(void)
     cliff_results[2] = (uint16_t)ADCDATA4;
     motor_right_an29 = (uint16_t)ADCDATA29;
     motor_left_an36 = (uint16_t)ADCDATA36;
+
+    if (capture_active) {
+      if (motor_left_an36 > max_left_counts) {
+        max_left_counts = motor_left_an36;
+      }
+      if (motor_right_an29 > max_right_counts) {
+        max_right_counts = motor_right_an29;
+      }
+    }
 
     conversion_done = true;
   } else {
