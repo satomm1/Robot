@@ -201,11 +201,6 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
       
       if ('s' == ThisEvent.EventParam) {
           SetDesiredSpeed(0,0);
-          
-          OC1RS = 0;
-          OC2RS = 0;
-          LATFbits.LATF8 = 0; 
-          LATJbits.LATJ3 = 0; 
       }
       
       if ('q' == ThisEvent.EventParam) {

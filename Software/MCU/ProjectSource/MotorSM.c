@@ -61,6 +61,14 @@
 #define V_MAX 1 // max 1 m/sec
 #define w_MAX 3 // max 2 rad/sec
 
+/* PWM slew: ~600 ms; also used for soft-stop and reverse-through-zero */
+#define DUTY_RAMP_TIME_S   0.6f
+#define T1_CONTROL_DT_S    ((8.0f * (float)CONTROL_PERIOD) / 2.0f / 50000000.0f) /* matches T1 1:8, PR1 */
+#define DUTY_SLEW_MAX_PCT  (100.0f * T1_CONTROL_DT_S / DUTY_RAMP_TIME_S)
+#define DUTY_STOP_EPS_PCT  1.0f
+#define RPM_REVERSE_EPS    10.0f /* flip H-bridge only once wheels are nearly stopped */
+#define RPM_SLEW_MAX       (200.0f * T1_CONTROL_DT_S / DUTY_RAMP_TIME_S) /* soft RPM setpoint after reverse */
+
 #define BUFF_SIZE 65
 
 #if (PCB_REV <= 2)
@@ -77,6 +85,9 @@ static bool IsPivotControlMode(void);
 static int8_t EncoderDeltaFromEdge(uint8_t RisingEdge, uint8_t ChannelB);
 static uint16_t ReadSecondCapture(volatile uint32_t *icbuf);
 static void SetMotorDirection(bool LeftDir, bool RightDir);
+static float SlewToward(float applied, float target, float max_delta);
+static float SlewDuty(float applied, float target);
+static void WriteMotorDuty(float left_pct, float right_pct, bool left_dir, bool right_dir);
 
 /*---------------------------- Module Variables ---------------------------*/
 // everybody needs a state variable, you may need others as well.
@@ -124,8 +135,13 @@ static volatile float w_current = 0.;
 static volatile float DesiredLeftRPM;
 static volatile float DesiredRightRPM;
 
+/* Commanded direction (from SetDesiredSpeed); pins follow Applied* after slew-to-zero */
 static bool LeftDirection = HW_LEFT_DIR_FORWARD;
 static bool RightDirection = HW_RIGHT_DIR_FORWARD;
+static bool AppliedLeftDir = 0;
+static bool AppliedRightDir = 0;
+static float AppliedLeftDuty = 0.0f;  /* 0–100% before hardware invert */
+static float AppliedRightDuty = 0.0f;
 
 static float V_desired = 0.;
 static float w_desired = 0.;
@@ -191,7 +207,11 @@ bool InitMotorSM(uint8_t Priority)
       pLeftDirSet = &LATFSET;
       pLeftDirClear = &LATFCLR;
   }
-  SetMotorDirection(0, 0); // Initialize to forward direction
+  SetMotorDirection(0, 0); // Initialize pins; Applied* start at 0 to match
+  AppliedLeftDir = 0;
+  AppliedRightDir = 0;
+  AppliedLeftDuty = 0.0f;
+  AppliedRightDuty = 0.0f;
 
   // Set encoder pins and fault pins to digital inputs
   ANSELCCLR = _ANSELC_ANSC1_MASK | _ANSELC_ANSC4_MASK;
@@ -627,8 +647,7 @@ void SetDesiredSpeed(float V, float w)
     left_w = left_w * 60 / 2 / 3.14159; // (rev/min)
     right_w = right_w * 60 / 2 / 3.14159; // (rev/min)
     
-    // Set the direction pins to the motor driver to get correct forward or 
-    // backward motion
+    // Commanded direction only — pins flip in T1 after duty slews through ~0
     if (left_w  >= 0) {
         LeftDirection = HW_LEFT_DIR_FORWARD;
     } else {
@@ -642,7 +661,6 @@ void SetDesiredSpeed(float V, float w)
         RightDirection = !HW_RIGHT_DIR_FORWARD;
         right_w = - right_w;
     }
-    SetMotorDirection(LeftDirection, RightDirection);
     
     // Set the desired RPM variables
     SetDesiredRPM(left_w, right_w);
@@ -920,34 +938,51 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     static int32_t DeltaRightRotations = 0;
     static bool LeftUseCountMode = false;
     static bool RightUseCountMode = false;
+    /* After reverse: ramp PID setpoint 0→Desired so we don't surge from a step error */
+    static float LeftCmdRPM = 0.0f;
+    static float RightCmdRPM = 0.0f;
+    static bool LeftRpmSoftStart = false;
+    static bool RightRpmSoftStart = false;
     
     IFS0CLR = _IFS0_T1IF_MASK; // Clear the timer interrupt
     
-    // If desired is static:
+    /* Soft stop: slew PWM to 0, then shut down (no instant cut) */
     if (DesiredLeftRPM == 0 && DesiredRightRPM == 0) {
-        // Turn control timer off
-        T1CONCLR = _T1CON_ON_MASK; // stop the timer 
-        TMR1 = 0;
-                
-        // Manually set drive pins to stopped
-        LeftDirection = HW_LEFT_DIR_FORWARD;
-        RightDirection = HW_RIGHT_DIR_FORWARD;
-        SetMotorDirection(0, 0);
-        
-        *pRightOCRS = 0;
-        *pLeftOCRS = 0;
-        
-        // Reset stored values
-        LeftErrorSum = 0;
-        RightErrorSum = 0;
-        LeftPrevError = 0;
-        RightPrevError = 0;
-        ActualLeftRPM = 0;
-        ActualRightRPM = 0;
-        LeftUseCountMode = false;
-        RightUseCountMode = false;
-        PrevLeftRotations_motor = *pLeftRotations;
-        PrevRightRotations_motor = *pRightRotations;
+        AppliedLeftDuty = SlewDuty(AppliedLeftDuty, 0.0f);
+        AppliedRightDuty = SlewDuty(AppliedRightDuty, 0.0f);
+        WriteMotorDuty(AppliedLeftDuty, AppliedRightDuty, AppliedLeftDir, AppliedRightDir);
+
+        if (AppliedLeftDuty <= DUTY_STOP_EPS_PCT && AppliedRightDuty <= DUTY_STOP_EPS_PCT) {
+            T1CONCLR = _T1CON_ON_MASK;
+            TMR1 = 0;
+
+            LeftDirection = HW_LEFT_DIR_FORWARD;
+            RightDirection = HW_RIGHT_DIR_FORWARD;
+            AppliedLeftDir = 0;
+            AppliedRightDir = 0;
+            AppliedLeftDuty = 0.0f;
+            AppliedRightDuty = 0.0f;
+            SetMotorDirection(0, 0);
+            *pRightOCRS = 0;
+            *pLeftOCRS = 0;
+
+            LeftErrorSum = 0;
+            RightErrorSum = 0;
+            LeftPrevError = 0;
+            RightPrevError = 0;
+            ActualLeftRPM = 0;
+            ActualRightRPM = 0;
+            LeftCmdRPM = 0.0f;
+            RightCmdRPM = 0.0f;
+            LeftRpmSoftStart = false;
+            RightRpmSoftStart = false;
+            LeftUseCountMode = false;
+            RightUseCountMode = false;
+            PrevLeftDutyCycle = 0;
+            PrevRightDutyCycle = 0;
+            PrevLeftRotations_motor = *pLeftRotations;
+            PrevRightRotations_motor = *pRightRotations;
+        }
         return;
     }
     
@@ -991,10 +1026,36 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
         // Calculate Current RPM based on Pulse Lengths from encoders
         ActualRightRPM = CONTROL_ALPHA * SPEED_CONVERSION_FACTOR / (*pRightPulseLength) + (1-CONTROL_ALPHA)*ActualRightRPM;
     }
+
+    /* PID setpoint: hold 0 while reversing; soft-ramp after flip to avoid speed surge */
+    if (LeftDirection != AppliedLeftDir) {
+        LeftCmdRPM = 0.0f;
+        LeftRpmSoftStart = true;
+    } else if (LeftRpmSoftStart) {
+        LeftCmdRPM = SlewToward(LeftCmdRPM, DesiredLeftRPM, RPM_SLEW_MAX);
+        if (LeftCmdRPM >= DesiredLeftRPM - 0.5f) {
+            LeftRpmSoftStart = false;
+            LeftCmdRPM = DesiredLeftRPM;
+        }
+    } else {
+        LeftCmdRPM = DesiredLeftRPM;
+    }
+    if (RightDirection != AppliedRightDir) {
+        RightCmdRPM = 0.0f;
+        RightRpmSoftStart = true;
+    } else if (RightRpmSoftStart) {
+        RightCmdRPM = SlewToward(RightCmdRPM, DesiredRightRPM, RPM_SLEW_MAX);
+        if (RightCmdRPM >= DesiredRightRPM - 0.5f) {
+            RightRpmSoftStart = false;
+            RightCmdRPM = DesiredRightRPM;
+        }
+    } else {
+        RightCmdRPM = DesiredRightRPM;
+    }
    
     // Calculate error from desired RPM
-    LeftError = DesiredLeftRPM - ActualLeftRPM;
-    RightError = DesiredRightRPM - ActualRightRPM;
+    LeftError = LeftCmdRPM - ActualLeftRPM;
+    RightError = RightCmdRPM - ActualRightRPM;
     
     if (fabsf(ActualLeftRPM) > 500) {
         // The RPM Readings are likely in error, use previous error instead
@@ -1023,9 +1084,19 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     
 //    DB_printf("%d, %d", (int16_t)LeftError, (int16_t)LeftErrorSum);
     
-    // Integral of error
-    LeftErrorSum += LeftError;
-    RightErrorSum += RightError;
+    // Integral: clear while reversing so post-flip doesn't inherit forward windup (causes speed surge)
+    if (LeftDirection == AppliedLeftDir) {
+        LeftErrorSum += LeftError;
+    } else {
+        LeftErrorSum = 0.0f;
+        LeftPrevError = LeftError;
+    }
+    if (RightDirection == AppliedRightDir) {
+        RightErrorSum += RightError;
+    } else {
+        RightErrorSum = 0.0f;
+        RightPrevError = RightError;
+    }
     
     // Derivative of Error
     LeftErrorDiff = LeftError - LeftPrevError;
@@ -1055,17 +1126,31 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
         RightDutyCycle = 0;
         RightErrorSum -= RightError;
     }
-        
-    // Lastly, Set the duty cycle of the motors by updating Output Compare
-    if (LeftDirection == 1) {
-        LeftDutyCycle = 100 - LeftDutyCycle;
+
+    /* Slew applied PWM; if reversing, force target 0 until near stop then flip pins */
+    {
+        float left_target = (LeftDirection == AppliedLeftDir) ? LeftDutyCycle : 0.0f;
+        float right_target = (RightDirection == AppliedRightDir) ? RightDutyCycle : 0.0f;
+
+        AppliedLeftDuty = SlewDuty(AppliedLeftDuty, left_target);
+        AppliedRightDuty = SlewDuty(AppliedRightDuty, right_target);
+
+        /* Flip only when PWM is low AND wheels have nearly stopped (avoids reverse jolt) */
+        if (AppliedLeftDuty <= DUTY_STOP_EPS_PCT && LeftDirection != AppliedLeftDir
+            && ActualLeftRPM <= RPM_REVERSE_EPS) {
+            AppliedLeftDir = LeftDirection;
+            SetMotorDirection(AppliedLeftDir, AppliedRightDir);
+        }
+        if (AppliedRightDuty <= DUTY_STOP_EPS_PCT && RightDirection != AppliedRightDir
+            && ActualRightRPM <= RPM_REVERSE_EPS) {
+            AppliedRightDir = RightDirection;
+            SetMotorDirection(AppliedLeftDir, AppliedRightDir);
+        }
+
+        WriteMotorDuty(AppliedLeftDuty, AppliedRightDuty, AppliedLeftDir, AppliedRightDir);
+        LeftDutyCycle = AppliedLeftDuty;
+        RightDutyCycle = AppliedRightDuty;
     }
-    *pLeftOCRS = (int16_t)((OC_PERIOD + 1)/100 * LeftDutyCycle);
-    
-    if (RightDirection == 1) {
-        RightDutyCycle = 100 - RightDutyCycle;
-    }
-    *pRightOCRS = (int16_t)((OC_PERIOD + 1)/100 * RightDutyCycle);
     
 #ifdef RL_MOTOR_LOGGING
     LeftDelta = LeftDutyCycle - PrevLeftDutyCycle;
@@ -1320,4 +1405,34 @@ static void SetMotorDirection(bool LeftDir, bool RightDir) {
     } else {
         *pRightDirClear = RightDirMask;
     }
+}
+
+/* Rate-limit applied toward target by at most max_delta per control tick. */
+static float SlewToward(float applied, float target, float max_delta)
+{
+    float d = target - applied;
+    if (d > max_delta) {
+        d = max_delta;
+    } else if (d < -max_delta) {
+        d = -max_delta;
+    }
+    return applied + d;
+}
+
+static float SlewDuty(float applied, float target)
+{
+    return SlewToward(applied, target, DUTY_SLEW_MAX_PCT);
+}
+
+/* Write OC PWM; dir==1 uses the existing inverted-duty hardware mapping. */
+static void WriteMotorDuty(float left_pct, float right_pct, bool left_dir, bool right_dir)
+{
+    if (left_dir == 1) {
+        left_pct = 100.0f - left_pct;
+    }
+    if (right_dir == 1) {
+        right_pct = 100.0f - right_pct;
+    }
+    *pLeftOCRS = (int16_t)((OC_PERIOD + 1) / 100.0f * left_pct);
+    *pRightOCRS = (int16_t)((OC_PERIOD + 1) / 100.0f * right_pct);
 }
