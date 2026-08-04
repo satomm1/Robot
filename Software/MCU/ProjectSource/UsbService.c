@@ -312,6 +312,10 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
           SetDesiredSpeed(0, -1);
       }
       
+      if('u' == ThisEvent.EventParam) {
+          PrintDutyCycle();
+      }
+      
       if ('0' == ThisEvent.EventParam) {
           ES_Event_t NewEvent = {EV_PRINT_RL_DATA,0};
           PostMotorSM(NewEvent);

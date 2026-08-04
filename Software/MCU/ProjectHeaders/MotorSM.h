@@ -52,5 +52,6 @@ void ResetPosition(void);
 void SetPosition(float x_set, float y_set, float theta_set);
 void GetPosition(float* x_get, float* y_get, float* theta_get);
 void PrintBufferSize(void);
+void PrintDutyCycle(void);
 #endif /* MotorFSM_H */
 

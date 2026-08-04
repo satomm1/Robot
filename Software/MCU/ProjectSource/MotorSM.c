@@ -523,6 +523,12 @@ MotorState_t QueryMotorSM(void)
   return CurrentState;
 }
 
+void PrintDutyCycle(void){
+    float r_dc = ((float)(*pRightOCRS * 100)) / (OC_PERIOD +1);
+    float l_dc = ((float)(*pLeftOCRS * 100)) / (OC_PERIOD +1);
+    DB_printf("R/L Duty Cycle: %d, %d\r\n", (uint32_t)r_dc, (uint32_t)l_dc);
+}
+
 /****************************************************************************
  Function
      SetDesiredRPM
