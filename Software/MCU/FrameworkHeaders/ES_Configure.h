@@ -105,37 +105,37 @@
 // These are the definitions for Service 2
 #if NUM_SERVICES > 2
 // the header file with the public function prototypes
-#define SERV_2_HEADER "IMU_SM.h"
+#define SERV_2_HEADER "JetsonSM.h"
 // the name of the Init function
-#define SERV_2_INIT InitImuSM
+#define SERV_2_INIT InitJetsonSM
 // the name of the run function
-#define SERV_2_RUN RunImuSM
+#define SERV_2_RUN RunJetsonSM
 // How big should this services Queue be?
-#define SERV_2_QUEUE_SIZE 3
+#define SERV_2_QUEUE_SIZE 5
 #endif
 
 /****************************************************************************/
 // These are the definitions for Service 3
 #if NUM_SERVICES > 3
 // the header file with the public function prototypes
-#define SERV_3_HEADER "JetsonSM.h"
+#define SERV_3_HEADER "Button1DebouncerSM.h"
 // the name of the Init function
-#define SERV_3_INIT InitJetsonSM
+#define SERV_3_INIT InitButton1DebouncerSM
 // the name of the run function
-#define SERV_3_RUN RunJetsonSM
+#define SERV_3_RUN RunButton1DebouncerSM
 // How big should this services Queue be?
-#define SERV_3_QUEUE_SIZE 5
+#define SERV_3_QUEUE_SIZE 3
 #endif
 
 /****************************************************************************/
 // These are the definitions for Service 4
 #if NUM_SERVICES > 4
 // the header file with the public function prototypes
-#define SERV_4_HEADER "Button1DebouncerSM.h"
+#define SERV_4_HEADER "Button2DebouncerSM.h"
 // the name of the Init function
-#define SERV_4_INIT InitButton1DebouncerSM
+#define SERV_4_INIT InitButton2DebouncerSM
 // the name of the run function
-#define SERV_4_RUN RunButton1DebouncerSM
+#define SERV_4_RUN RunButton2DebouncerSM
 // How big should this services Queue be?
 #define SERV_4_QUEUE_SIZE 3
 #endif
@@ -144,11 +144,11 @@
 // These are the definitions for Service 5
 #if NUM_SERVICES > 5
 // the header file with the public function prototypes
-#define SERV_5_HEADER "Button2DebouncerSM.h"
+#define SERV_5_HEADER "Button3DebouncerSM.h"
 // the name of the Init function
-#define SERV_5_INIT InitButton2DebouncerSM
+#define SERV_5_INIT InitButton3DebouncerSM
 // the name of the run function
-#define SERV_5_RUN RunButton2DebouncerSM
+#define SERV_5_RUN RunButton3DebouncerSM
 // How big should this services Queue be?
 #define SERV_5_QUEUE_SIZE 3
 #endif
@@ -157,11 +157,11 @@
 // These are the definitions for Service 6
 #if NUM_SERVICES > 6
 // the header file with the public function prototypes
-#define SERV_6_HEADER "Button3DebouncerSM.h"
+#define SERV_6_HEADER "MotorSM.h"
 // the name of the Init function
-#define SERV_6_INIT InitButton3DebouncerSM
+#define SERV_6_INIT InitMotorSM
 // the name of the run function
-#define SERV_6_RUN RunButton3DebouncerSM
+#define SERV_6_RUN RunMotorSM
 // How big should this services Queue be?
 #define SERV_6_QUEUE_SIZE 3
 #endif
@@ -170,37 +170,37 @@
 // These are the definitions for Service 7
 #if NUM_SERVICES > 7
 // the header file with the public function prototypes
-#define SERV_7_HEADER "MotorSM.h"
+#define SERV_7_HEADER "EEPROMSM.h"
 // the name of the Init function
-#define SERV_7_INIT InitMotorSM
+#define SERV_7_INIT InitEEPROMSM
 // the name of the run function
-#define SERV_7_RUN RunMotorSM
+#define SERV_7_RUN RunEEPROMSM
 // How big should this services Queue be?
-#define SERV_7_QUEUE_SIZE 3
+#define SERV_7_QUEUE_SIZE 5
 #endif
 
 /****************************************************************************/
 // These are the definitions for Service 8
 #if NUM_SERVICES > 8
 // the header file with the public function prototypes
-#define SERV_8_HEADER "EEPROMSM.h"
+#define SERV_8_HEADER "IMU_SM.h"
 // the name of the Init function
-#define SERV_8_INIT InitEEPROMSM
+#define SERV_8_INIT InitImuSM
 // the name of the run function
-#define SERV_8_RUN RunEEPROMSM
+#define SERV_8_RUN RunImuSM
 // How big should this services Queue be?
-#define SERV_8_QUEUE_SIZE 5
+#define SERV_8_QUEUE_SIZE 3
 #endif
 
 /****************************************************************************/
 // These are the definitions for Service 9
 #if NUM_SERVICES > 9
 // the header file with the public function prototypes
-#define SERV_9_HEADER "ReflectService.h"
+#define SERV_9_HEADER "EnvironmentSensorSM.h"
 // the name of the Init function
-#define SERV_9_INIT InitReflectService
+#define SERV_9_INIT InitEnvironmentSensorSM
 // the name of the run function
-#define SERV_9_RUN RunReflectService
+#define SERV_9_RUN RunEnvironmentSensorSM
 // How big should this services Queue be?
 #define SERV_9_QUEUE_SIZE 3
 #endif
@@ -209,11 +209,11 @@
 // These are the definitions for Service 10
 #if NUM_SERVICES > 10
 // the header file with the public function prototypes
-#define SERV_10_HEADER "EnvironmentSensorSM.h"
+#define SERV_10_HEADER "ReflectService.h"
 // the name of the Init function
-#define SERV_10_INIT InitEnvironmentSensorSM
+#define SERV_10_INIT InitReflectService
 // the name of the run function
-#define SERV_10_RUN RunEnvironmentSensorSM
+#define SERV_10_RUN RunReflectService
 // How big should this services Queue be?
 #define SERV_10_QUEUE_SIZE 3
 #endif
