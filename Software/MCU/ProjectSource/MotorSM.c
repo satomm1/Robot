@@ -62,12 +62,13 @@
 #define w_MAX 3 // max 2 rad/sec
 
 /* PWM slew: ~600 ms; also used for soft-stop and reverse-through-zero */
-#define DUTY_RAMP_TIME_S   0.6f
+#define DUTY_RAMP_TIME_S   0.25f
 #define T1_CONTROL_DT_S    ((8.0f * (float)CONTROL_PERIOD) / 2.0f / 50000000.0f) /* matches T1 1:8, PR1 */
 #define DUTY_SLEW_MAX_PCT  (100.0f * T1_CONTROL_DT_S / DUTY_RAMP_TIME_S)
 #define DUTY_STOP_EPS_PCT  1.0f
 #define RPM_REVERSE_EPS    10.0f /* flip H-bridge only once wheels are nearly stopped */
 #define RPM_SLEW_MAX       (200.0f * T1_CONTROL_DT_S / DUTY_RAMP_TIME_S) /* soft RPM setpoint after reverse */
+#define I_FOLDBACK_MA      2000 /* duty foldback above 2.0 A; stall peaks observed >2.2 A */
 
 #define BUFF_SIZE 65
 
@@ -943,6 +944,9 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     static float RightCmdRPM = 0.0f;
     static bool LeftRpmSoftStart = false;
     static bool RightRpmSoftStart = false;
+    /* Current-limit foldback latches (clear I windup; soft-start RPM on release) */
+    static bool LeftFoldbackActive = false;
+    static bool RightFoldbackActive = false;
     
     IFS0CLR = _IFS0_T1IF_MASK; // Clear the timer interrupt
     
@@ -976,6 +980,8 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
             RightCmdRPM = 0.0f;
             LeftRpmSoftStart = false;
             RightRpmSoftStart = false;
+            LeftFoldbackActive = false;
+            RightFoldbackActive = false;
             LeftUseCountMode = false;
             RightUseCountMode = false;
             PrevLeftDutyCycle = 0;
@@ -1027,7 +1033,31 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
         ActualRightRPM = CONTROL_ALPHA * SPEED_CONVERSION_FACTOR / (*pRightPulseLength) + (1-CONTROL_ALPHA)*ActualRightRPM;
     }
 
-    /* PID setpoint: hold 0 while reversing; soft-ramp after flip to avoid speed surge */
+    /* Non-blocking ISEN peaks (1-tick lag OK). Used for foldback + anti-windup. */
+    uint16_t peak_l, peak_r;
+    uint32_t i_l_mA, i_r_mA;
+    bool left_oc, right_oc;
+    ReadADC();
+    DecayMotorCurrentPeaks();
+    GetMotorCurrentPeakADC(&peak_l, &peak_r);
+    i_l_mA = MotorCurrentCountsTomA(peak_l);
+    i_r_mA = MotorCurrentCountsTomA(peak_r);
+    left_oc = (i_l_mA > I_FOLDBACK_MA);
+    right_oc = (i_r_mA > I_FOLDBACK_MA);
+
+    /* Stall release: peak current falls → soft-ramp RPM cmd from actual (avoids P/I surge) */
+    if (LeftFoldbackActive && !left_oc) {
+        LeftRpmSoftStart = true;
+        LeftCmdRPM = ActualLeftRPM;
+    }
+    if (RightFoldbackActive && !right_oc) {
+        RightRpmSoftStart = true;
+        RightCmdRPM = ActualRightRPM;
+    }
+    LeftFoldbackActive = left_oc;
+    RightFoldbackActive = right_oc;
+
+    /* PID setpoint: hold 0 while reversing; soft-ramp after flip / foldback release */
     if (LeftDirection != AppliedLeftDir) {
         LeftCmdRPM = 0.0f;
         LeftRpmSoftStart = true;
@@ -1084,14 +1114,14 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     
 //    DB_printf("%d, %d", (int16_t)LeftError, (int16_t)LeftErrorSum);
     
-    // Integral: clear while reversing so post-flip doesn't inherit forward windup (causes speed surge)
-    if (LeftDirection == AppliedLeftDir) {
+    /* Clear I while reversing or current-limited (stall would otherwise wind up → release surge) */
+    if (LeftDirection == AppliedLeftDir && !left_oc) {
         LeftErrorSum += LeftError;
     } else {
         LeftErrorSum = 0.0f;
         LeftPrevError = LeftError;
     }
-    if (RightDirection == AppliedRightDir) {
+    if (RightDirection == AppliedRightDir && !right_oc) {
         RightErrorSum += RightError;
     } else {
         RightErrorSum = 0.0f;
@@ -1125,6 +1155,14 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     } else if (RightDutyCycle < 0) {
         RightDutyCycle = 0;
         RightErrorSum -= RightError;
+    }
+
+    /* Proportional duty foldback while peak ISEN > 2.0 A */
+    if (left_oc) {
+        LeftDutyCycle *= (float)I_FOLDBACK_MA / (float)i_l_mA;
+    }
+    if (right_oc) {
+        RightDutyCycle *= (float)I_FOLDBACK_MA / (float)i_r_mA;
     }
 
     /* Slew applied PWM; if reversing, force target 0 until near stop then flip pins */

@@ -319,7 +319,7 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
       }
 
       if ('i' == ThisEvent.EventParam) {
-          /* Restartable non-blocking max capture over many PWM periods */
+          /* Restartable non-blocking max capture (separate from control-loop peaks) */
           StartMotorCurrentMaxCapture();
           current_samples_left = MOTOR_I_SAMPLE_COUNT;
           ReadADC();
@@ -364,11 +364,16 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
             ES_Timer_InitTimer(USB_TIMER, MOTOR_I_SAMPLE_MS);
           } else {
             uint16_t left_counts, right_counts;
+            uint16_t left_over, right_over, samples;
             StopMotorCurrentMaxCapture();
             GetMotorCurrentMaxADC(&left_counts, &right_counts);
+            GetMotorCurrentCaptureOverCounts(&left_over, &right_over, &samples);
             DB_printf("Left max: %u counts, %u mA | Right max: %u counts, %u mA\r\n",
                       (unsigned)left_counts, (unsigned)MotorCurrentCountsTomA(left_counts),
                       (unsigned)right_counts, (unsigned)MotorCurrentCountsTomA(right_counts));
+            DB_printf("Over 2.0 A: Left %u/%u samples | Right %u/%u samples\r\n",
+                      (unsigned)left_over, (unsigned)samples,
+                      (unsigned)right_over, (unsigned)samples);
           }
         }
       } else {

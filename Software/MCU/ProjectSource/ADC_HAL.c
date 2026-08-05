@@ -17,17 +17,29 @@
 /* I_mA = counts * Vref / 4095 / Rsense * 1000; Vref=3.3, Rsense=0.25 */
 #define ADC_TO_MA_NUM 13200u  /* 3.3 * 1000 / 0.25 */
 #define ADC_TO_MA_DEN 4095u
+/* Decay control peaks each T1 tick so PWM-off zeros don't clear, but spikes fade */
+#define PEAK_DECAY_NUM 95u
+#define PEAK_DECAY_DEN 100u
+/* Usb 'i' window: count samples above this (matches MotorSM I_FOLDBACK_MA) */
+#define CAPTURE_OVER_MA 2000u
 
 static bool adc_initialized = false;
-static volatile bool conversion_done = false;
+static volatile bool conversion_done = true; /* true = idle, safe to trigger */
 static volatile uint16_t cliff_results[3];   /* AN6, AN37, AN4 */
 static volatile uint16_t motor_right_an29; /* RA1 / right motor ISEN */
 static volatile uint16_t motor_left_an36;  /* RJ9 / left motor ISEN */
 
-/* Peak capture: ISEN is only valid during PWM on-time, so track max over a window */
+/* Always-on peaks for duty foldback (bridge PWM off samples) */
+static volatile uint16_t peak_left_counts = 0;
+static volatile uint16_t peak_right_counts = 0;
+
+/* Usb 'i' windowed max capture */
 static volatile bool capture_active = false;
 static volatile uint16_t max_left_counts = 0;
 static volatile uint16_t max_right_counts = 0;
+static volatile uint16_t over_left_count = 0;   /* samples with I > CAPTURE_OVER_MA */
+static volatile uint16_t over_right_count = 0;
+static volatile uint16_t capture_sample_count = 0; /* completed scans in the window */
 
 void InitADC(void)
 {
@@ -149,11 +161,23 @@ void InitADC(void)
   adc_initialized = true;
 }
 
+/**************************************************************************
+  Function
+     ReadADC
+
+ Description
+     Non-blocking: arm EOS IRQ and kick a scan via GSWTRG. No-ops if a
+     scan is already in progress (T1, Reflect, and Usb may all call this).
+ *************************************************************************/
 void ReadADC(void)
 {
+  /* Skip if a scan is already running */
+  if (!conversion_done) {
+    return;
+  }
   conversion_done = false;
   IEC1SET = _IEC1_ADCIE_MASK;  // Enable local interrupt
-  ADCCON3bits.GSWTRG = 1;  // Trigger a conversion    
+  ADCCON3bits.GSWTRG = 1;  // Trigger a conversion
 }
 
 bool ADC_ConversionReady(void)
@@ -168,6 +192,14 @@ void GetCliffADC(uint16_t out[3])
   out[2] = cliff_results[2];
 }
 
+/**************************************************************************
+  Function
+     GetMotorCurrentADC
+
+ Description
+     Latest single-sample ISEN counts (left=AN36, right=AN29). Often ~0
+     during PWM off; prefer peaks for control.
+ *************************************************************************/
 void GetMotorCurrentADC(uint16_t *left_counts, uint16_t *right_counts)
 {
   if (left_counts) {
@@ -197,10 +229,54 @@ uint32_t MotorCurrentCountsTomA(uint16_t counts)
   return ((uint32_t)counts * ADC_TO_MA_NUM) / ADC_TO_MA_DEN;
 }
 
+/**************************************************************************
+  Function
+     GetMotorCurrentPeakADC
+
+ Description
+     Always-on peak ISEN counts for duty foldback. Updated in the EOS ISR
+     whenever a sample exceeds the held peak (bridges PWM-off zeros).
+ *************************************************************************/
+void GetMotorCurrentPeakADC(uint16_t *left_counts, uint16_t *right_counts)
+{
+  if (left_counts) {
+    *left_counts = peak_left_counts;
+  }
+  if (right_counts) {
+    *right_counts = peak_right_counts;
+  }
+}
+
+/**************************************************************************
+  Function
+     DecayMotorCurrentPeaks
+
+ Description
+     Soft-decay control peaks each motor control tick (~0.9x) so a stall
+     spike does not stick forever, while still spanning PWM-off samples.
+ *************************************************************************/
+void DecayMotorCurrentPeaks(void)
+{
+  peak_left_counts = (uint16_t)(((uint32_t)peak_left_counts * PEAK_DECAY_NUM) / PEAK_DECAY_DEN);
+  peak_right_counts = (uint16_t)(((uint32_t)peak_right_counts * PEAK_DECAY_NUM) / PEAK_DECAY_DEN);
+}
+
+/**************************************************************************
+  Function
+     StartMotorCurrentMaxCapture / Stop / GetMotorCurrentMaxADC /
+     GetMotorCurrentCaptureOverCounts
+
+ Description
+     Usb 'i' bring-up: windowed max over many scans, plus how many samples
+     in that window exceeded 2.0 A (separate from always-on control peaks).
+ *************************************************************************/
 void StartMotorCurrentMaxCapture(void)
 {
   max_left_counts = 0;
   max_right_counts = 0;
+  over_left_count = 0;
+  over_right_count = 0;
+  capture_sample_count = 0;
   capture_active = true;
 }
 
@@ -219,6 +295,20 @@ void GetMotorCurrentMaxADC(uint16_t *left_counts, uint16_t *right_counts)
   }
 }
 
+void GetMotorCurrentCaptureOverCounts(uint16_t *left_over, uint16_t *right_over,
+                                      uint16_t *samples)
+{
+  if (left_over) {
+    *left_over = over_left_count;
+  }
+  if (right_over) {
+    *right_over = over_right_count;
+  }
+  if (samples) {
+    *samples = capture_sample_count;
+  }
+}
+
 void __ISR(_ADC_VECTOR, IPL4SRS) ADCHandler(void)
 {
   uint32_t status = ADCCON2; /* reading ADCCON2 also clears EOSRDY */
@@ -232,12 +322,28 @@ void __ISR(_ADC_VECTOR, IPL4SRS) ADCHandler(void)
     motor_right_an29 = (uint16_t)ADCDATA29;
     motor_left_an36 = (uint16_t)ADCDATA36;
 
+    /* Control peaks: always track max (ISEN valid mainly during PWM on) */
+    if (motor_left_an36 > peak_left_counts) {
+      peak_left_counts = motor_left_an36;
+    }
+    if (motor_right_an29 > peak_right_counts) {
+      peak_right_counts = motor_right_an29;
+    }
+
+    /* Separate windowed max + over-2A tallies for Usb 'i' bring-up */
     if (capture_active) {
+      capture_sample_count++;
       if (motor_left_an36 > max_left_counts) {
         max_left_counts = motor_left_an36;
       }
       if (motor_right_an29 > max_right_counts) {
         max_right_counts = motor_right_an29;
+      }
+      if (MotorCurrentCountsTomA(motor_left_an36) > CAPTURE_OVER_MA) {
+        over_left_count++;
+      }
+      if (MotorCurrentCountsTomA(motor_right_an29) > CAPTURE_OVER_MA) {
+        over_right_count++;
       }
     }
 

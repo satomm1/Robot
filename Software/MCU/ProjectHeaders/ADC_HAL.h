@@ -25,9 +25,16 @@ void GetMotorCurrentADC(uint16_t *left_counts, uint16_t *right_counts);
  * V_ISEN = counts * 3.3 / 4095; I = V_ISEN / 0.25 ohm. */
 uint32_t MotorCurrentCountsTomA(uint16_t counts);
 
+/* Always-on peaks for control (PWM on-time); decay each control tick */
+void GetMotorCurrentPeakADC(uint16_t *left_counts, uint16_t *right_counts);
+void DecayMotorCurrentPeaks(void);
+
 /* Peak capture over a PWM-aware window (updated in EOS ISR while active) */
 void StartMotorCurrentMaxCapture(void);
 void StopMotorCurrentMaxCapture(void);
 void GetMotorCurrentMaxADC(uint16_t *left_counts, uint16_t *right_counts);
+/* Samples in the 'i' window with I > 2.0 A, plus total completed scans */
+void GetMotorCurrentCaptureOverCounts(uint16_t *left_over, uint16_t *right_over,
+                                      uint16_t *samples);
 
 #endif /* ADC_HAL_H */
