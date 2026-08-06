@@ -70,6 +70,15 @@
 #define RPM_SLEW_MAX       (200.0f * T1_CONTROL_DT_S / DUTY_RAMP_TIME_S) /* soft RPM setpoint after reverse */
 #define I_FOLDBACK_MA      2000 /* duty foldback above 2.0 A; stall peaks observed >2.2 A */
 
+// Encoder stall: commanded motion but no wheel speed → cut PWM (complements ISEN foldback) 
+// Detect: all of Desired>min, AppliedDuty>min, Actual<max, dirs match, past grace, for TIME_S 
+#define STALL_RPM_MAX          8.0f   // ActualRPM below this = "not moving" (detect); above = motion recovered
+#define STALL_DESIRED_MIN     20.0f   // DesiredRPM must exceed this to arm detect; drop below to clear latch
+#define STALL_DUTY_MIN         8.0f   // AppliedDuty % must exceed this so we only trip when actually driving
+#define STALL_TIME_S           0.25f  // How long the detect conditions must hold before latching
+#define STALL_GRACE_S          0.15f  // Ignore detect this long after DesiredRPM rises above DESIRED_MIN (takeoff)
+#define STALL_CLEAR_RPM_TICKS  3      // Consecutive ticks with ActualRPM > RPM_MAX before clearing latch
+
 #define BUFF_SIZE 65
 
 #if (PCB_REV <= 2)
@@ -89,6 +98,11 @@ static void SetMotorDirection(bool LeftDir, bool RightDir);
 static float SlewToward(float applied, float target, float max_delta);
 static float SlewDuty(float applied, float target);
 static void WriteMotorDuty(float left_pct, float right_pct, bool left_dir, bool right_dir);
+static bool UpdateStallLatch(bool *latched, float *timer, float *grace, float *prev_des,
+                             bool *dir_at_latch, uint8_t *clear_rpm_ticks,
+                             float desired, float actual, float applied,
+                             bool cmd_dir, bool applied_dir,
+                             bool *rpm_soft_start, float *cmd_rpm);
 
 /*---------------------------- Module Variables ---------------------------*/
 // everybody needs a state variable, you may need others as well.
@@ -947,6 +961,19 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     /* Current-limit foldback latches (clear I windup; soft-start RPM on release) */
     static bool LeftFoldbackActive = false;
     static bool RightFoldbackActive = false;
+    /* Encoder stall latches (cleared on stop, reverse, soft-stop reset, or RPM recovery) */
+    static bool LeftStallLatched = false;
+    static bool RightStallLatched = false;
+    static float LeftStallTimer = 0.0f;
+    static float RightStallTimer = 0.0f;
+    static float LeftStallGrace = 0.0f;
+    static float RightStallGrace = 0.0f;
+    static float LeftStallPrevDes = 0.0f;
+    static float RightStallPrevDes = 0.0f;
+    static bool LeftStallDirAtLatch = 0;
+    static bool RightStallDirAtLatch = 0;
+    static uint8_t LeftStallClearRpmTicks = 0;
+    static uint8_t RightStallClearRpmTicks = 0;
     
     IFS0CLR = _IFS0_T1IF_MASK; // Clear the timer interrupt
     
@@ -982,6 +1009,16 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
             RightRpmSoftStart = false;
             LeftFoldbackActive = false;
             RightFoldbackActive = false;
+            LeftStallLatched = false;
+            RightStallLatched = false;
+            LeftStallTimer = 0.0f;
+            RightStallTimer = 0.0f;
+            LeftStallGrace = 0.0f;
+            RightStallGrace = 0.0f;
+            LeftStallPrevDes = 0.0f;
+            RightStallPrevDes = 0.0f;
+            LeftStallClearRpmTicks = 0;
+            RightStallClearRpmTicks = 0;
             LeftUseCountMode = false;
             RightUseCountMode = false;
             PrevLeftDutyCycle = 0;
@@ -1031,6 +1068,30 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     } else {
         // Calculate Current RPM based on Pulse Lengths from encoders
         ActualRightRPM = CONTROL_ALPHA * SPEED_CONVERSION_FACTOR / (*pRightPulseLength) + (1-CONTROL_ALPHA)*ActualRightRPM;
+    }
+
+    // Encoder stall detect/release (uses prior-tick AppliedDuty); may arm RPM soft-start
+    {
+        bool left_was_stalled = LeftStallLatched;
+        bool right_was_stalled = RightStallLatched;
+
+        LeftStallLatched = UpdateStallLatch(
+            &LeftStallLatched, &LeftStallTimer, &LeftStallGrace, &LeftStallPrevDes,
+            &LeftStallDirAtLatch, &LeftStallClearRpmTicks,
+            DesiredLeftRPM, ActualLeftRPM, AppliedLeftDuty,
+            LeftDirection, AppliedLeftDir, &LeftRpmSoftStart, &LeftCmdRPM);
+        RightStallLatched = UpdateStallLatch(
+            &RightStallLatched, &RightStallTimer, &RightStallGrace, &RightStallPrevDes,
+            &RightStallDirAtLatch, &RightStallClearRpmTicks,
+            DesiredRightRPM, ActualRightRPM, AppliedRightDuty,
+            RightDirection, AppliedRightDir, &RightRpmSoftStart, &RightCmdRPM);
+
+        if (!left_was_stalled && LeftStallLatched) {
+            DB_printf("Left stall: cutting duty\r\n");
+        }
+        if (!right_was_stalled && RightStallLatched) {
+            DB_printf("Right stall: cutting duty\r\n");
+        }
     }
 
     /* Non-blocking ISEN peaks (1-tick lag OK). Used for foldback + anti-windup. */
@@ -1114,14 +1175,14 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
     
 //    DB_printf("%d, %d", (int16_t)LeftError, (int16_t)LeftErrorSum);
     
-    /* Clear I while reversing or current-limited (stall would otherwise wind up → release surge) */
-    if (LeftDirection == AppliedLeftDir && !left_oc) {
+    // Clear I while reversing, current-limited, or encoder-stalled (avoids release surge) 
+    if (LeftDirection == AppliedLeftDir && !left_oc && !LeftStallLatched) {
         LeftErrorSum += LeftError;
     } else {
         LeftErrorSum = 0.0f;
         LeftPrevError = LeftError;
     }
-    if (RightDirection == AppliedRightDir && !right_oc) {
+    if (RightDirection == AppliedRightDir && !right_oc && !RightStallLatched) {
         RightErrorSum += RightError;
     } else {
         RightErrorSum = 0.0f;
@@ -1165,10 +1226,16 @@ void __ISR(_TIMER_1_VECTOR, IPL7SRS) T1Handler(void)
         RightDutyCycle *= (float)I_FOLDBACK_MA / (float)i_r_mA;
     }
 
-    /* Slew applied PWM; if reversing, force target 0 until near stop then flip pins */
+    // Slew applied PWM; stall → target 0; reverse → target 0 until near stop then flip
     {
         float left_target = (LeftDirection == AppliedLeftDir) ? LeftDutyCycle : 0.0f;
         float right_target = (RightDirection == AppliedRightDir) ? RightDutyCycle : 0.0f;
+        if (LeftStallLatched) {
+            left_target = 0.0f;
+        }
+        if (RightStallLatched) {
+            right_target = 0.0f;
+        }
 
         AppliedLeftDuty = SlewDuty(AppliedLeftDuty, left_target);
         AppliedRightDuty = SlewDuty(AppliedRightDuty, right_target);
@@ -1473,4 +1540,82 @@ static void WriteMotorDuty(float left_pct, float right_pct, bool left_dir, bool 
     }
     *pLeftOCRS = (int16_t)((OC_PERIOD + 1) / 100.0f * left_pct);
     *pRightOCRS = (int16_t)((OC_PERIOD + 1) / 100.0f * right_pct);
+}
+
+/*
+ * Per-wheel encoder stall latch.
+ * Detect: commanded + duty applied + no speed for STALL_TIME_S (after grace).
+ * Clear when command drops, direction reverses, or ActualRPM recovers.
+ */
+static bool UpdateStallLatch(bool *latched, float *timer, float *grace, float *prev_des,
+                             bool *dir_at_latch, uint8_t *clear_rpm_ticks,
+                             float desired, float actual, float applied,
+                             bool cmd_dir, bool applied_dir,
+                             bool *rpm_soft_start, float *cmd_rpm)
+{
+    // Command withdrawn (DesiredRPM low) */
+    if (*latched && desired < STALL_DESIRED_MIN) {
+        *latched = false;
+        *timer = 0.0f;
+        *clear_rpm_ticks = 0;
+    }
+
+    // Reverse / commanded direction change while latched
+    if (*latched && (cmd_dir != *dir_at_latch || cmd_dir != applied_dir)) {
+        *latched = false;
+        *timer = 0.0f;
+        *clear_rpm_ticks = 0;
+        *rpm_soft_start = true;
+        *cmd_rpm = actual;
+    }
+
+    // Wheel moved again (e.g. freed externally) 
+    if (*latched) {
+        if (actual > STALL_RPM_MAX) {
+            (*clear_rpm_ticks)++;
+            if (*clear_rpm_ticks >= STALL_CLEAR_RPM_TICKS) {
+                *latched = false;
+                *timer = 0.0f;
+                *clear_rpm_ticks = 0;
+                *rpm_soft_start = true;
+                *cmd_rpm = actual;
+            }
+        } else {
+            *clear_rpm_ticks = 0;
+        }
+    }
+
+    // Startup grace when Desired crosses above min 
+    if (desired > STALL_DESIRED_MIN && *prev_des <= STALL_DESIRED_MIN) {
+        *grace = STALL_GRACE_S;
+    }
+    *prev_des = desired;
+    if (*grace > 0.0f) {
+        *grace -= T1_CONTROL_DT_S;
+        if (*grace < 0.0f) {
+            *grace = 0.0f;
+        }
+    }
+
+    // Accumulate toward latch 
+    if (!*latched) {
+        bool eligible = (desired > STALL_DESIRED_MIN) &&
+                        (applied > STALL_DUTY_MIN) &&
+                        (actual < STALL_RPM_MAX) &&
+                        (cmd_dir == applied_dir) &&
+                        (*grace <= 0.0f);
+        if (eligible) {
+            *timer += T1_CONTROL_DT_S;
+            if (*timer >= STALL_TIME_S) {
+                *latched = true;
+                *dir_at_latch = cmd_dir;
+                *timer = 0.0f;
+                *clear_rpm_ticks = 0;
+            }
+        } else {
+            *timer = 0.0f;
+        }
+    }
+
+    return *latched;
 }
