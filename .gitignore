@@ -70,3 +70,6 @@ Software/MCU/nbproject/private/
 Software/MCU/nbproject/Makefile-local-*.mk
 Software/MCU/nbproject/Makefile-genesis.properties
 Jetson/__pycache__/host_service.cpython-312.pyc
+
+# VS Code
+.vscode/
