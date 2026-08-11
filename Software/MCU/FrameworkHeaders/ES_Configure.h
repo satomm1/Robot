@@ -373,11 +373,20 @@ typedef enum
 #define TIMER1_RESP_FUNC TIMER_UNUSED
 #define TIMER2_RESP_FUNC TIMER_UNUSED
 #define TIMER3_RESP_FUNC ES_PostList00
+#if NUM_SERVICES > 9
 #define TIMER4_RESP_FUNC PostEnvironmentSensorSM
 #define TIMER5_RESP_FUNC PostEnvironmentSensorSM
+#else
+#define TIMER4_RESP_FUNC TIMER_UNUSED
+#define TIMER5_RESP_FUNC TIMER_UNUSED
+#endif 
 #define TIMER6_RESP_FUNC PostMotorSM
 #define TIMER7_RESP_FUNC PostEEPROMSM
+#if NUM_SERVICES > 8
 #define TIMER8_RESP_FUNC PostImuSM
+#else
+#define TIMER8_RESP_FUNC TIMER_UNUSED
+#endif
 #if NUM_SERVICES > 10
 #define TIMER9_RESP_FUNC PostReflectService
 #else
