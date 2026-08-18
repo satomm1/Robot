@@ -22,7 +22,7 @@ We use an 8 GB Nvidia Jetson Orin Nano Developer Kit for high level control of t
     - Navigate to opt/nvidia/jetson-io: `cd /opt/nvidia/jetson-io`
     - Call `sudo python3 jetson-io.py`
         - We need to manullay conifgure the 40 pin header
-        - Select options to activate SPI1 and I2S
+        - Select options to activate SPI1, SPI3, and I2S
     - Reboot the Jetson for the new pin functions to take effect
 
 6) Load the spidev module automatically on start up.
