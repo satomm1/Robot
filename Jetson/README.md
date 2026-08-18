@@ -427,8 +427,10 @@ If everything has gone according to plan, you should now have a docker container
 
 3) Start the container:
     ```
-    sudo docker run -v ~/gemini_api:/gemini_code -v ~/Desktop/audio:/audio -w /gemini_code -it --rm --privileged -p 5000:5000 --name gemini ghcr.io/satomm1/gemini:latest
+    sudo docker run -v ~/gemini_api:/gemini_code -w /gemini_code -it --rm --privileged -p 5000:5000 --name gemini ghcr.io/satomm1/gemini:latest
     ```
+
+    Speech is handled by the display app on the Jetson host (Piper TTS), so this container does not need an audio volume.
 
 4) To run the needed file, run the `start_scripts.sh` script (which just runs `endpoint.py`):
     ```
@@ -454,43 +456,44 @@ Verify: `curl -s http://127.0.0.1:8081/status`
 ----
 ### Setting up the Display
 
+The touch-screen display runs on the Jetson host (outside Docker). It shows messages sent to `localhost:65432` and speaks them with [Piper TTS](https://github.com/rhasspy/piper). There is **no PyInstaller executable** — a user systemd service runs `display_app.py` directly from the cloned repo.
+
+Install the [Jetson host service](#jetson-host-service-gui-startup) first so the toolbar **Start Docker** / **Start Robot** / **Stop Robot** buttons work.
+
 1) Clone the display repository:
     ```
+    cd ~
     git clone https://github.com/satomm1/mattbot_display.git
     cd mattbot_display
     ```
 
-2) Install dependencies:
+2) Install as a user systemd service (recommended). This installs `python3-tk` and `alsa-utils`, downloads Piper TTS into `./piper/`, enables `mattbot-display`, and adds a desktop shortcut:
     ```
-    pip3 install pygame
-    pip3 install -U pyinstaller
+    chmod +x scripts/install.sh
+    sudo ./scripts/install.sh
     ```
+    The service runs the code in this clone. After you edit `display_app.py`, restart from the desktop — no rebuild or copy step.
 
-3) Make the `Desktop/audio` directory:
+3) After a desktop login, the display should start automatically. To start it manually, double-click **Start-Mattbot-Display.sh** on the desktop, or:
     ```
-    mkdir ~/Desktop/audio
+    systemctl --user start mattbot-display
     ```
-    Copy the `default.mp3` file to the `audio` directory:
+    Status and logs:
     ```
-    cp default.mp3 ~/Desktop/audio
+    systemctl --user status mattbot-display
+    journalctl --user -u mattbot-display -n 30
     ```
+    If you see `couldn't connect to display ":0"`, log in to the desktop first, then `systemctl --user restart mattbot-display`. Auto-login is recommended for kiosk use.
 
-4) You can run the display script via:
-
+4) To test without systemd:
     ```
     python3 display_app.py
     ```
-    This will print messages sent to localhost:65432 to the screen. You may need to adjust the line `os.environ['AUDIODEV'] = 'plughw:<card number>,<device number>'` for your specific device/card number for the sound to work. I recommend adjusting the card number between 0 and 2.
+    Messages sent to `localhost:65432` appear on screen and are spoken (status lines like `Listening...` are shown but not spoken). HDMI audio is auto-detected from `aplay -l`. To force a device, set `MATTBOT_ALSA_DEVICE` (e.g. `plughw:2,3`).
 
-5) Create an executable:
-    ```
-    pyinstaller display_app.spec
-    ```
-    This executable will be located at `/dist/display_app`.
+5) Daily use:
+    - **Exit** on the display returns you to the desktop (the service stops and does not auto-restart on a clean exit).
+    - Double-click **Start-Mattbot-Display.sh** to start it again.
+    - On LXDE / PCManFM, if the shortcut opens in a text editor, choose **Execute** / **Run**, or set PCManFM **Edit → Preferences → General → “Don’t ask options on launch executable file”**.
 
-6) Copy the executable to the Desktop:
-    ```
-    cp dist/display_app ~/Desktop
-    ```
-
-7) Now, the executable can be run by double-clicking the icon on the desktop!
+You do **not** need `~/Desktop/audio/` or MP3 files. Full details (env vars, socket protocol, troubleshooting): https://github.com/satomm1/mattbot_display
