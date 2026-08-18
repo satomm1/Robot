@@ -155,8 +155,6 @@ Adjust paths if your interface is not `wlan0` or if no `.bak` files were created
 
 ## Docker Setup
 
-Most setups should use the pre-built **`ml_ros`** image from GitHub Container Registry (GHCR). Building the image from scratch on the Jetson is only needed if you are customizing the container.
-
 1)  Follow system setup (through at least the “Relocating Docker Data Root” step) from https://github.com/dusty-nv/jetson-containers/blob/master/docs/setup.md
     
     If you have NVME storage to add, I found this tutorial helpful for setting up the NVME storage: https://www.digitalocean.com/community/tutorials/how-to-partition-and-format-storage-devices-in-linux
@@ -177,6 +175,8 @@ Most setups should use the pre-built **`ml_ros`** image from GitHub Container Re
 <a name="load-docker-image"></a>
 ### Pull the pre-built `ml_ros` image (recommended)
 
+Most setups should use the pre-built **`ml_ros`** image from GitHub Container Registry (GHCR). Building the image from scratch on the Jetson is only needed if you are customizing the container; see [BUILD_ML_ROS.md](BUILD_ML_ROS.md).
+
 After Docker is installed on the Jetson, pull the published image from GHCR:
 
 ```bash
@@ -193,103 +193,9 @@ No `docker login` is required—the package is public on GHCR.
 
 To refresh an existing Jetson after the image is updated on GHCR, run `docker pull ghcr.io/satomm1/ml_ros:latest` again.
 
-Skip the [manual build](#build-ml_ros-from-scratch) steps below and continue with [Setting Up ROS Workspace](#setting-up-ros-workspace).
+Then continue with [Setting Up ROS Workspace](#setting-up-ros-workspace).
 
 **Offline / no registry access:** on a connected machine, `docker pull ghcr.io/satomm1/ml_ros:latest`, then `docker save ghcr.io/satomm1/ml_ros:latest | gzip > ml_ros.tar.gz`, copy to the Jetson, and `sudo docker load < ml_ros.tar.gz`.
-
-----
-
-<a name="build-ml_ros-from-scratch"></a>
-### Build `ml_ros` from scratch (optional)
-
-The following steps worked for my NVIDIA Jetson Orin Nano when assembling the image locally before it was published to GHCR.
-
-2)	Choose a base container. I like l4t-ml since it contains cuda enabled pytorch, cuda enabled tensorflow2, and cuda enabled opencv. The full list of containers can be found https://github.com/dusty-nv/jetson-containers/tree/master
-
-    Now, run the container, e.g.:
-    ```
-	jetson-containers run $(autotag l4t-ml)
-    ```
-
-3)	Now we can install ROS. For example, for ROS Noetic, follow the instructions here: https://wiki.ros.org/noetic/Installation/Ubuntu
-
-    **IMPORTANT**: Install the **ROS-Base** version. The other version will attempt to modify the opencv, which we cannot do! Thus, install the bare bones version and the selectively install additional packages we may need.
-
-    The following is also useful to put in your `~/.bashrc` file
-    ```
-    source /workspace/catkin_ws/devel/setup.bash
-    export ROS_IP=192.168.xx.xx
-    export ROS_MASTER_URI=http://$ROS_IP:11311
-    export ROBOT_ID=x
-    ```
-
-4)	Install any additional ros packages you need, e.g.
-    ```
-	sudo apt install ros-noetic-PACKAGE
-    ```
-    I installed the following:
-    - tf2-msgs
-    - tf
-    - gmapping
-    - diagnostic-updater
-    
-    For the camera to work, I find it necessary to first run:
-    ```
-    apt-get purge -y '*opencv*'
-    ```
-    Then, follow instructions at https://github.com/satomm1/ros_astra_camera, with the following exception: run these lines outside of the docker container
-    ```
-    ./scripts/create_udev_rules
-    sudo udevadm control --reload && sudo  udevadm trigger
-    ```
- 
-5)	Install other python packages you need.
-
-    **IMPORTANT**: Any package which has an opencv-python dependency must be sure not to modify the opencv-python package already installed from the original container. Updating will break the package!
-
-    Some packages I install include:
-    - spidev
-    - confluent-kafka
-    - rospy-message-converter
-    - pyignite
-    - matplotlib
-    - scipy
-    - ultralytics****be careful with opencv-python here!
-
-6)	Install Cyclone DDS and it’s python binding.
-
-    Follow the directions of https://github.com/eclipse-cyclonedds/cyclonedds to first install cycloneDDS. Be careful! Check what the latest version of the cyclonedds python binding is and match this version!  The install directory should be /path/to/cyclonedds/install. Next:
-    ```
-    export CYCLONEDDS_HOME="$(pwd)/install"
-    ```
-    Even better, put this in the `~/.bashrc` file since we need this anytime we use the python binding. Last, we install the python binding via:
-    ```
-    pip3 install cyclonedds --no-binary cyclonedds
-    ```
-
-7)	Commit the docker container so you can use it later, e.g.:
-	docker commit c3f279d17e0a ml_ros:latest
-
-8)	Now, to run the container, we can use the command:
-    ```
-	jetson-containers run $(autotag ml_ros:latest)
-    ```
-
-    You can include any of the usual docker commands with this. For example, my full command is:
-    ```
-    jetson-containers run -v ~/workspaces/catkin_ws:/workspace/catkin_ws -v ~/gemini_api:/gemini_code -v /dev/bus/usb:/dev/bus/usb -v /dev/video0:/dev/video0 -v /dev/video1:/dev/video1 -i --device=/dev/ttyUSB0 --device=/dev/spidev0.0 --rm --privileged --name ros_noetic $(autotag ml_ros:latest)
-    ```
-    OR
-    ```
-    sudo docker run --runtime nvidia --network=host -v ~/workspaces/catkin_ws:/workspace/catkin_ws -v ~/gemini_api:/gemini_code -v /dev/bus/usb:/dev/bus/usb -v /dev/video0:/dev/video0 -v /dev/video1:/dev/video1 -it --device=/dev/ttyUSB0 --device=/dev/spidev0.0 --rm --privileged --name ros_noetic ml_ros:latest
-    ```
-
-9)	To save the image (for easy loading on a new machine), use the following command:
-    ```
-	docker save myimage:latest | gzip > myimage_latest.tar.gz
-    ```
-
-If everything has gone according to plan, you should now have a docker container which has ROS, cuda enabled pytorch/tensorflow, and everything else you might need!
 
 ----
 <a name="setting-up-ros-workspace"></a>
