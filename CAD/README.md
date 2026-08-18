@@ -43,14 +43,20 @@ A comprehensive parts list is located in `BOM.xlsx` that will be needed for cons
 
 ![Wheel](./images/wheel.jpg)
 
-7) **Install all parts on the first platform layer.** 
+7) **(Optional) Install the treaded wheels.** These 3D printed wheel treads can be slipped over the existing skate wheels to provide extra traction (good for carpet).
+    - Print the tread shell in PLA (or another hard plastic). The STL is located at [`./stl/pla_wheel_shell_81.5_od_2_thickness.stl`](./stl/pla_wheel_shell_81.5_od_2_thickness.stl). This is meant to slip over 80 mm diameter skate wheels. Fit may vary depending on your skate wheel model. It is a friction fit, so it may be tough to slide over the wheels.
+    - Print the wheel treads using TPU (choose your desired TPU hardness; I use 85A). The treads are located at [`./stl/ridge_treads_tpu.stl`](./stl/ridge_treads_tpu.stl). Slide the TPU treads over the shell. I recommend using some glue to attach the TPU treads to the wheel shell.
+
+![Treaded Wheel](./images/wheel_treads.jpg)
+
+8) **Install all parts on the first platform layer.** 
     - Secure the motor, wheel, bearing blocks, shaft, and spider coupler to the first platform layer. Use M3 screws. The ball bearing should be facing the wheel.
     - Secure the two ball casters to the bottom of the first level using (2) M3 screws per caster.
 
 ![Drive Train](./images/drive_train.jpg)
 ![Casters](./images/casters.png)
 
-8) **Install battery holders, Jetson holder, and IMU onto the second level platform.** 
+9) **Install battery holders, Jetson holder, and IMU onto the second level platform.** 
 
     - Use (16) M3 screws to attach the 2 battery holders and Nvidia Jetson Holder onto the top of the second level platform. 
     - Use (3) M3 screws and plastic standoffs to attach the IMU to the bottom of the second level platform. Please see the [IMU README](../Electrical/IMU_Breakout/README.md) for details on soldering and installing the IMU board.
@@ -62,28 +68,28 @@ A comprehensive parts list is located in `BOM.xlsx` that will be needed for cons
 ![Second Level Top](./images/second_level.png)
 ![Second Level Bottom](./images/second_level_bottom.png)
 
-9) **Install standoffs on the first layer.** Install the 3 inch standoffs to the first layer platform. Connect the motors and IMU to the PCB, and secure the second layer to the standoffs.
+10) **Install standoffs on the first layer.** Install the 3 inch standoffs to the first layer platform. Connect the motors and IMU to the PCB, and secure the second layer to the standoffs.
 
 ![First Layer Standoffs](./images/first_layer_standoff.jpg)
 
 ![Fist and Second Layer Connected](./images/first_and_second.png)
 
-10) **Secure 3 Pronged standoffs to each platform.** Connect the 3 pronged standoff to the top of levels 3, 4, and 5. This means you will insert (3) M3 screws through the bottom of the platform. Make sure the prongs are aligned so that when you connect the other side they are lined up with the empty holes!
+11) **Secure 3 Pronged standoffs to each platform.** Connect the 3 pronged standoff to the top of levels 3, 4, and 5. This means you will insert (3) M3 screws through the bottom of the platform. Make sure the prongs are aligned so that when you connect the other side they are lined up with the empty holes!
 
 ![Three Prong Standoffs](./images/three_prong.png)
 
 > [!TIP]
 > At this point, I recommend preparing the Jetson and inserting the Jetson into it's platform. Read more instructions [here](../Electrical/README.md) in the `Electrical` directory.
 
-11) **Add Levels 4, 5, and 6.** Add these levels one by one by connecting to the 3 pronged standoffs. This is the most tedious part of the whole process as you will need to attach three M3 screws per standoff. 
+12) **Add Levels 4, 5, and 6.** Add these levels one by one by connecting to the 3 pronged standoffs. This is the most tedious part of the whole process as you will need to attach three M3 screws per standoff. 
 
 ![Three Prong All Connected](./images/three_prong_all.png)
 
-12) **Connect the 2nd and 3rd level.** Connect the 2nd and 3rd level using the 3D printed 3 inch standoffs and M3 screws. At this point all the levels are connected!
+13) **Connect the 2nd and 3rd level.** Connect the 2nd and 3rd level using the 3D printed 3 inch standoffs and M3 screws. At this point all the levels are connected!
 
 ![All Levels Connected](./images/all_levels.png)
 
-13) **Attach the LiDAR to the platform and to the top level.** Screw the LiDAR sensor into the platform. Then, attach the LiDAR platform to the top level with the 3.5 inch standoffs. 
+14) **Attach the LiDAR to the platform and to the top level.** Screw the LiDAR sensor into the platform. Then, attach the LiDAR platform to the top level with the 3.5 inch standoffs. 
 
 > [!IMPORTANT] 
 > Do not use too long of screws. 
@@ -93,24 +99,24 @@ A comprehensive parts list is located in `BOM.xlsx` that will be needed for cons
 
 ![LiDAR](./images/LiDAR.jpg)
 
-14) **Attach the Astra Camera.** Insert the Astra camera into its mount using an M6 screw. Then, attach the mount to the top level using M3 screws.
+15) **Attach the Astra Camera.** Insert the Astra camera into its mount using an M6 screw. Then, attach the mount to the top level using M3 screws.
 
 ![Astra Camera](./images/astra.jpg)
 
-15) **Attach the touch screen.** Attach the touch screen to its legs. The long legs use a screw (provided with the screen) to attach, while the screen just rests in the short legs. Secure the legs to the top platform using M3 screws.
+16) **Attach the touch screen.** Attach the touch screen to its legs. The long legs use a screw (provided with the screen) to attach, while the screen just rests in the short legs. Secure the legs to the top platform using M3 screws.
 
 ![Touch Screen](./images/touch_screen.jpg)
 
-16) **Attach the USB camera.** Use two M3 screws to attach the camera to the top level. 
+17) **Attach the USB camera.** Use two M3 screws to attach the camera to the top level. 
 
 ![USB Camera](./images/usb_cam.jpg)
 
-17) **Attach the microphones.** 
+18) **Attach the microphones.** 
     - First, the microphones need to be inserted into the housings. To view detailed information on constructing the microphone housing, visit the [microphone README](../Electrical/Microphones/README.md).
     - Second, connect the entire housing to one of the three pronged standoffs using a M3 screw and nut.
 
 ![Microphone](./images/microphone.jpg)
 
-18) **Attach the foam bumpers.** Use the zipties to secure the foam bumpers to each level. You may need to cut small sections out of the foam to accomodate the three pronged standoffs. To connect the ends of the foam together, use some masking tape.
+19) **Attach the foam bumpers.** Use the zipties to secure the foam bumpers to each level. You may need to cut small sections out of the foam to accomodate the three pronged standoffs. To connect the ends of the foam together, use some masking tape.
 
 ![Foam Bumper](./images/bumper.jpg)
