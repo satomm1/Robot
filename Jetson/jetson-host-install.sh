@@ -222,27 +222,54 @@ def _poweroff_summary():
     }
 
 
+# LLM_PROVIDER value -> env var that must hold that provider's API key.
+LLM_PROVIDER_KEYS = {
+    "gemini": "GEMINI_API_KEY",
+    "openai": "OPENAI_API_KEY",
+}
+DEFAULT_LLM_PROVIDER = "gemini"
+
+
+def _read_env_file(path):
+    """Parse KEY=VALUE lines the same way docker --env-file does (no inline comments)."""
+    env = {}
+    with open(path, encoding="utf-8") as fh:
+        for line in fh:
+            stripped = line.strip()
+            if not stripped or stripped.startswith("#") or "=" not in stripped:
+                continue
+            key, value = stripped.split("=", 1)
+            env[key.strip()] = value.strip()
+    return env
+
+
 def _gemini_env_ready():
-    """Gemini is started detached; API_KEY must come from an env file, not host .bashrc."""
+    """LLM container is started detached; keys must come from an env file, not host .bashrc."""
     if not os.path.isfile(GEMINI_ENV_FILE):
         return (
             False,
             f"Gemini env file not found: {GEMINI_ENV_FILE}. "
-            "Create it with a line like API_KEY=your-key",
+            "Copy .env.example to .env and fill in LLM_PROVIDER and its API key.",
         )
     try:
-        with open(GEMINI_ENV_FILE, encoding="utf-8") as fh:
-            for line in fh:
-                stripped = line.strip()
-                if not stripped or stripped.startswith("#"):
-                    continue
-                if stripped.startswith("export "):
-                    stripped = stripped[len("export ") :]
-                if stripped.startswith("API_KEY=") and stripped != "API_KEY=":
-                    return True, ""
+        env = _read_env_file(GEMINI_ENV_FILE)
     except OSError as exc:
         return False, f"Cannot read {GEMINI_ENV_FILE}: {exc}"
-    return False, f"{GEMINI_ENV_FILE} must contain a non-empty API_KEY= line."
+
+    provider = (env.get("LLM_PROVIDER") or DEFAULT_LLM_PROVIDER).lower()
+    key_name = LLM_PROVIDER_KEYS.get(provider)
+    if key_name is None:
+        return (
+            False,
+            f"{GEMINI_ENV_FILE}: unsupported LLM_PROVIDER={provider!r} "
+            f"(expected one of: {', '.join(LLM_PROVIDER_KEYS)}).",
+        )
+    if not env.get(key_name):
+        return (
+            False,
+            f"{GEMINI_ENV_FILE}: LLM_PROVIDER={provider} requires a non-empty {key_name}= line.",
+        )
+    return True, ""
 
 
 def _start_container(name, run_cmd):
