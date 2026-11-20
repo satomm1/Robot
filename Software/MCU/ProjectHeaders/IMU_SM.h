@@ -16,26 +16,20 @@
 // State definitions for use with the query function
 typedef enum
 {
-  InitPState_IMU, IMUReset, IMUWait, IMURun, IMURecovering, IMUInitFailed
+  InitPState_IMU,
+  IMUInit,      /* non-blocking init sequence (reset, verify, configure) */
+  IMURun,       /* sampling; data valid */
+  IMUBackoff    /* init failed repeatedly; waiting to retry (never terminal) */
 }ImuState_t;
 
+/* One validated raw sample (see ImuGetSample) */
 typedef struct
 {
-    uint8_t LowerByte;
-    uint8_t UpperByte;
-} DataByBytes_t;
-
-typedef union
-{
-    DataByBytes_t DataStruct;
-    uint16_t FullData;
-} AccelGyroData_t;
-
-typedef union
-{
-    DataByBytes_t DataStruct;
-    uint16_t FullData;
-} ReceivedData_t;
+    uint32_t seq;    /* increments per published sample (never 0 when valid) */
+    uint32_t t;      /* CP0 core timer count when the sample was received */
+    int16_t acc[3];  /* raw accel X/Y/Z, 8192 LSB/g (+/-4 g) */
+    int16_t gyr[3];  /* raw gyro X/Y/Z, 131.2 LSB/(deg/s) (+/-250 dps) */
+} ImuSample_t;
 
 // Public Function Prototypes
 
@@ -43,12 +37,15 @@ bool InitImuSM(uint8_t Priority);
 bool PostImuSM(ES_Event_t ThisEvent);
 ES_Event_t RunImuSM(ES_Event_t ThisEvent);
 ImuState_t QueryImuSM(void);
-void GetIMUData(float *ImuResults);
+
+/* Data access: safe from any context, including higher-priority ISRs.
+ * Each returns false when the IMU is not running or the data is stale
+ * (older than 100 ms). */
+bool ImuGetSample(ImuSample_t *out);
+bool GetIMUData(float *ImuResults);          /* m/s^2 x3, deg/s x3; zeros if false */
+bool GetAngles(float* roll, float* pitch);   /* deg; zeros if false */
+bool GetRobotYawRate(float *rad_per_s);      /* unchanged if false */
 void WriteImuToSPI(uint8_t *Message2Send);
-uint8_t ReadIMU8(uint8_t Address);
-uint16_t ReadIMU16(uint8_t Address);
-void GetAngles(float* roll, float* pitch);
-bool GetRobotYawRate(float *rad_per_s);
 void ImuPrintDiagnostics(void);
 
 /* Set to 0 to compile out IMU fault-injection test hooks */

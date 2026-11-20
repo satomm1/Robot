@@ -189,7 +189,10 @@
 // the name of the run function
 #define SERV_8_RUN RunImuSM
 // How big should this services Queue be?
-#define SERV_8_QUEUE_SIZE 3
+// IMU worst case: DATA_UPDATE + RECOVERY (each coalesced to 1) plus a stale
+// and a current XFER_DONE and ES_TIMEOUT. ES_Timers drops a timeout that
+// cannot be posted, which would stall the IMU in a wait state, so keep headroom.
+#define SERV_8_QUEUE_SIZE 8
 #endif
 
 /****************************************************************************/
@@ -315,6 +318,7 @@ typedef enum
   EV_UPDATE_MOTOR_SPEED,
   EV_IMU_DATA_UPDATE,
   EV_IMU_RECOVERY,
+  EV_IMU_XFER_DONE,     /* IMU SPI init transfer complete; param = transfer id */
   EV_LED_ON,
   EV_LED_OFF,
   EV_EEPROM_RX_COMPLETE,
