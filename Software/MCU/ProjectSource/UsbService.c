@@ -344,6 +344,26 @@ ES_Event_t RunUsbService(ES_Event_t ThisEvent)
         DB_printf("Roll, Pitch = %d, %d\r\n", (int16_t)roll, (int16_t)pitch);
       }
       
+      /* IMU diagnostics */
+      if ('j' == ThisEvent.EventParam)
+      {
+        ImuPrintDiagnostics();
+      }
+#if IMU_TEST_HOOKS
+      if ('k' == ThisEvent.EventParam)
+      {
+        ImuTestInjectBadFrames(5);   /* below limit: should be absorbed */
+      }
+      if ('l' == ThisEvent.EventParam)
+      {
+        ImuTestInjectBadFrames(15);  /* above limit: should recover once */
+      }
+      if ('r' == ThisEvent.EventParam)
+      {
+        ImuTestInjectSoftReset();    /* simulate chip brownout/reset */
+      }
+#endif
+
       if ('z' == ThisEvent.EventParam)
       {
         float x_val, y_val, theta_val;

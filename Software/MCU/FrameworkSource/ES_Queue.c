@@ -85,23 +85,25 @@ uint8_t ES_InitQueue(ES_Event_t *pBlock, uint8_t BlockSize)
 bool ES_EnQueueFIFO(ES_Event_t *pBlock, ES_Event_t Event2Add)
 {
   pQueue_t pThisQueue;
+  bool     Added = false;
   pThisQueue = (pQueue_t)pBlock;
+
+  // The space check must be inside the critical region together with the
+  // insert: otherwise two posters (e.g. an ISR preempting main-line code)
+  // can both pass the check on the last free slot and overrun the queue.
+  EnterCritical();  // save interrupt state, turn ints off
   // index will go from 0 to QueueSize-1 so use '<' to test if there is space
   if (pThisQueue->NumEntries < pThisQueue->QueueSize) // save the new event, use % to create circular buffer in block
-  {   
-    EnterCritical();  // save interrupt state, turn ints off
-// 1+ to step past the Queue struct at the beginning of the block
-	pBlock[1 + ((pThisQueue->CurrentIndex + pThisQueue->NumEntries)
+  {
+    // 1+ to step past the Queue struct at the beginning of the block
+    pBlock[1 + ((pThisQueue->CurrentIndex + pThisQueue->NumEntries)
           % pThisQueue->QueueSize)] = Event2Add;
     pThisQueue->NumEntries++; // inc number of entries
-    ExitCritical();    // restore saved interrupt state
+    Added = true;
+  }
+  ExitCritical();    // restore saved interrupt state
 
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  return Added;
 }
 
 /****************************************************************************
@@ -124,13 +126,14 @@ bool ES_EnQueueFIFO(ES_Event_t *pBlock, ES_Event_t Event2Add)
 bool ES_EnQueueLIFO(ES_Event_t *pBlock, ES_Event_t Event2Add)
 {
   pQueue_t pThisQueue;
+  bool     Added = false;
   pThisQueue = (pQueue_t)pBlock;
+
+  // Space check and insert are one critical region (see ES_EnQueueFIFO)
+  EnterCritical();  // save interrupt state, turn ints off
   // index will go from 0 to QueueSize-1 so use '<' to test if there is space
   if (pThisQueue->NumEntries < pThisQueue->QueueSize)
   {
-#ifdef POST_FROM_INTS
-    EnterCritical();  // save interrupt state, turn ints off
-#endif
     // OK, there is space note that the queue now has 1 more entry
     pThisQueue->NumEntries++;
     // Check to see if we need to wrap around as we back up index
@@ -143,15 +146,11 @@ bool ES_EnQueueLIFO(ES_Event_t *pBlock, ES_Event_t Event2Add)
       pThisQueue->CurrentIndex--;
     }
     pBlock[1 + pThisQueue->CurrentIndex] = Event2Add;
-#ifdef POST_FROM_INTS
-    ExitCritical();    // restore saved interrupt state
-#endif
-    return true;
+    Added = true;
   }
-  else    // in case no room on the queue
-  {
-    return false;
-  }
+  ExitCritical();    // restore saved interrupt state
+
+  return Added;
 }
 
 /****************************************************************************
@@ -176,11 +175,12 @@ uint8_t ES_DeQueue(ES_Event_t *pBlock, ES_Event_t *pReturnEvent)
   uint8_t   NumLeft;
 
   pThisQueue = (pQueue_t)pBlock;
+
+  // Empty check and removal are one critical region so the result is
+  // consistent with any concurrent post from an ISR.
+  EnterCritical();  // save interrupt state, turn ints off
   if (pThisQueue->NumEntries > 0)
   {
-#ifdef POST_FROM_INTS
-    EnterCritical();  // save interrupt state, turn ints off
-#endif
     *pReturnEvent = pBlock[1 + pThisQueue->CurrentIndex];
     // inc the index
     pThisQueue->CurrentIndex++;
@@ -191,10 +191,6 @@ uint8_t ES_DeQueue(ES_Event_t *pBlock, ES_Event_t *pReturnEvent)
     }
     //dec number of elements since we took 1 out
     NumLeft = --pThisQueue->NumEntries;
-#ifdef POST_FROM_INTS
-    ExitCritical();    // restore saved interrupt state
-#endif
-
   }
   else     // no items left in the queue
   {
@@ -202,6 +198,8 @@ uint8_t ES_DeQueue(ES_Event_t *pBlock, ES_Event_t *pReturnEvent)
     (*pReturnEvent).EventParam  = 0;
     NumLeft                     = 0;
   }
+  ExitCritical();    // restore saved interrupt state
+
   return NumLeft;
 }
 

@@ -32,16 +32,14 @@
 #define OC_PERIOD 200  // 312   // Output compare period (312 ~ 10 kHz, 200==15.625 kHz)
 #define NO_SPEED_PERIOD 65535 // Period to indicate motor not spinning
 #define DEAD_RECKONING_PERIOD 15624 // Chosen so that we update at 25 Hz rate (50 mHZ / 256 prescaler / 15624 * 2 = 25 Hz)
-#define V_PIVOT_THRESH 0.05f // |V_desired| below this with |w_desired| above W_PIVOT_THRESH => pivot gains
-#define W_PIVOT_THRESH 0.05f // |w_desired| above this with low V => pivot gains
+#define PIVOT_TRANSLATION_RATIO 0.2f // Odometry drops translation when wheels oppose and |dL+dR| < this * |dR-dL| (turn radius < 0.1*WHEEL_BASE)
 #define Kp 0.2f // Proportional constant for PID law
 #define Ki 0.01f // Integral constant for PID law
 #define Kd 0.0f // Derivative constant for PID law
 #define CONTROL_PERIOD 30000 // Control update period --- (1000 == 6250*2 Hz, 12500 == 500*2 Hz 30000 == 208*2 Hz)
 
-#define PULSE_LENGTH_ALPHA 0.3f // Exponential Moving average for Pulse Length
-#define CONTROL_ALPHA 0.3f // Exponential Moving Average for PID Velocity
-#define ODOMETRY_ALPHA 0.3f // Exponential Moving Average for Odometry Velocity
+#define CONTROL_ALPHA 0.3f // EMA for PID velocity (the only filter on measured wheel speed)
+#define ODOMETRY_ALPHA 0.3f // EMA for *reported* odometry velocity only (pose integrates raw counts)
 
 #if (MOTOR_TYPE==1)
 #define ENCODER_RESOLUTION (2*374) // Number of pulses per revolution
@@ -49,10 +47,17 @@
 #define ENCODER_RESOLUTION (1440 / 2) // 720: one ISR per 2 rising edges (ICI=0b01)
 #endif
 
+// Fresh edges needed after a no-speed timeout before an interval is valid
+#if (MOTOR_TYPE==1)
+#define PULSE_EDGES_NEEDED 2 // Two-edge span needs two prior edges
+#else
+#define PULSE_EDGES_NEEDED 1
+#endif
+
 #define SPEED_CONVERSION_FACTOR ((1.25e7*60.0f)/((float)ENCODER_RESOLUTION)) // 1.25e7 = 6.25MHz T3 speed *2
 
 #define DEAD_RECKONING_TIME (256.0f  * DEAD_RECKONING_PERIOD / 2.0f / 50000000.0f) // Time between dead reckoning updates in seconds (depends on DEAD_RECKONING_PERIOD)
-#define DEAD_RECKONING_RATIO (2.0f * (float)M_PI / ENCODER_RESOLUTION / DEAD_RECKONING_TIME * WHEEL_RADIUS) // This number times change in encoder clicks is linear velocity in m/second
+#define METERS_PER_COUNT (2.0f * (float)M_PI * (float)WHEEL_RADIUS / (float)ENCODER_RESOLUTION) // Wheel arc length per encoder count (m)
 #define CONTROL_TIME (8.0f * CONTROL_PERIOD / 2.0f / 50000000.0f)
 #define CONTROL_RATIO (60.0f / ENCODER_RESOLUTION / CONTROL_TIME) // This number times change in encoder clicks is rpm
 #define HYBRID_COUNT_ENTER_DELTA 4 // Switch to count-based RPM when |delta| > 3
@@ -91,9 +96,12 @@
    relevant to the behavior of this state machine
 */
 static void Store_RL_Data(void);
-static bool IsPivotControlMode(void);
 static int8_t EncoderDeltaFromEdge(uint8_t RisingEdge, uint8_t ChannelB);
 static uint16_t ReadSecondCapture(volatile uint32_t *icbuf);
+static uint32_t MeasurePulseLength(uint32_t now, volatile uint32_t *prev,
+                                   volatile uint32_t *prev_prev,
+                                   volatile uint8_t *edges_since_stop,
+                                   uint32_t current_len);
 static void SetMotorDirection(bool LeftDir, bool RightDir);
 static float SlewToward(float applied, float target, float max_delta);
 static float SlewDuty(float applied, float target);
@@ -117,6 +125,10 @@ static volatile uint32_t IC1PulseLength = 4294967295;
 static volatile uint32_t IC3PulseLength = 4294967295;
 static volatile uint32_t IC1PrevTime = 0;
 static volatile uint32_t IC3PrevTime = 0;
+static volatile uint32_t IC1PrevPrevTime = 0;
+static volatile uint32_t IC3PrevPrevTime = 0;
+static volatile uint8_t IC1EdgesSinceStop = 0; // Edges since last no-speed timeout
+static volatile uint8_t IC3EdgesSinceStop = 0;
 
 // Used for dead reckoning to determine current position
 static volatile int32_t * pLeftRotations;
@@ -773,6 +785,12 @@ void ResetPosition(void) {
 }
 
 void SetPosition(float x_set, float y_set, float theta_set) {
+    // Normalize to [-pi, pi] so the T7 single-step wrap stays valid for any input
+    if (isfinite(theta_set)) {
+        theta_set = remainderf(theta_set, 2.0f * (float)M_PI);
+    } else {
+        theta_set = 0.0f;
+    }
     x = x_set;
     y = y_set;
     theta = theta_set;
@@ -792,11 +810,6 @@ void PrintBufferSize(void) {
 /***************************************************************************
  private functions
  ***************************************************************************/
-
-static bool IsPivotControlMode(void)
-{
-    return (fabsf(V_desired) < V_PIVOT_THRESH) && (fabsf(w_desired) > W_PIVOT_THRESH);
-}
 
 /* ICM sync: first falling edge, then alternating fall/rise. A high => rising edge. */
 static int8_t EncoderDeltaFromEdge(uint8_t RisingEdge, uint8_t ChannelB)
@@ -818,6 +831,39 @@ static int8_t EncoderDeltaFromEdge(uint8_t RisingEdge, uint8_t ChannelB)
     }
 
     return Delta;
+}
+
+/*
+ * Raw (unfiltered) encoder time per count, in T3 ticks.
+ * MOTOR_TYPE 1 captures every A edge: span two edges (rise->rise or
+ * fall->fall) and halve, so A-channel duty-cycle asymmetry cancels instead of
+ * alternating the reading. MOTOR_TYPE 2 captures are already same-polarity.
+ * Intervals that reach back before the last no-speed timeout (T4/T5) are
+ * meaningless, so the stopped value is held until enough fresh edges arrive.
+ */
+static uint32_t MeasurePulseLength(uint32_t now, volatile uint32_t *prev,
+                                   volatile uint32_t *prev_prev,
+                                   volatile uint8_t *edges_since_stop,
+                                   uint32_t current_len)
+{
+    uint32_t len = current_len;
+
+    if (*edges_since_stop >= PULSE_EDGES_NEEDED) {
+#if (MOTOR_TYPE==1)
+        len = (now - *prev_prev) >> 1;
+#else // MOTOR_TYPE==2
+        len = now - *prev;
+#endif
+        if (len == 0u) {
+            len = 1u; // Never hand T1 a divide-by-zero
+        }
+    } else {
+        (*edges_since_stop)++;
+    }
+
+    *prev_prev = *prev;
+    *prev = now;
+    return len;
 }
 
 /* ICI=0b01 requires two FIFO reads per interrupt; discard the first. */
@@ -852,11 +898,10 @@ void __ISR(_INPUT_CAPTURE_1_VECTOR, IPL7SRS) IC1Handler(void)
         IFS0CLR = _IFS0_T3IF_MASK; // clear the rollover interrupt   
     }                                                     
     
-    // Calculate the time length between encoder pulses
-    uint32_t CurrentPulseLength = MyTimer.FullTime - IC1PrevTime; 
-    IC1PulseLength = (uint32_t)(PULSE_LENGTH_ALPHA*CurrentPulseLength + (1-PULSE_LENGTH_ALPHA)*IC1PulseLength);
-    IC1PrevTime = MyTimer.FullTime; // update our last time variable 
-    
+    // Raw time per count (T1's EMA is the only speed filter)
+    IC1PulseLength = MeasurePulseLength(MyTimer.FullTime, &IC1PrevTime, &IC1PrevPrevTime,
+                                        &IC1EdgesSinceStop, IC1PulseLength);
+
     // Update number of rotations for dead reckoning
 #if (MOTOR_TYPE==1)
     Delta = EncoderDeltaFromEdge(RisingEdge, ChannelB);
@@ -894,11 +939,10 @@ void __ISR(_INPUT_CAPTURE_3_VECTOR, IPL7SRS) IC3Handler(void)
         IFS0CLR = _IFS0_T3IF_MASK; // clear the rollover interrupt   
     }                                                     
     
-    // Calculate the time length between encoder pulses
-    uint32_t CurrentPulseLength = MyTimer.FullTime - IC3PrevTime;    
-    IC3PulseLength = (uint32_t)(PULSE_LENGTH_ALPHA*CurrentPulseLength + (1-PULSE_LENGTH_ALPHA)*IC3PulseLength);         
-    IC3PrevTime = MyTimer.FullTime; // update our last time variable 
-    
+    // Raw time per count (T1's EMA is the only speed filter)
+    IC3PulseLength = MeasurePulseLength(MyTimer.FullTime, &IC3PrevTime, &IC3PrevPrevTime,
+                                        &IC3EdgesSinceStop, IC3PulseLength);
+
     // Update number of rotations for dead reckoning
 #if (MOTOR_TYPE==1)
     Delta = EncoderDeltaFromEdge(RisingEdge, (uint8_t)(ChannelB ^ 1u));
@@ -1321,7 +1365,8 @@ void __ISR(_TIMER_4_VECTOR, IPL6SRS) T4Handler(void)
 {
     IFS0CLR = _IFS0_T4IF_MASK; // clear the interrupt flag     
     T4CONCLR = _T4CON_ON_MASK; // stop the timer 
-    IC3PulseLength = 4294967295; // set LeftPulseLength to max    
+    IC3EdgesSinceStop = 0;       // next intervals would span the stop
+    IC3PulseLength = 4294967295; // set LeftPulseLength to max
 }
 
 /****************************************************************************
@@ -1335,25 +1380,26 @@ void __ISR(_TIMER_5_VECTOR, IPL6SRS) T5Handler(void)
 {
     IFS0CLR = _IFS0_T5IF_MASK; // clear the interrupt flag     
     T5CONCLR = _T5CON_ON_MASK; // stop the timer 
-    IC1PulseLength = 4294967295; // set RightPulseLength to max    
+    IC1EdgesSinceStop = 0;       // next intervals would span the stop
+    IC1PulseLength = 4294967295; // set RightPulseLength to max
 }
 
-// Using an exact method to solve the differential equations
+/****************************************************************************
+ Function
+    T7Handler
+
+ Description
+   Dead reckoning. The pose is integrated from the raw encoder count deltas
+   (exact; no filter in the integration path), assuming each update interval
+   is a constant-curvature arc. The EMA is applied only to the velocity
+   reported in V_current / w_current.
+****************************************************************************/
 void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
 {
-    static float V_l; // Left wheel linear velocity (m/s)
-    static float V_r; // Right wheel linear velocity (m/s)
-    static float V_l_prev = 0.0; // Previous left wheel linear velocity
-    static float V_r_prev = 0.0; // Previous right wheel linear velocity
-    static float V;   // Robot linear velocity (m/s)
-    static float omega; // Robot angular velocity (rad/second)
-    static float prev_theta;
-    static float effective_V;
-    
-    static int32_t CurLeftRotations;
-    static int32_t CurRightRotations;
-    
-    IFS1CLR = _IFS1_T7IF_MASK; // clear the interrupt flag 
+    static float V_filt = 0.0f;     // Reported linear velocity (m/s), EMA
+    static float omega_filt = 0.0f; // Reported angular velocity (rad/s), EMA
+
+    IFS1CLR = _IFS1_T7IF_MASK; // clear the interrupt flag
 
     // TEMP: car pitch correction disabled
 //    static float roll;
@@ -1367,82 +1413,55 @@ void __ISR(_TIMER_7_VECTOR, IPL6SRS) T7Handler(void)
 //        }
 //    }
         
-    // First thing we do is grab current number of rotations so this doesn't change mid function
-    CurLeftRotations = *pLeftRotations;
-    CurRightRotations = *pRightRotations;
-    
-    // Next we calculate the linear velocity of each wheel
-    V_l = (CurLeftRotations - LeftPrevRotations) * DEAD_RECKONING_RATIO; 
-    V_r = (CurRightRotations - RightPrevRotations) * DEAD_RECKONING_RATIO;
-    
-    // Perform exponential moving average on the wheel velocities
-    V_l = ODOMETRY_ALPHA * V_l + (1-ODOMETRY_ALPHA) * V_l_prev;
-    V_r = ODOMETRY_ALPHA * V_r + (1-ODOMETRY_ALPHA) * V_r_prev;
-    
-    // Store wheel velocities for next odometry update
-    V_l_prev = V_l;
-    V_r_prev = V_r;
-        
-    // Store the current number of rotations for next time
+    // Snapshot the counts once so they can't change mid-function
+    int32_t CurLeftRotations = *pLeftRotations;
+    int32_t CurRightRotations = *pRightRotations;
+
+    // Wheel arc lengths this interval (m), straight from the counts
+    float dL = (float)(CurLeftRotations - LeftPrevRotations) * METERS_PER_COUNT;
+    float dR = (float)(CurRightRotations - RightPrevRotations) * METERS_PER_COUNT;
     LeftPrevRotations = CurLeftRotations;
     RightPrevRotations = CurRightRotations;
-    
-    // Calculate the instantaneous linear/angular velocity of robot
-    V = (V_l + V_r) * 0.5f;
-    omega = (V_r - V_l) / WHEEL_BASE;
 
-    // // Get angular velocity from encoders or imu depending on IMU status and control mode
-    // float omega_enc = (V_r - V_l) / WHEEL_BASE;
-    // omega = omega_enc;
-    // if (IsPivotControlMode()) {
-    //     float omega_gyro;
-    //     if (GetRobotYawRate(&omega_gyro)) {
-    //         omega = omega_gyro;
-    //     }
-    // }
-        
-    w_current = omega; // used to store current angular velocity
-    
-    // Calculate the update in theta and ensure theta stays within [-pi, pi]
-    prev_theta = theta;
-    theta = theta + omega * DEAD_RECKONING_TIME;
-    theta = fmod(theta + M_PI, 2*M_PI) - M_PI;
-    
-    if (IsPivotControlMode()) {
-        // Spin-in-place: update heading only; wheel slip often adds false V
-        V_current = 0.0f;
-        return;
+    float ds = 0.5f * (dL + dR);        // Distance travelled by robot center
+    float dth = (dR - dL) / WHEEL_BASE; // Heading change
+
+    // // Gyro heading (disabled until IMU yaw rate is reliable): replace dth
+    // // with the integrated gyro yaw over this interval when available.
+
+    // Pivot detection from *measured* wheel motion: wheels turning opposite
+    // ways and the turn radius tiny (< PIVOT_TRANSLATION_RATIO * WHEEL_BASE/2).
+    // Translation here is dominated by asymmetric slip, so drop it.
+    if ((dL * dR < 0.0f) && (fabsf(dL + dR) < PIVOT_TRANSLATION_RATIO * fabsf(dR - dL))) {
+        ds = 0.0f;
     }
-    V_current = V;
-    
-    // TEMP: car pitch correction disabled
-//    if (CAR) {
-//        pitch *= 0.0174533f; // Convert pitch to radians
-//        effective_V = V * cosf(pitch); // Get effective velocity for pitch
-//        if (!isfinite(effective_V)) {
-//            effective_V = V;
-//        }
-//    } else {
-        effective_V = V;
-//    }
-    
-    if (omega < 0.01 && omega > -0.01) {
-        // No account for pitch
-//        x = x + V * cosf(prev_theta) * DEAD_RECKONING_TIME;
-//        y = y + V * sinf(prev_theta) * DEAD_RECKONING_TIME;
-        
-        // Account for pitch
-        x = x + effective_V * cosf(prev_theta) * DEAD_RECKONING_TIME;
-        y = y + effective_V * sinf(prev_theta) * DEAD_RECKONING_TIME;
-    } else {
-        // No account for pitch
-//        x = x + V/omega * (sinf(theta) - sinf(prev_theta));
-//        y = y - V/omega * (cosf(theta) - cosf(prev_theta));
-        
-        // Account for pitch
-        x = x + effective_V/omega * (sinf(theta) - sinf(prev_theta));
-        y = y - effective_V/omega * (cosf(theta) - cosf(prev_theta));
+
+    // TEMP: car pitch correction disabled. If re-enabled, scale ds by
+    // cosf(pitch) here (pitch from GetAngles(), in radians).
+
+    // Exact constant-curvature arc update: chord length ds*sin(h)/h along the
+    // midpoint heading theta + h. Taylor series for small h avoids 0/0.
+    float h = 0.5f * dth;
+    float k = (fabsf(h) < 1e-3f) ? (1.0f - h * h * (1.0f / 6.0f)) : (sinf(h) / h);
+    float th_mid = theta + h;
+    x = x + ds * k * cosf(th_mid);
+    y = y + ds * k * sinf(th_mid);
+
+    // Wrap to [-pi, pi]. (fmod keeps the dividend's sign, so the old
+    // fmod(theta + pi, 2pi) - pi form failed to wrap below -pi.) A single
+    // add/subtract suffices since |dth| per update is << 2pi.
+    theta = theta + dth;
+    if (theta > (float)M_PI) {
+        theta -= 2.0f * (float)M_PI;
+    } else if (theta < -(float)M_PI) {
+        theta += 2.0f * (float)M_PI;
     }
+
+    // Reported velocities: smoothed only here, never fed back into the pose
+    V_filt = ODOMETRY_ALPHA * (ds / DEAD_RECKONING_TIME) + (1.0f - ODOMETRY_ALPHA) * V_filt;
+    omega_filt = ODOMETRY_ALPHA * (dth / DEAD_RECKONING_TIME) + (1.0f - ODOMETRY_ALPHA) * omega_filt;
+    V_current = V_filt;
+    w_current = omega_filt;
 }
 
 static void Store_RL_Data(void) {

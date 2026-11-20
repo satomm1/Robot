@@ -233,9 +233,12 @@ static ES_QueueDesc_t const EventQueues[NUM_SERVICES] = {
 };
 
 /****************************************************************************/
-// Variable used to keep track of which queues have events in them
+// Variable used to keep track of which queues have events in them.
+// Modified from both main-line code and ISRs (posts from interrupts), so it
+// is volatile and every read-modify-write of it happens inside a critical
+// region together with the queue operation it reflects.
 
-uint16_t Ready;
+volatile uint16_t Ready;
 
 /*------------------------------ Module Code ------------------------------*/
 /****************************************************************************
@@ -310,9 +313,19 @@ ES_Return_t ES_Run(void)
     while ((_HW_Process_Pending_Ints()) && (Ready != 0))
     {
       HighestPrior = ES_GetMSBitSet(Ready);
-      if (ES_DeQueue(EventQueues[HighestPrior].pMem, &ThisEvent) == 0)
       {
-        Ready &= BitNum2ClrMask[HighestPrior]; // mark queue as now empty
+        // Dequeue and clearing the Ready bit must be atomic. Otherwise an
+        // ISR can post to this queue after the dequeue reports it empty but
+        // before the bit is cleared; the bit is then cleared with an event
+        // still queued, and that event is stranded until the next post.
+        // (The &= is itself a read-modify-write that could drop another
+        // service's bit set by an ISR in between.)
+        EnterCritical();
+        if (ES_DeQueue(EventQueues[HighestPrior].pMem, &ThisEvent) == 0)
+        {
+          Ready &= BitNum2ClrMask[HighestPrior]; // mark queue as now empty
+        }
+        ExitCritical();
       }
 #ifdef _INCLUDE_BASIC_FRAMEWORK_DEBUG_
       _HW_DebugSetLine1();
@@ -364,13 +377,18 @@ bool ES_PostAll(ES_Event_t ThisEvent)
   // loop through the list executing the post functions
   for (i = 0; i < ARRAY_SIZE(EventQueues); i++)
   {
-    if (ES_EnQueueFIFO(EventQueues[i].pMem, ThisEvent) != true)
-    {
-      break; // this is a failed post
-    }
-    else
+    bool Posted;
+    // enqueue + Ready update as one critical region (see ES_PostToService)
+    EnterCritical();
+    Posted = ES_EnQueueFIFO(EventQueues[i].pMem, ThisEvent);
+    if (Posted)
     {
       Ready |= BitNum2SetMask[i]; // show queue as non-empty
+    }
+    ExitCritical();
+    if (!Posted)
+    {
+      break; // this is a failed post
     }
   }
   if (i == ARRAY_SIZE(EventQueues))    // if no failures
@@ -400,17 +418,23 @@ bool ES_PostAll(ES_Event_t ThisEvent)
 ****************************************************************************/
 bool ES_PostToService(uint8_t WhichService, ES_Event_t TheEvent)
 {
-  if ((WhichService < ARRAY_SIZE(EventQueues)) &&
-      (ES_EnQueueFIFO(EventQueues[WhichService].pMem, TheEvent) ==
-        true))
+  bool Posted = false;
+
+  if (WhichService < ARRAY_SIZE(EventQueues))
   {
-    Ready |= BitNum2SetMask[WhichService]; // show queue as non-empty
-    return true;
+    // Enqueue and Ready |= must be one critical region: Ready |= is a
+    // read-modify-write shared with ES_Run and with posts from ISRs at other
+    // priorities, and a lost bit leaves an event stranded in its queue.
+    // (ES_EnQueueFIFO's own critical region nests safely inside this one.)
+    EnterCritical();
+    Posted = ES_EnQueueFIFO(EventQueues[WhichService].pMem, TheEvent);
+    if (Posted)
+    {
+      Ready |= BitNum2SetMask[WhichService]; // show queue as non-empty
+    }
+    ExitCritical();
   }
-  else
-  {
-    return false;
-  }
+  return Posted;
 }
 
 /****************************************************************************
@@ -430,17 +454,20 @@ bool ES_PostToService(uint8_t WhichService, ES_Event_t TheEvent)
 ****************************************************************************/
 bool ES_PostToServiceLIFO(uint8_t WhichService, ES_Event_t TheEvent)
 {
-  if ((WhichService < ARRAY_SIZE(EventQueues)) &&
-      (ES_EnQueueLIFO(EventQueues[WhichService].pMem, TheEvent) ==
-        true))
+  bool Posted = false;
+
+  if (WhichService < ARRAY_SIZE(EventQueues))
   {
-    Ready |= BitNum2SetMask[WhichService]; // show queue as non-empty
-    return true;
+    // enqueue + Ready update as one critical region (see ES_PostToService)
+    EnterCritical();
+    Posted = ES_EnQueueLIFO(EventQueues[WhichService].pMem, TheEvent);
+    if (Posted)
+    {
+      Ready |= BitNum2SetMask[WhichService]; // show queue as non-empty
+    }
+    ExitCritical();
   }
-  else
-  {
-    return false;
-  }
+  return Posted;
 }
 
 //*********************************

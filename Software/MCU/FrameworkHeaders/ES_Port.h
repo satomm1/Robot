@@ -72,12 +72,30 @@ extern  uint8_t _INTCON_temp;
 // in the MIPS architecture, interrupts are not disabled on entry to an ISR
 // the interrupt controller simply prevents interrupts from lower or the
 // same priority. As a result, we can create a critical region by simply
-// disabling interrupts. 
-// NOTE: This means that critical regions can not be nested
-// I don't think that this should be a serious limitation for the framework
+// disabling interrupts.
+//
+// EnterCritical saves the current interrupt state (IE + IPL) and disables
+// interrupts; ExitCritical restores exactly that state rather than blindly
+// re-enabling. This makes critical regions nestable and safe to use from
+// code that already has interrupts disabled (e.g. a post made inside another
+// critical region). The previous unconditional enable would re-enable
+// interrupts in the middle of an outer critical region.
+//
+// Usage rules (the state lives in a local variable declared by the macro):
+//  - at most one EnterCritical() per block scope,
+//  - always pair it with ExitCritical() in the same scope,
+//  - use it as a statement inside braces, never as the body of an
+//    unbraced if/else/loop.
+// The empty asm with a "memory" clobber is a compiler barrier so shared
+// variables are not cached in registers across the region boundary.
 #ifdef POST_FROM_INTS
-#define EnterCritical()__builtin_disable_interrupts()
-#define ExitCritical() __builtin_enable_interrupts()
+#define EnterCritical()                                         \
+  uint32_t _es_isr_state = __builtin_get_isr_state();           \
+  __builtin_disable_interrupts();                               \
+  __asm__ volatile ("" ::: "memory")
+#define ExitCritical()                                          \
+  __asm__ volatile ("" ::: "memory");                           \
+  __builtin_set_isr_state(_es_isr_state)
 #else
 #define EnterCritical()
 #define ExitCritical()

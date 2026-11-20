@@ -49,5 +49,13 @@ uint8_t ReadIMU8(uint8_t Address);
 uint16_t ReadIMU16(uint8_t Address);
 void GetAngles(float* roll, float* pitch);
 bool GetRobotYawRate(float *rad_per_s);
+void ImuPrintDiagnostics(void);
+
+/* Set to 0 to compile out IMU fault-injection test hooks */
+#define IMU_TEST_HOOKS 1
+#if IMU_TEST_HOOKS
+void ImuTestInjectBadFrames(uint8_t n);
+void ImuTestInjectSoftReset(void);
+#endif
 #endif /* ImuFSM_H */
 

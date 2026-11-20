@@ -35,10 +35,49 @@
 #define BMI323_CHIP_ID_VAL      0x43u
 #define BMI323_CMD_SOFT_RESET   0xDEAFu
 
-/* Burst read: cmd echo + SPI dummy + 6 x int16 (3 accel + 3 gyro) */
-#define IMU_BURST_RX_BYTES      14u
-#define IMU_BURST_DATA_OFFSET   2u      /* First data byte index in rx_data[] */
-#define IMU_BURST_DATA_BYTES    12u     /* Clocks after address + dummy */
+/* STATUS register bits (datasheet 6.1, all clear-on-read) */
+#define IMU_STATUS_POR_DETECTED 0x0001u /* chip was power-cycled or reset */
+#define IMU_STATUS_DRDY_GYR     0x0040u
+#define IMU_STATUS_DRDY_ACC     0x0080u
+
+/* Value reported by the BMI323 for an axis whose data is invalid
+ * (sensor disabled, no sample yet, or just after reset). */
+#define IMU_INVALID_SAMPLE      ((int16_t)0x8000)
+
+/* Burst read starting at STATUS (0x02):
+ *   [0] cmd echo, [1] SPI dummy, [2..3] STATUS, [4..15] 6 x int16
+ *   (accel X/Y/Z then gyro X/Y/Z, little-endian). */
+#define IMU_BURST_START_REG     IMU_REG_STATUS
+#define IMU_BURST_RX_BYTES      16u
+#define IMU_BURST_STATUS_OFFSET 2u      /* STATUS LSB index in rx_data[] */
+#define IMU_BURST_DATA_OFFSET   4u      /* First data byte index in rx_data[] */
+
+/* Fault handling: a single bad frame is dropped; this many consecutive bad
+ * frames (~100 ms at 100 Hz) triggers a full re-init. */
+#define IMU_BAD_FRAME_LIMIT     10u
+
+/* EventParam of EV_IMU_RECOVERY: why recovery was requested */
+#define IMU_FAULT_BAD_FRAMES    1u
+#define IMU_FAULT_POR           2u
+
+/* Retry delay after init/recovery gives up; doubles each time up to the cap.
+ * The state machine never stops retrying. */
+#define IMU_BACKOFF_MIN_MS      1000u
+#define IMU_BACKOFF_MAX_MS      8000u
+
+/* IMU_TEST_HOOKS (IMU_SM.h) enables fault injection for bench testing. */
+#if IMU_TEST_HOOKS
+static volatile uint8_t ImuInjectBadFrames = 0;   /* corrupt the next N frames */
+static volatile bool ImuInjectSoftReset = false;  /* send soft reset on next T6 tick */
+static void ImuSpiSendSoftResetFromIsr(void);
+#endif
+
+/* PIC32MZ enhanced-buffer FIFO is 16 bytes deep in 8-bit mode; the whole
+ * burst is loaded in one shot in ImuSpiStartSampleBurst, so it must fit. */
+#define IMU_SPI_FIFO_DEPTH      16u
+#if (IMU_BURST_RX_BYTES > IMU_SPI_FIFO_DEPTH)
+#error "IMU burst no longer fits in the SPI FIFO; ImuSpiStartSampleBurst must be reworked"
+#endif
 
 /* ES_Timer delays (ms) */
 #define IMU_RESET_DELAY_MS      500u
@@ -76,14 +115,15 @@ void WriteIMU2Transfer(uint8_t Address, AccelGyroData_t data1, AccelGyroData_t d
 void PrintImuData(void);
 void MahonyUpdate(float ax, float ay, float az, float gx, float gy, float gz, float dt);
 static void ImuSpiFlushRx(void);
-static void ImuSpiPushTxByte(uint8_t byte);
 static void ImuSpiStartSampleBurst(void);
-static void ImuSpiParseBurstFrame(void);
 static void ImuStopSampling(void);
 static void ImuBusRecover(void);
 static void ImuMahonyReset(void);
-static void ImuRequestRecovery(void);
-static void ImuEnterRecovery(void);
+static void ImuRequestRecovery(uint8_t reason);
+static void ImuNoteBadFrame(volatile uint16_t *counter);
+static void ImuProcessBurstFrame(void);
+static void ImuEnterRecovery(uint8_t reason);
+static void ImuStartRetry(void);
 static void ImuPostLed(ES_EventType_t event_type, uint8_t led);
 static void ImuEnterInitFailed(void);
 static float RawAccelToMps2(int16_t raw);
@@ -108,6 +148,16 @@ static uint8_t ImuInitAttempts = 0;
 static uint8_t ImuRecoveryAttempts = 0;
 static uint8_t ImuTransferStaleTicks = 0;
 static uint8_t rx_data[IMU_BURST_RX_BYTES];
+
+/* Fault bookkeeping (written from IPL5 ISRs, read by RunImuSM) */
+static volatile uint8_t ImuConsecutiveBadFrames = 0;
+static volatile uint16_t ImuBadInvalidCount = 0;   /* an axis read 0x8000 */
+static volatile uint16_t ImuBadNoDrdyCount = 0;    /* no new sample since last read */
+static volatile uint16_t ImuBadOverflowCount = 0;  /* SPI RX overflow */
+static volatile uint16_t ImuBadStaleCount = 0;     /* transfer never completed */
+static volatile uint16_t ImuPorCount = 0;          /* chip reset detected */
+static uint16_t ImuRetryDelayMs = IMU_BACKOFF_MIN_MS;
+static bool ImuFaultLedOn = false;
 
 #if PCB_REV == 1
 static volatile __SPI4CONbits_t * pSPICON;
@@ -214,8 +264,10 @@ bool InitImuSM(uint8_t Priority)
   pSPICON->DISSDO = 0; // SDO1 is used by the module
   pSPICON->MODE32 = 0; // 8 bit mode
   pSPICON->MODE16 = 0; // 8 bit mode
-  pSPICON->SMP = 1; // Data sampled at middle of data output time
-  pSPICON->CKE = 0; // Serial output data changes on transition from active clock state to idle clock state
+  // SPI mode 3 (CPOL=1, CPHA=1). BMI323 drives SDO on the falling edge of SCK
+  // and expects capture on the rising edge (datasheet 7.2.3).
+  pSPICON->SMP = 0; // Input sampled at middle of data output time (rising edge). SMP=1 would sample at the falling edge, racing the BMI323's SDO change
+  pSPICON->CKE = 0; // Serial output data changes on transition from idle clock state to active clock state (falling edge)
   pSPICON->CKP = 1; // Idle state for the clock is high level
   pSPICON->MSTEN = 1; // Host mode
   pSPICON->DISSDI = 0; // The SDI pin is controlled by the module
@@ -358,8 +410,9 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
                 if (ImuInitAttempts < IMU_INIT_MAX_ATTEMPTS) {
                     ES_Timer_InitTimer(IMU_TIMER, IMU_RESET_DELAY_MS);
                 } else {
-                    DB_printf("IMU init failed after %u attempts; giving up\r\n",
-                              (unsigned)IMU_INIT_MAX_ATTEMPTS);
+                    DB_printf("IMU init failed after %u attempts; retrying in %u ms\r\n",
+                              (unsigned)IMU_INIT_MAX_ATTEMPTS,
+                              (unsigned)ImuRetryDelayMs);
                     ImuEnterInitFailed();
                 }
             }
@@ -374,8 +427,14 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
     break;
 
     case IMUInitFailed:
-      /* No further init attempts — avoids blocking SPI in RunImuSM */
-      break;
+    {
+      /* Fault/backoff state: wait ImuRetryDelayMs, then start a fresh
+       * recovery cycle. Never terminal. */
+      if (ThisEvent.EventType == ES_TIMEOUT) {
+          ImuStartRetry();
+      }
+    }
+    break;
     
     case IMUWait:
     {
@@ -390,10 +449,20 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
                 IEC3SET = _IEC3_SPI1RXIE_MASK;
             }
             CurrentState = IMURun;
+            ImuConsecutiveBadFrames = 0;
             ImuAllowRecovery = 1;
             ImuRecoveryPosted = false;
             ImuTransferStaleTicks = 0;
+            ImuRetryDelayMs = IMU_BACKOFF_MIN_MS;
+            if (ImuFaultLedOn) {
+                ImuPostLed(EV_LED_OFF, IMU_FAULT_LED);
+                ImuFaultLedOn = false;
+            }
         }
+        break;
+
+        default:
+          ;
       }
     }
     break;
@@ -415,8 +484,9 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
                     ResetIMU();
                     ES_Timer_InitTimer(IMU_TIMER, IMU_RESET_DELAY_MS);
                 } else {
-                    DB_printf("IMU recovery failed after %u attempts\r\n",
-                              (unsigned)IMU_RECOVERY_MAX_ATTEMPTS);
+                    DB_printf("IMU recovery failed after %u attempts; retrying in %u ms\r\n",
+                              (unsigned)IMU_RECOVERY_MAX_ATTEMPTS,
+                              (unsigned)ImuRetryDelayMs);
                     ImuEnterInitFailed();
                 }
             }
@@ -436,7 +506,7 @@ ES_Event_t RunImuSM(ES_Event_t ThisEvent)
         case EV_IMU_RECOVERY:
         {
             ImuRecoveryPosted = false;
-            ImuEnterRecovery();
+            ImuEnterRecovery((uint8_t)ThisEvent.EventParam);
         }
         break;
 
@@ -624,6 +694,10 @@ bool InitIMU(void)
     }
     DB_printf("IMU Chip Verified: %d\r\n", chip_id);
 
+    /* Reading STATUS is required here, not just informational: it clears the
+     * clear-on-read por_detected flag set by the soft reset. Every sample
+     * burst reads STATUS and treats por_detected as "chip reset, re-init",
+     * so skipping this read would cause an endless recovery loop. */
     uint16_t data = ReadIMU16(IMU_REG_STATUS);
     DB_printf("IMU Status: %d\r\n", data);
                   
@@ -821,40 +895,88 @@ static void ImuSpiFlushRx(void)
 }
 
 /**
- * ImuSpiPushTxByte
+ * ImuProcessBurstFrame
  *
- * Writes one byte to the SPI TX buffer, blocking until SPITBF is clear.
- * Required with ENHBUF enabled so bytes are not dropped when the TX FIFO fills.
+ * Validates a complete IMU_BURST_RX_BYTES frame in rx_data[] and, only if it
+ * is good, publishes it to Accel[]/Gyro[] and runs the Mahony update.
+ * Called from the SPI RX ISR.
+ *
+ *  - STATUS.por_detected set: the BMI323 reset itself (e.g. brownout) and is
+ *    back to defaults with sensors disabled -> request recovery immediately.
+ *  - Neither drdy bit set: no new sample since the last read (sensor stalled);
+ *    the data would be a repeat, so drop it.
+ *  - Any axis == 0x8000: the chip's "invalid data" marker -> drop the frame.
+ *
+ * Dropped frames leave the last good sample in place and count toward
+ * IMU_BAD_FRAME_LIMIT. Each axis is published with a single 16-bit store so
+ * readers can no longer see half-updated (torn) values.
  */
-static void ImuSpiPushTxByte(uint8_t byte)
+static void ImuProcessBurstFrame(void)
 {
-    while (pSPISTAT->SPITBF) {
-        ;
+    int16_t raw[6];
+    uint16_t status;
+    uint8_t i;
+
+#if IMU_TEST_HOOKS
+    if (ImuInjectBadFrames > 0u) {
+        /* Simulate the chip's invalid-data marker on accel X */
+        ImuInjectBadFrames -= 1;
+        rx_data[IMU_BURST_DATA_OFFSET] = 0x00u;
+        rx_data[IMU_BURST_DATA_OFFSET + 1u] = 0x80u;
     }
-    *pSPIBUF = byte;
+#endif
+
+    status = (uint16_t)rx_data[IMU_BURST_STATUS_OFFSET] |
+             ((uint16_t)rx_data[IMU_BURST_STATUS_OFFSET + 1] << 8);
+
+    if (status & IMU_STATUS_POR_DETECTED) {
+        ImuPorCount += 1;
+        ImuRequestRecovery(IMU_FAULT_POR);
+        return;
+    }
+
+    if ((status & (IMU_STATUS_DRDY_ACC | IMU_STATUS_DRDY_GYR)) == 0u) {
+        ImuNoteBadFrame(&ImuBadNoDrdyCount);
+        return;
+    }
+
+    for (i = 0; i < 6u; i++) {
+        raw[i] = (int16_t)((uint16_t)rx_data[IMU_BURST_DATA_OFFSET + 2u * i] |
+                           ((uint16_t)rx_data[IMU_BURST_DATA_OFFSET + 2u * i + 1u] << 8));
+        if (raw[i] == IMU_INVALID_SAMPLE) {
+            ImuNoteBadFrame(&ImuBadInvalidCount);
+            return;
+        }
+    }
+
+    /* Good frame */
+    ImuConsecutiveBadFrames = 0;
+    for (i = 0; i < 3u; i++) {
+        Accel[i].FullData = (uint16_t)raw[i];
+        Gyro[i].FullData = (uint16_t)raw[i + 3u];
+    }
+
+    MahonyUpdate(RawAccelToMps2(raw[0]), RawAccelToMps2(raw[1]),
+                 RawAccelToMps2(raw[2]), RawGyroToDegPerS(raw[3]),
+                 RawGyroToDegPerS(raw[4]), RawGyroToDegPerS(raw[5]), DT);
 }
 
 /**
- * ImuSpiParseBurstFrame
+ * ImuNoteBadFrame
  *
- * Copies the latest IMU_BURST_RX_BYTES RX buffer into Accel[] and Gyro[].
- * Skips the first two bytes (command echo and SPI dummy); bytes 2..13 are
- * six little-endian int16 values: accel X/Y/Z then gyro X/Y/Z.
+ * Records one dropped frame (bumps the per-cause counter and the consecutive
+ * counter). Requests recovery only after IMU_BAD_FRAME_LIMIT bad frames in a
+ * row, so a single glitch no longer resets the chip. ISR context.
  */
-static void ImuSpiParseBurstFrame(void)
+static void ImuNoteBadFrame(volatile uint16_t *counter)
 {
-    Accel[0].DataStruct.LowerByte = rx_data[IMU_BURST_DATA_OFFSET + 0];
-    Accel[0].DataStruct.UpperByte = rx_data[IMU_BURST_DATA_OFFSET + 1];
-    Accel[1].DataStruct.LowerByte = rx_data[IMU_BURST_DATA_OFFSET + 2];
-    Accel[1].DataStruct.UpperByte = rx_data[IMU_BURST_DATA_OFFSET + 3];
-    Accel[2].DataStruct.LowerByte = rx_data[IMU_BURST_DATA_OFFSET + 4];
-    Accel[2].DataStruct.UpperByte = rx_data[IMU_BURST_DATA_OFFSET + 5];
-    Gyro[0].DataStruct.LowerByte = rx_data[IMU_BURST_DATA_OFFSET + 6];
-    Gyro[0].DataStruct.UpperByte = rx_data[IMU_BURST_DATA_OFFSET + 7];
-    Gyro[1].DataStruct.LowerByte = rx_data[IMU_BURST_DATA_OFFSET + 8];
-    Gyro[1].DataStruct.UpperByte = rx_data[IMU_BURST_DATA_OFFSET + 9];
-    Gyro[2].DataStruct.LowerByte = rx_data[IMU_BURST_DATA_OFFSET + 10];
-    Gyro[2].DataStruct.UpperByte = rx_data[IMU_BURST_DATA_OFFSET + 11];
+    *counter += 1;
+    if (ImuConsecutiveBadFrames < 255u) {
+        ImuConsecutiveBadFrames += 1;
+    }
+    if (ImuConsecutiveBadFrames >= IMU_BAD_FRAME_LIMIT) {
+        ImuRequestRecovery(IMU_FAULT_BAD_FRAMES);
+    }
 }
 
 /**
@@ -922,8 +1044,12 @@ static void ImuMahonyReset(void)
  * Posts EV_IMU_RECOVERY to this state machine (safe to call from ISR). Only
  * acts while ImuAllowRecovery is set (IMURun) and coalesces duplicate requests
  * via ImuRecoveryPosted so RunImuSM performs blocking re-init, not the ISR.
+ * If the post fails (queue full) the flag is cleared so the next bad frame
+ * retries, instead of suppressing recovery forever.
+ *
+ * @param reason - IMU_FAULT_* code, delivered as EventParam
  */
-static void ImuRequestRecovery(void)
+static void ImuRequestRecovery(uint8_t reason)
 {
     ES_Event_t ev;
 
@@ -932,8 +1058,10 @@ static void ImuRequestRecovery(void)
     }
     ImuRecoveryPosted = true;
     ev.EventType = EV_IMU_RECOVERY;
-    ev.EventParam = 0;
-    (void)PostImuSM(ev);
+    ev.EventParam = reason;
+    if (!PostImuSM(ev)) {
+        ImuRecoveryPosted = false;
+    }
 }
 
 /**
@@ -942,14 +1070,25 @@ static void ImuRequestRecovery(void)
  * Full runtime recovery entry: stop sampling, reset the filter, bus recover,
  * soft-reset the BMI323, then enter IMURecovering and wait for InitIMU on
  * ES_TIMEOUT (same post-reset path as boot).
+ *
+ * @param reason - IMU_FAULT_* code from the EV_IMU_RECOVERY event
  */
-static void ImuEnterRecovery(void)
+static void ImuEnterRecovery(uint8_t reason)
 {
     if (CurrentState != IMURun) {
         return;
     }
-    DB_printf("IMU recovery started\r\n");
     ImuStopSampling();
+#if IMU_TEST_HOOKS
+    ImuInjectBadFrames = 0;  /* don't carry test corruption past a recovery */
+#endif
+    DB_printf("IMU recovery started: %s\r\n",
+              (reason == IMU_FAULT_POR) ? "chip reset detected"
+                                        : "too many bad frames");
+    DB_printf("  bad frames: invalid=%u nodrdy=%u ovf=%u stale=%u por=%u\r\n",
+              (unsigned)ImuBadInvalidCount, (unsigned)ImuBadNoDrdyCount,
+              (unsigned)ImuBadOverflowCount, (unsigned)ImuBadStaleCount,
+              (unsigned)ImuPorCount);
     ImuMahonyReset();
     ImuRecoveryAttempts = 0;
     CurrentState = IMURecovering;
@@ -975,38 +1114,77 @@ static void ImuPostLed(ES_EventType_t event_type, uint8_t led)
 /**
  * ImuEnterInitFailed
  *
- * Terminal fault state after boot init or mid-run recovery is exhausted.
- * Stops sampling, turns off IMU_RUN_LED, and turns on IMU_FAULT_LED.
+ * Fault/backoff state after boot init or mid-run recovery is exhausted.
+ * Stops sampling, turns on IMU_FAULT_LED, and arms a retry after
+ * ImuRetryDelayMs (doubling each time, capped at IMU_BACKOFF_MAX_MS). The
+ * LED is turned off and the delay reset once IMURun is reached again.
  */
 static void ImuEnterInitFailed(void)
 {
     ImuStopSampling();
     CurrentState = IMUInitFailed;
-    ImuPostLed(EV_LED_ON, IMU_FAULT_LED);
+    if (!ImuFaultLedOn) {
+        ImuPostLed(EV_LED_ON, IMU_FAULT_LED);
+        ImuFaultLedOn = true;
+    }
+    ES_Timer_InitTimer(IMU_TIMER, ImuRetryDelayMs);
+    if (ImuRetryDelayMs < IMU_BACKOFF_MAX_MS) {
+        ImuRetryDelayMs = (uint16_t)(ImuRetryDelayMs * 2u);
+        if (ImuRetryDelayMs > IMU_BACKOFF_MAX_MS) {
+            ImuRetryDelayMs = IMU_BACKOFF_MAX_MS;
+        }
+    }
+}
+
+/**
+ * ImuStartRetry
+ *
+ * Leaves the IMUInitFailed backoff state: resynchronizes the SPI peripheral,
+ * soft-resets the BMI323 and enters IMURecovering with a fresh attempt
+ * budget. IMURecovering then runs InitIMU after IMU_RESET_DELAY_MS.
+ */
+static void ImuStartRetry(void)
+{
+    DB_printf("IMU retrying init\r\n");
+    ImuRecoveryAttempts = 0;
+    CurrentState = IMURecovering;
+    ImuBusRecover();
+    ResetIMU();
+    ES_Timer_InitTimer(IMU_TIMER, IMU_RESET_DELAY_MS);
 }
 
 /**
  * ImuSpiStartSampleBurst
  *
- * Starts a 14-byte SPI read from DATA_0 (0x03): read address, dummy byte,
- * then 12 clocks to burst accel and gyro data. RX ISR assembles the response
+ * Starts a 16-byte SPI read from STATUS (0x02): read address, dummy byte,
+ * then 14 clocks for STATUS + accel + gyro. RX ISR assembles the response
  * and clears SpiTransferBusy when IMU_BURST_RX_BYTES have been received.
  * Invoked from the T6 timer ISR at ~100 Hz during IMURun.
  */
 static void ImuSpiStartSampleBurst(void)
 {
     uint8_t i;
+    unsigned int isr_state;
 
     ImuSpiFlushRx();
     SpiTransferBusy = true;
     ImuTransferStaleTicks = 0;
     ImuSpiRxCount = 0;
 
-    ImuSpiPushTxByte(IMU_SPI_READ_FLAG | IMU_REG_DATA_0);
-    ImuSpiPushTxByte(0x00u);
-    for (i = 0; i < IMU_BURST_DATA_BYTES; i++) {
-        ImuSpiPushTxByte(0x00u);
+    /* Load the whole frame into the TX FIFO with interrupts masked. With
+     * MSSEN=1 the hardware releases SS as soon as the TX FIFO and shift
+     * register run dry; if a higher-priority ISR (motor/Jetson, IPL6/7)
+     * preempted us between pushes, SS could rise mid-frame and the BMI323
+     * would treat the remaining bytes as a new (write) transaction.
+     * The caller has verified SPIBUSY == 0, so the FIFO is empty and the
+     * full frame fits without waiting on SPITBF (no spin in the ISR). */
+    isr_state = __builtin_get_isr_state();
+    __builtin_disable_interrupts();
+    *pSPIBUF = IMU_SPI_READ_FLAG | IMU_BURST_START_REG;
+    for (i = 1; i < IMU_BURST_RX_BYTES; i++) {
+        *pSPIBUF = 0x00u; /* SPI dummy byte, then clocks for STATUS + data */
     }
+    __builtin_set_isr_state(isr_state);
 }
 
 static float RawAccelToMps2(int16_t raw)
@@ -1140,26 +1318,28 @@ void MahonyUpdate(float ax, float ay, float az, float gx, float gy, float gz, fl
 
 void __ISR(IMU_SPI_RX_ISR_VECTOR, IPL5SRS) ImuSpiRxIsr(void)
 {
-    static float imu_data[6];
-
     if (pSPISTAT->SPIROV) {
         ImuSpiFlushRx();
         SpiTransferBusy = false;
-        ImuRequestRecovery();
+        ImuNoteBadFrame(&ImuBadOverflowCount);
         ImuSpiClearRxIf();
         return;
     }
 
     while (pSPISTAT->SPIRBE == 0) {
-        rx_data[ImuSpiRxCount] = (uint8_t)*pSPIBUF;
+        uint8_t byte = (uint8_t)*pSPIBUF;
+
+        if (!SpiTransferBusy) {
+            /* Stray byte with no burst in flight: discard it rather than
+             * letting it shift the alignment of the next frame. */
+            continue;
+        }
+        rx_data[ImuSpiRxCount] = byte;
         ImuSpiRxCount += 1;
         if (ImuSpiRxCount >= IMU_BURST_RX_BYTES) {
             ImuSpiRxCount = 0;
-            ImuSpiParseBurstFrame();
-            GetIMUData(imu_data);
-            MahonyUpdate(imu_data[0], imu_data[1], imu_data[2], imu_data[3],
-                         imu_data[4], imu_data[5], DT);
             SpiTransferBusy = false;
+            ImuProcessBurstFrame();
         }
     }
     ImuSpiClearRxIf();
@@ -1177,7 +1357,7 @@ void __ISR(_TIMER_6_VECTOR, IPL5SRS) T6Handler(void)
     if (pSPISTAT->SPIROV) {
         ImuSpiFlushRx();
         SpiTransferBusy = false;
-        ImuRequestRecovery();
+        ImuNoteBadFrame(&ImuBadOverflowCount);
         return;
     }
 
@@ -1188,12 +1368,113 @@ void __ISR(_TIMER_6_VECTOR, IPL5SRS) T6Handler(void)
                 ImuTransferStaleTicks = 0;
                 SpiTransferBusy = false;
                 ImuSpiFlushRx();
-                ImuRequestRecovery();
+                ImuNoteBadFrame(&ImuBadStaleCount);
             }
         }
         return;
     }
 
     ImuTransferStaleTicks = 0;
+#if IMU_TEST_HOOKS
+    if (ImuInjectSoftReset) {
+        ImuInjectSoftReset = false;
+        ImuSpiSendSoftResetFromIsr();
+        return;
+    }
+#endif
     ImuSpiStartSampleBurst();
 }
+
+/****************************************************************************
+ Diagnostics / test hooks (called from main-line code, e.g. UsbService)
+ ****************************************************************************/
+
+/**
+ * ImuPrintDiagnostics
+ *
+ * Prints state, fault counters and the latest published sample. Counters
+ * accumulate since boot (they are not cleared by recovery).
+ */
+void ImuPrintDiagnostics(void)
+{
+    static const char * const StateNames[] = {
+        "InitPState", "Reset", "Wait", "Run", "Recovering", "InitFailed(backoff)"
+    };
+    float roll;
+    float pitch;
+    ImuState_t state = CurrentState;
+
+    DB_printf("IMU state: %s\r\n",
+              (state <= IMUInitFailed) ? StateNames[state] : "?");
+    DB_printf("  consecutive bad: %u, next retry delay: %u ms, fault LED: %u\r\n",
+              (unsigned)ImuConsecutiveBadFrames, (unsigned)ImuRetryDelayMs,
+              (unsigned)ImuFaultLedOn);
+    DB_printf("  bad frames: invalid=%u nodrdy=%u ovf=%u stale=%u por=%u\r\n",
+              (unsigned)ImuBadInvalidCount, (unsigned)ImuBadNoDrdyCount,
+              (unsigned)ImuBadOverflowCount, (unsigned)ImuBadStaleCount,
+              (unsigned)ImuPorCount);
+    /* accel in cm/s^2, gyro in 0.1 deg/s (DB_printf has no float support) */
+    DB_printf("  accel cm/s^2: %d %d %d\r\n",
+              (int)(100.0f * RawAccelToMps2((int16_t)Accel[0].FullData)),
+              (int)(100.0f * RawAccelToMps2((int16_t)Accel[1].FullData)),
+              (int)(100.0f * RawAccelToMps2((int16_t)Accel[2].FullData)));
+    DB_printf("  gyro 0.1dps:  %d %d %d\r\n",
+              (int)(10.0f * RawGyroToDegPerS((int16_t)Gyro[0].FullData)),
+              (int)(10.0f * RawGyroToDegPerS((int16_t)Gyro[1].FullData)),
+              (int)(10.0f * RawGyroToDegPerS((int16_t)Gyro[2].FullData)));
+    GetAngles(&roll, &pitch);
+    DB_printf("  roll, pitch deg: %d, %d\r\n", (int)roll, (int)pitch);
+}
+
+#if IMU_TEST_HOOKS
+/**
+ * ImuTestInjectBadFrames
+ *
+ * Marks the next n received frames as invalid (accel X = 0x8000), which
+ * exercises the real validation path. n < IMU_BAD_FRAME_LIMIT should be
+ * absorbed silently; n >= IMU_BAD_FRAME_LIMIT should trigger one recovery.
+ */
+void ImuTestInjectBadFrames(uint8_t n)
+{
+    ImuInjectBadFrames = n;
+    DB_printf("IMU test: corrupting next %u frames (limit %u)\r\n",
+              (unsigned)n, (unsigned)IMU_BAD_FRAME_LIMIT);
+}
+
+/**
+ * ImuTestInjectSoftReset
+ *
+ * On the next T6 tick, sends a soft-reset command to the BMI323 instead of a
+ * sample burst. This simulates the chip resetting by itself (e.g. brownout)
+ * and should be detected via STATUS.por_detected or as bad frames, then
+ * recovered.
+ */
+void ImuTestInjectSoftReset(void)
+{
+    if (CurrentState != IMURun) {
+        DB_printf("IMU test: not in Run state, ignoring\r\n");
+        return;
+    }
+    ImuInjectSoftReset = true;
+    DB_printf("IMU test: soft-resetting BMI323 behind the driver's back\r\n");
+}
+
+/**
+ * ImuSpiSendSoftResetFromIsr
+ *
+ * T6 ISR helper: writes CMD (0x7E) = 0xDEAF as a 3-byte frame. SpiTransferBusy
+ * stays false, so the RX ISR discards the echoed bytes.
+ */
+static void ImuSpiSendSoftResetFromIsr(void)
+{
+    unsigned int isr_state;
+
+    ImuSpiFlushRx();
+    isr_state = __builtin_get_isr_state();
+    __builtin_disable_interrupts();
+    *pSPIBUF = IMU_REG_CMD;                              /* write, address 0x7E */
+    *pSPIBUF = (uint8_t)(BMI323_CMD_SOFT_RESET & 0xFFu); /* LSB first */
+    *pSPIBUF = (uint8_t)(BMI323_CMD_SOFT_RESET >> 8);
+    __builtin_set_isr_state(isr_state);
+}
+#endif
